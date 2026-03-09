@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Form from './components/Form'
 import Data from './components/Data'
 import Juros from './components/Juros'
+import Footer from './components/Footer'
 
 function App() {
   return (
@@ -17,12 +18,13 @@ function App() {
         </p>
       </div>
 
-      <div className="flex flex-col justify-center items-center mt-10 gap-4">
+      <div className="flex-1 flex-col justify-center items-center mt-10 gap-4">
         <Form />
         <Data />
         <Juros />
         <Calcular />
       </div>
+      <Footer />
 
     </div>
   )
