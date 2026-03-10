@@ -1,14 +1,11 @@
 import './App.css'
-import Calcular from './components/Calcular'
 import Header from './components/Header'
-import Form from './components/Form'
-import Data from './components/Data'
-import Juros from './components/Juros'
+import CentralCard from './components/CentralCard'
 import Footer from './components/Footer'
 
 function App() {
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen w-full">
+    <div className="flex flex-col bg-gray-100 min-h-screen w-full">
 
       <Header />
 
@@ -18,11 +15,8 @@ function App() {
         </p>
       </div>
 
-      <div className="flex-1 flex-col justify-center items-center mt-10 gap-4">
-        <Form />
-        <Data />
-        <Juros />
-        <Calcular />
+      <div className="flex-1 flex-col mt-10 gap-4">
+        <CentralCard />
       </div>
       <Footer />
 
