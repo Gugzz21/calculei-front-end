@@ -3,10 +3,12 @@ import Header from './components/Header'
 import CentralCard from './components/CentralCard'
 import Footer from './components/Footer'
 import Juros from './components/Juros'
+import Calcular from './components/Calcular'
+import Limpar from './components/Limpar'  
 
 function App() {
   return (
-    <div className="flex flex-col bg-gray-200 min-h-screen w-full">
+    <div className="flex flex-col bg-gray-100 min-h-screen w-full">
 
       <Header />
 
@@ -18,8 +20,11 @@ function App() {
 
       <div className="flex-1 flex-col gap-4">
         <CentralCard />
-        
         <Juros />
+        <div className="flex flex-row gap-6">
+          <Calcular />
+          <Limpar />
+        </div>
       </div>
 
       <Footer />
