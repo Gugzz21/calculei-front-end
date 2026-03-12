@@ -11,9 +11,9 @@ function TipoCalculo() {
                 value={selecionado}
                 onChange={(e) => setSelecionado(e.target.value)}
             >
-                <option value="cdparticular">Créditos / Débitos Entre Particulares</option> 
+                <option value="cdparticular">Créditos / Débitos Entre Particulares</option>
 
-                <option value="cfazenda">Créditos da Fazenda Pública</option> 
+                <option value="cfazenda">Créditos da Fazenda Pública</option>
 
                 <option value="dfazendatributario">Débitos da Fazenda Pública - Tributários</option>
 
