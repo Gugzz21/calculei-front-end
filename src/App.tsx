@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import Juros from './components/Juros'
 import Calcular from './components/Calcular'
 import Limpar from './components/Limpar'  
+import Lancamentos from './components/Lancamentos'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Calcular />
           <Limpar />
         </div>
+        <Lancamentos />
       </div>
 
       <Footer />
