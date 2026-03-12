@@ -5,7 +5,7 @@ import Footer from './components/Footer'
 
 function App() {
   return (
-    <div className="flex flex-col bg-gray-100 min-h-screen w-full">
+    <div className="flex flex-col bg-gray-200 min-h-screen w-full">
 
       <Header />
 
@@ -15,7 +15,7 @@ function App() {
         </p>
       </div>
 
-      <div className="flex-1 flex-col mt-10 gap-4">
+      <div className="flex-1 flex-col gap-4">
         <CentralCard />
       </div>
       <Footer />

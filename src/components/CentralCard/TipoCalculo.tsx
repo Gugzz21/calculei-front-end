@@ -1,32 +1,24 @@
 import { useState } from "react"
 
 function TipoCalculo() {
-    const [selecionado, setSelecionado] = useState("tributario")
+    const [selecionado, setSelecionado] = useState("dfazendanaotributario")
 
     return (
-        <div className="flex flex-col">
-            <strong className="text-[14px]">Tipo de Cálculo</strong>
+        <div className="flex flex-col gap-1">
+            <strong className="text-[13px] text-gray-700 font-semibold">Tipo de Cálculo</strong>
             <select
-                className="bg-white border-black border-[1px]  h-[60px] flex justify-center items-center rounded-[5  px]"
+                className="bg-white border border-blue-400 h-[45px] w-full px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
                 value={selecionado}
                 onChange={(e) => setSelecionado(e.target.value)}
             >
                 <option value="cdparticular">Créditos / Débitos Entre Particulares</option>
-
                 <option value="cfazenda">Créditos da Fazenda Pública</option>
-
                 <option value="dfazendatributario">Débitos da Fazenda Pública - Tributários</option>
-
                 <option value="dfazendanaotributario">Débitos da Fazenda Pública - Não Tributários</option>
-
                 <option value="previdenciario">Débitos Previdenciários</option>
-
                 <option value="precatoriostributario">Precatórios - Tributários</option>
-
                 <option value="precatoriosnaotributario">Precatórios - Não Tributários</option>
-
                 <option value="multadiaria">Multa diária</option>
-
             </select>
         </div>
     )
