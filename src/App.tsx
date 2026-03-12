@@ -2,6 +2,7 @@ import './App.css'
 import Header from './components/Header'
 import CentralCard from './components/CentralCard'
 import Footer from './components/Footer'
+import Juros from './components/Juros'
 
 function App() {
   return (
@@ -17,7 +18,10 @@ function App() {
 
       <div className="flex-1 flex-col gap-4">
         <CentralCard />
+        
+        <Juros />
       </div>
+
       <Footer />
 
     </div>
