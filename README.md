@@ -1,58 +1,77 @@
-# Status do Projeto: Calculei (React Clone)
+# Calculei — Calculadora Jurídica Online
 
-Este documento descreve o que já foi implementado e o que ainda falta para que a interface da aplicação "Calculei" fique idêntica ao modelo de referência (mockup) apresentado.
+O **Calculei** é uma calculadora jurídica virtual desenvolvida para auxiliar advogados, servidores do Judiciário e demais profissionais do Direito na realização de **cálculos de atualização monetária e juros** sobre valores de processos judiciais.
 
-## ✅ O que já foi feito
-
-*   **Estrutura Inicial do Projeto:** Configuração básica com React e TailwindCSS (via Vite/CRA).vos dos componentes criados i
-*   **Componentes Base:** Arquisoladamente (`Header`, `Form`, `Data`, `Juros`, `Calcular`).
-*   **Cabeçalho (Header):**
-    *   Inclusão da logo do "Calculei".
-    *   Link de "Orientações" com o respectivo ícone na direita.
-*   **Aviso Superior:** O texto abaixo do cabeçalho já está presente na tela ("Todos os valores estão em Reais (R$)...").
-*   **Renderização Principal:** O arquivo `App.tsx` já incorpora e chama os componentes (ainda que dispostos de forma vertical simples).
+> ⚠️ A presente calculadora virtual **não substitui** o cálculo realizado e homologado judicialmente. Todos os valores estão em Reais (R$).
 
 ---
 
-## ❌ O que falta fazer (Para ficar visualmente completo)
+## 📌 O que é o Calculei?
 
-Abaixo estão listadas as pendências para que a UI fique como no mockup.
+O Calculei permite calcular, de forma simples e rápida, quanto um valor deve ser **corrigido monetariamente** ao longo do tempo, aplicando índices oficiais utilizados pela Justiça brasileira, como IPCA, SELIC, IGPM, TR, entre outros.
 
-### 1. Layout Base (Grid) e Estilização
-*   O layout atual empilha tudo em uma coluna simples (`flex-col`). Ele precisa ser modificado para dividir a tela em duas colunas na parte de cima:
-    *   **Esquerda:** Formulário Principal.
-    *   **Direita:** Card de Histórico de Cálculos e textos explicativos.
-*   Ajustar margens laterais, fontes padrão e cores secundárias para bater com a identidade visual da imagem.
+É especialmente útil para cálculos envolvendo:
 
-### 2. Formulário Principal
-Os inputs e componentes básicos existem, mas estão incorretos e sem estilização. É preciso criar:
-*   `Select`: **Tipo de cálculo** (ex: "Créditos / Débitos Entre Particulares").
-*   `Select`: **Índice de correção monetária** (ex: "TJ/RJ LEI 6.899/81").
-*   `Input`: **Valor** (formatado como moeda, com prefixo `R$`).
-*   `Input/Datepicker`: **Data inicial** e **Data do cálculo** alinhadas na mesma linha.
-*   `Select`: **Descrição** (ex: "Ressarcimento").
+- Créditos e débitos entre particulares
+- Créditos da Fazenda Pública
+- Débitos Tributários e Não Tributários da Fazenda Pública
+- Débitos Previdenciários
+- Precatórios (Tributários e Não Tributários)
+- Multas diárias
 
-### 3. Coluna da Direita (Contexto Histórico)
-*   **Tabela de Histórico de Cálculos:** Precisa ser desenhada uma pequena tabela com as colunas `#`, `Data Inicial`, `Valor principal`, e `Total devido`.
-*   **Caixa e Textos:** O card branco ao redor dessa tabela.
-*   **Parágrafos Informativos:** Adicionar o texto explicativo sobre Lançamentos de Crédito e o direcionamento para a DIRETRIZ TÉCNICA MPRJ (com estilo de link azul).
+---
 
-### 4. Toggle "Juros"
-*   O componente atual `Juros` possui um campo numérico simples. Ele deve ser atualizado para exibir apenas o label **"Juros"** e um **botão Toggle do tipo on/off** (switch arredondado) ativo ou inativo.
+## ⚙️ Funcionalidades
 
-### 5. Botões de Ação
-*   O componente atual tem apenas um pequeno botão azul.
-*   É necessário criar 2 botões grandes ocupando toda a largura do formulário, dispostos lado a lado:
-    *   **CALCULAR**: Fundo cinza claro (estilo botão desativado/secundário).
-    *   **LIMPAR**: Fundo branco, com borda azul.
+| Funcionalidade | Descrição |
+|---|---|
+| **Tipo de Cálculo** | Selecione a natureza jurídica do crédito ou débito |
+| **Índice de Correção Monetária** | Escolha o índice oficial (IPCA, SELIC, IGPM, TR, CDI, etc.) |
+| **Valor Principal** | Informe o valor em R$ a ser corrigido |
+| **Data Inicial** | Data de início da correção monetária |
+| **Data do Cálculo** | Data de referência para o cálculo (geralmente hoje) |
+| **Descrição** | Classifique o lançamento (Ressarcimento, Multa Civil, etc.) |
+| **Juros** | Toggle para ativar/desativar o cálculo de juros separadamente, com índice e período próprios |
+| **Lançamentos** | Tabela com o histórico de todos os cálculos realizados na sessão |
 
-### 6. Seção Central - Tabela "Lançamentos"
-Totalmente ausente. É necessário criar:
-*   Título **"Lançamentos"** com hierarquia visual clara.
-*   A tabela de lançamentos com fundo azulado contendo as seguintes colunas de cabeçalho: `#`, `Data Inicial`, `Valor principal`, `Data do cálculo`, `Índice de correção monetária`, `Valor atualizado`, `Dias`, `Juros` e `Total devido`.
-*   A linha padrão (default row) da tabela preenchida com zerados (`R$ 0,00`).
-*   O texto informativo da tabela com borda inferior: *"Calcule o primeiro lançamento."*
+---
 
-### 7. Rodapé (Footer)
-*   Ausente no projeto atual.
-*   Incluir logo e título **GATE MPRJ - GRUPO DE APOIO TÉCNICO ESPECIALIZADO**, centralizado no fundo da página.
+## 🏛️ Contexto
+
+O Calculei foi desenvolvido seguindo as diretrizes do **GATE MPRJ — Grupo de Apoio Técnico Especializado** do Ministério Público do Estado do Rio de Janeiro, em conformidade com a **DIRETRIZ TÉCNICA nº 010/2020 - MPRJ 2019.00273069**.
+
+---
+
+## 🚀 Como rodar o projeto
+
+```bash
+# Instale as dependências
+npm install
+
+# Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+O projeto utiliza **React** com **TypeScript** e **TailwindCSS**, criado com **Vite**.
+
+---
+
+## 🗂️ Estrutura de Componentes
+
+```
+src/
+├── components/
+│   ├── Header.tsx               # Cabeçalho com logo e link de Orientações
+│   ├── CentralCard.tsx          # Card principal do formulário
+│   │   ├── TipoCalculo.tsx      # Select do tipo de cálculo
+│   │   ├── IndiceCorrecao.tsx   # Select do índice de correção monetária
+│   │   ├── InputValor.tsx       # Input de valor em R$ com máscara
+│   │   ├── Data.tsx             # Input de data reutilizável
+│   │   └── Descricao.tsx        # Select de descrição do lançamento
+│   ├── Juros.tsx                # Toggle de juros com campos adicionais
+│   ├── Calcular.tsx             # Botão de ação principal
+│   ├── Limpar.tsx               # Botão para limpar o formulário
+│   ├── Lancamentos.tsx          # Tabela de lançamentos da sessão
+│   └── Footer.tsx               # Rodapé com identidade GATE MPRJ
+└── App.tsx                      # Composição geral da aplicação
+```
