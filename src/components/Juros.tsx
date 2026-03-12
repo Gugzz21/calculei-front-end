@@ -5,10 +5,10 @@ function Juros() {
     const [isEnabled, setIsEnabled] = useState(false);
 
     return (
-        <div className="flex flex-col bg-slate-50 rounded-lg p-6 gap-5 border border-slate-200 shadow-sm w-full max-w-[800px] ml-95 mt-6">
+        <div className="">
 
             {/* Linha sempre visível: label "Juros" + switch */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-3 ">
                 <strong className="text-[13px] text-gray-700 font-semibold">Juros</strong>
 
                 {/* Switch visual */}

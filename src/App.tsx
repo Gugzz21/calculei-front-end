@@ -21,7 +21,6 @@ function App() {
 
       <div className="flex-1 flex-col gap-4">
         <CentralCard />
-        <Juros />
         <div className="flex flex-row gap-6">
           <Calcular />
           <Limpar />

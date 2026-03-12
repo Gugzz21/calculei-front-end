@@ -3,17 +3,18 @@ import Data from "./CentralCard/Data";
 import IndiceCorrecao from "./CentralCard/IndiceCorrecao";
 import InputValor from "./CentralCard/InputValor";
 import Descricao from "./CentralCard/Descricao";
+import Juros from "./Juros";
 
 function CentralCard() {
   return (
-    <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full max-w-[800px] h-auto ml-95 p-6 gap-5 shadow-sm border border-slate-200">
+    <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full max-w-[1200px] h-auto ml-95 p-6 gap-5 shadow-sm border border-slate-200">
 
       {/* Linha 1: Tipo de Cálculo + Índice de Correção */}
-      <div className="flex flex-row gap-6">
+      <div className="flex gap-6">
         <div className="flex-1">
           <TipoCalculo />
         </div>
-        <div className="flex-none w-[240px]">
+        <div className="flex-1">
           <IndiceCorrecao />
         </div>
       </div>
@@ -23,11 +24,13 @@ function CentralCard() {
         <InputValor />
         <Data title="Data Inicial" />
         <Data title="Data do Cálculo" />
+        <Descricao />
       </div>
 
       {/* Linha 3: Descrição */}
-      <div>
-        <Descricao />
+      <div className="flex flex-col gap-6">
+        
+        <Juros />
       </div>
 
     </div>
