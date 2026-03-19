@@ -1,9 +1,11 @@
-import gate from "../assets/images/gate.png";
+import logo_mprj_horizontal from "../assets/images/logo_mprj_horizontal_preto 1.png";
+import logo_gate_horizontal from "../assets/images/logo_gate_horizontal_preto 1.png"
 
 function Footer() {
     return (
-        <div className="flex justify-center items-center bg-white py-4 w-full">
-            <img src={gate} className="w-[30%] md:w-[10%] h-auto" alt="gate" />
+        <div className="flex absolute bottom-0 bg-white py-4 w-full justify-around items-center shadow-top-lg h-[8vh] min-h-[60px]">
+            <img src={logo_mprj_horizontal}  alt="logo_mprj_horizontal" />
+            <img src={logo_gate_horizontal}  alt="logo_gate_horizontal" />
         </div>
     );
 }
