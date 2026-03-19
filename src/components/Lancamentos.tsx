@@ -30,7 +30,7 @@ function Lancamentos({ lancamentos, onRemover }: LancamentosProps) {
         <div className="overflow-x-auto w-full">
           <table className="w-full text-sm text-gray-700 min-w-[900px]">
             <thead>
-              <tr className="border-b-2 border-gray-300 text-left text-[11px] text-gray-500 uppercase">
+              <tr className="border-b-2 border-gray-300 text-left text-[11px] text-black bg-gray-300 uppercase">
                 <th className="pb-2 pr-4">Descrição</th>
                 <th className="pb-2 pr-4">Data Inicial</th>
                 <th className="pb-2 pr-4">Valor Principal</th>
