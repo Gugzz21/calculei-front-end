@@ -20,7 +20,7 @@ function Calcular({ onClick, loading, disabled }: CalcularProps) {
             : "bg-blue-100 border-blue-400 text-blue-700 hover:bg-blue-200 cursor-pointer"
           }`}
       >
-        <Calculator className="w-6 h-6 underline" />
+        <Calculator className="w-6 h-6" />
         {loading ? "Calculando..." : "Calcular"}
       </button>
     </div>
