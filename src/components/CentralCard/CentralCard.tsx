@@ -25,8 +25,8 @@ function CentralCard({ form, juros, today, loading, erro, isFormValid, onFormCha
   const selicSelecionada = form.indiceCorrecao === 'selic' || form.indiceCorrecao === 'tjrj119602009ipcaeselic';
 
   return (
-    <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 gap-5 shadow-sm border border-slate-200">
-      <div className="text-gray-600 font-bold text-2xl md:text-3xl mb-4 md:mb-6"><h1>Cálculo de Débitos Judiciais</h1></div>
+    <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 gap-5 shadow-sm border border-slate-400">
+      <div className="text-gray-600 font-bold text-2xl md:text-3xl mb-4 md:mb-6"><h1>Atualização Monetária</h1></div>
 
       {/* Linha 1: Tipo de Cálculo + Índice de Correção */}
       <div className="flex flex-col md:flex-row gap-6 w-full">

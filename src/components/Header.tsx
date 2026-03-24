@@ -2,14 +2,17 @@ import { House } from 'lucide-react';
 import imagemLogo from '../assets/images/calculei.png';
 
 function Header() {
-    return (
-        <div className="flex flex-col md:flex-row py-4 bg-white px-4 md:px-[20px] w-full justify-between md:justify-center items-center gap-8 md:gap-0 shadow-sm z-10">
-            <img src={imagemLogo} alt="logo" className="w-[150px] md:w-auto" />
 
-            <div className="flex items-center md:pl-[970px] gap-1">
-                <a href="https://linkedin.com/in/gustavo-dinizz21" className="font-bold text-blue-600 text-[14px] flex items-center">
-                    <House />
-                </a>
+    return (
+        <div className="flex bg-white w-full h-[65px] items-center shadow-sm z-10">
+            <div className="flex justify-between items-center w-[95%] md:w-full max-w-[1200px] mx-auto md:ml-95">
+                <img src={imagemLogo} alt="logo" className="w-[150px] md:w-[130px] object-contain" />
+
+                <div className="flex items-center gap-1">
+                    <a href="https://linkedin.com/in/gustavo-dinizz21" className="font-bold text-blue-600 text-[14px] flex items-center hover:opacity-80 transition-opacity">
+                        <House />
+                    </a>
+                </div>
             </div>
         </div>
     );

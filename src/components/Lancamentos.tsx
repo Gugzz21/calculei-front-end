@@ -38,7 +38,7 @@ function Lancamentos({ lancamentos, onRemover }: LancamentosProps) {
   };
 
   return (
-    <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 mt-6 gap-5 shadow-sm border border-slate-200 overflow-hidden">
+    <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
       <h1 className="text-[18px] text-gray-700 font-semibold">Lançamentos</h1>
 
       {lancamentos.length === 0 ? (

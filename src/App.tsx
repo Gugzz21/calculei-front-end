@@ -159,7 +159,7 @@ function App() {
   return (
     <div className="flex flex-col bg-gray-200 min-h-screen w-full overflow-x-hidden">
       <Header />
-      <div className="flex-1 flex-col gap-4 mt-12 md:mt-2 w-full">
+      <div className="flex-1 flex-col gap-4 mt-12 md:mt-2 w-full pt-12">
         <CentralCard
           form={form}
           juros={juros}
@@ -172,10 +172,12 @@ function App() {
           onCalcular={calcular}
           onLimpar={limpar}
         />
-        <Lancamentos
-          lancamentos={lancamentos}
-          onRemover={removerLancamento}
-        />
+        <div className='w-full pt-8'>
+          <Lancamentos
+            lancamentos={lancamentos}
+            onRemover={removerLancamento}
+          />
+        </div>
       </div>
       <Footer />
     </div>
