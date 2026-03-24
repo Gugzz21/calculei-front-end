@@ -54,17 +54,17 @@ function Lancamentos({ lancamentos, onRemover }: LancamentosProps) {
             <table className="w-full text-sm text-gray-700 min-w-[900px]">
               <thead>
                 <tr className="border-b-2 border-gray-300 text-left text-[11px] text-black bg-gray-300 uppercase">
-                  <th className="pb-2 pt-2 pl-2 pr-4">Descrição</th>
-                  <th className="pb-2 pt-2 pr-4">Data Inicial</th>
-                  <th className="pb-2 pt-2 pr-4">Valor Principal</th>
-                  <th className="pb-2 pt-2 pr-4">Data do Cálculo</th>
-                  <th className="pb-2 pt-2 pr-4">Índice de Correção</th>
-                  <th className="pb-2 pt-2 pr-4">Valor Atualizado</th>
-                  <th className="pb-2 pt-2 pr-4">Dias</th>
-                  <th className="pb-2 pt-2 pr-4">% Correção</th>
-                  <th className="pb-2 pt-2 pr-4">Juros</th>
-                  <th className="pb-2 pt-2 pr-4">Total</th>
-                  <th className="pb-2 pt-2">Ações</th>
+                  <th className="pb-2 pt-2 pl-2 pr-4 underline">Descrição</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Data Inicial</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Valor Principal</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Data do Cálculo</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Índice de Correção</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Valor Atualizado</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Dias</th>
+                  <th className="pb-2 pt-2 pr-4 underline">% Correção</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Juros</th>
+                  <th className="pb-2 pt-2 pr-4 underline">Total</th>
+                  <th className="pb-2 pt-2 underline">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
