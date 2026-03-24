@@ -5,6 +5,7 @@ import { FaFilePdf } from "react-icons/fa";
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
+  loading?: boolean;
   onRemover: (id: number) => void;
 }
 
@@ -22,7 +23,7 @@ function formatPercent(value: number): string {
   return `${Number(value).toFixed(4)}%`;
 }
 
-function Lancamentos({ lancamentos, onRemover }: LancamentosProps) {
+function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -46,7 +47,7 @@ function Lancamentos({ lancamentos, onRemover }: LancamentosProps) {
         <FaFilePdf className="text-red-600 hover:text-red-700 transition-colors" />
       </div>
 
-      {lancamentos.length === 0 ? (
+      {lancamentos.length === 0 && !loading ? (
         <p className="text-sm text-gray-400 italic">Nenhum cálculo realizado ainda. Preencha os dados acima e clique em Calcular.</p>
       ) : (
         <div className="flex flex-col gap-4">

@@ -21,7 +21,7 @@ function Calcular({ onClick, loading, disabled }: CalcularProps) {
           }`}
       >
         <Calculator className="w-6 h-6" />
-        {loading ? "Calculando..." : "Calcular"}
+        <span className="underline decoration-2 underline-offset-4">{loading ? "Calculando..." : "Calcular"}</span>
       </button>
     </div>
   );

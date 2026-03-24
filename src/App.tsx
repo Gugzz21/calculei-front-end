@@ -79,6 +79,7 @@ function App() {
 
     setLoading(true);
     try {
+      const minWait = new Promise(resolve => setTimeout(resolve, 500));
       // Correção monetária
       const respCorrecao = await calcularIndice(form.indiceCorrecao, {
         valor: valorNum,
@@ -123,6 +124,7 @@ function App() {
         total,
       };
 
+      await minWait;
       setLancamentos(prev => [...prev, novo]);
     } catch (e: unknown) {
       if (e instanceof Error) setErro(e.message);
@@ -142,7 +144,6 @@ function App() {
       descricao: 'ressarci',
     });
     setJuros({ enabled: false, indice: 'codigocivil', dataInicio: '', dataFim: '' });
-    setLancamentos([]);
     setErro(null);
   };
 
@@ -175,6 +176,7 @@ function App() {
         <div className='w-full pt-8'>
           <Lancamentos
             lancamentos={lancamentos}
+            loading={loading}
             onRemover={removerLancamento}
           />
         </div>
