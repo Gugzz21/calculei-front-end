@@ -179,7 +179,9 @@ function App() {
           />
         </div>
       </div>
-      <Footer />
+      <div className='flex justify-end w-full h-[8vh] min-h-[60px] pt-6'>
+        <Footer />
+      </div>
     </div>
   );
 }

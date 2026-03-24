@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LancamentoItem } from "../App";
+import { FaFilePdf } from "react-icons/fa";
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
@@ -39,7 +40,11 @@ function Lancamentos({ lancamentos, onRemover }: LancamentosProps) {
 
   return (
     <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
-      <h1 className="text-[18px] text-gray-700 font-semibold">Lançamentos</h1>
+
+      <div className="flex items-center justify-between">
+        <h1 className="text-[18px] text-gray-700 font-semibold">Lançamentos</h1>
+        <FaFilePdf className="text-red-600 hover:text-red-700 transition-colors" />
+      </div>
 
       {lancamentos.length === 0 ? (
         <p className="text-sm text-gray-400 italic">Nenhum cálculo realizado ainda. Preencha os dados acima e clique em Calcular.</p>
