@@ -43,8 +43,8 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
     <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
 
       <div className="flex items-center justify-between">
-        <h1 className="text-[18px] text-gray-700 font-semibold">Lançamentos</h1>
-        <FaFilePdf className="text-red-600 hover:text-red-700 transition-colors" />
+        <h1 className="text-[24px] text-gray-700 font-bold underline">Lançamentos</h1>
+        <FaFilePdf className="text-red-600 hover:text-red-700 transition-colors h-6 w-6" />
       </div>
 
       {lancamentos.length === 0 && !loading ? (
@@ -52,9 +52,9 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
       ) : (
         <div className="flex flex-col gap-4">
           <div className="overflow-x-auto w-full">
-            <table className="w-full text-sm text-gray-700 min-w-[900px]">
+            <table className="text-sm text-gray-700 w-full">
               <thead>
-                <tr className="border-b-2 border-gray-300 text-left text-[11px] text-black bg-gray-300 uppercase">
+                <tr className="border-b-2 border-gray-300 text-left text-[12px] text-black bg-gray-300 uppercase">
                   <th className="pb-2 pt-2 pl-2 pr-4 underline">Descrição</th>
                   <th className="pb-2 pt-2 pr-4 underline">Data Inicial</th>
                   <th className="pb-2 pt-2 pr-4 underline">Valor Principal</th>
@@ -133,26 +133,24 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
                 <button
                   onClick={handlePrev}
                   disabled={currentPage === 1}
-                  className={`flex items-center justify-center w-8 h-8 rounded border ${
-                    currentPage === 1
-                      ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
-                      : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
-                  } transition-colors`}
+                  className={`flex items-center justify-center w-8 h-8 rounded border ${currentPage === 1
+                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                    : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
+                    } transition-colors`}
                   title="Página Anterior"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                
+
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }).map((_, idx) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentPage(idx + 1)}
-                      className={`w-8 h-8 rounded border text-sm font-medium ${
-                        currentPage === idx + 1
-                          ? "border-blue-500 bg-blue-50 text-blue-600"
-                          : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-                      }`}
+                      className={`w-8 h-8 rounded border text-sm font-medium ${currentPage === idx + 1
+                        ? "border-blue-500 bg-blue-50 text-blue-600"
+                        : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                        }`}
                     >
                       {idx + 1}
                     </button>
@@ -162,11 +160,10 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
                 <button
                   onClick={handleNext}
                   disabled={currentPage === totalPages}
-                  className={`flex items-center justify-center w-8 h-8 rounded border ${
-                    currentPage === totalPages
-                      ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
-                      : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
-                  } transition-colors`}
+                  className={`flex items-center justify-center w-8 h-8 rounded border ${currentPage === totalPages
+                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                    : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
+                    } transition-colors`}
                   title="Próxima Página"
                 >
                   <ChevronRight className="w-5 h-5" />

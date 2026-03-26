@@ -3,7 +3,7 @@ import logo_gate_horizontal from "../assets/images/logo_gate_horizontal_preto 1.
 
 function Footer() {
     return (
-        <div className="flex bottom-0 bg-white py-4 w-full justify-around items-center shadow-top-lg h-[8vh] min-h-[60px]">
+        <div className="flex bottom-0 bg-white py-4 w-full justify-around items-center shadow-top-lg min-h-[60px]">
             <img src={logo_mprj_horizontal} alt="logo_mprj_horizontal" />
             <img src={logo_gate_horizontal} alt="logo_gate_horizontal" />
         </div>

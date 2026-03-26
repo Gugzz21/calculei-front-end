@@ -28,7 +28,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm 
     <div className="">
       {/* Linha sempre visível: label "Juros" + switch */}
       <div className="flex flex-col gap-3">
-        <strong className="text-[13px] text-gray-700 font-semibold">
+        <strong className="text-[14px] text-gray-700 font-semibold">
           Juros
           {jurosDesativado && (
             <span className="ml-2 text-[11px] text-orange-500 font-normal">

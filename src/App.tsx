@@ -160,7 +160,7 @@ function App() {
   return (
     <div className="flex flex-col bg-gray-200 min-h-screen w-full overflow-x-hidden">
       <Header />
-      <div className="flex-1 flex-col gap-4 mt-12 md:mt-2 w-full pt-12">
+      <div className="flex flex-col gap-4 mt-12 md:mt-2 w-full pt-12 pb-4">
         <CentralCard
           form={form}
           juros={juros}
@@ -173,7 +173,7 @@ function App() {
           onCalcular={calcular}
           onLimpar={limpar}
         />
-        <div className='w-full pt-8'>
+        <div className='w-full pt-4'>
           <Lancamentos
             lancamentos={lancamentos}
             loading={loading}
@@ -181,7 +181,7 @@ function App() {
           />
         </div>
       </div>
-      <div className='flex justify-end w-full h-[8vh] min-h-[60px] pt-6'>
+      <div className='flex justify-end w-full h-[8vh] min-h-[60px] pt-6 mt-auto'>
         <Footer />
       </div>
     </div>
