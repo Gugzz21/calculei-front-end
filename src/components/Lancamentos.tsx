@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LancamentoItem } from "../App";
 import { FaFilePdf } from "react-icons/fa";
@@ -34,6 +34,12 @@ function Lancamentos({
   const totalPages = Math.ceil(lancamentos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = lancamentos.slice(startIndex, startIndex + itemsPerPage);
+
+  const [pageInput, setPageInput] = useState(currentPage.toString());
+
+  useEffect(() => {
+    setPageInput(currentPage.toString());
+  }, [currentPage]);
 
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
@@ -174,7 +180,7 @@ function Lancamentos({
 
           {/* Paginação */}
           {totalPages > 1 && (
-            <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+            <div className="flex flex-col md:flex-row justify-between items-center mt-4 border-t border-gray-200 pt-4 gap-4">
               <span className="text-sm text-gray-500">
                 Mostrando{" "}
                 <span className="font-semibold text-gray-700">
@@ -190,7 +196,37 @@ function Lancamentos({
                 </span>{" "}
                 registros
               </span>
-              <div className="flex gap-2">
+              
+              <div className="flex flex-col md:flex-row items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Ir para:</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    value={pageInput}
+                    onChange={(e) => setPageInput(e.target.value)}
+                    onBlur={() => {
+                      let p = parseInt(pageInput);
+                      if (isNaN(p) || p < 1) p = 1;
+                      if (p > totalPages) p = totalPages;
+                      setCurrentPage(p);
+                      setPageInput(p.toString());
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        let p = parseInt(e.currentTarget.value);
+                        if (isNaN(p) || p < 1) p = 1;
+                        if (p > totalPages) p = totalPages;
+                        setCurrentPage(p);
+                        setPageInput(p.toString());
+                      }
+                    }}
+                    className="w-16 h-8 text-center border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="flex gap-2">
                 <button
                   onClick={handlePrev}
                   disabled={currentPage === 1}
@@ -233,6 +269,7 @@ function Lancamentos({
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
+            </div>
             </div>
           )}
         </div>
