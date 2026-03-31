@@ -29,11 +29,11 @@ function Lancamentos({
   onRemover,
 }: LancamentosProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = lancamentos.length || 1;
 
   const totalPages = Math.ceil(lancamentos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = lancamentos.slice(startIndex, startIndex + itemsPerPage);
+  const currentItems = lancamentos;
 
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
@@ -44,7 +44,7 @@ function Lancamentos({
   };
 
   return (
-    <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
+    <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
       <div className="flex items-center justify-between">
         <h1 className="text-[24px] text-gray-700 font-bold underline">
           Lançamentos

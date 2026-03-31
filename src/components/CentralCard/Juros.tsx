@@ -1,5 +1,5 @@
-import Data from "./CentralCard/Data";
-import type { JurosState } from "../App";
+import Data from "./Data";
+import type { JurosState } from "../../App";
 
 interface JurosProps {
   juros: JurosState;

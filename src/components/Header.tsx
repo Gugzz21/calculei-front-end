@@ -5,7 +5,7 @@ function Header() {
 
     return (
         <div className="flex bg-white w-full h-[65px] items-center shadow-sm z-10">
-            <div className="flex justify-between items-center w-[95%] md:w-full max-w-[1200px] mx-auto md:ml-95">
+            <div className="flex justify-between items-center w-[95%] max-w-[1400px] mx-auto">
                 <img src={imagemLogo} alt="logo" className="w-[150px] md:w-[130px] object-contain" />
 
                 <div className="flex items-center gap-1">

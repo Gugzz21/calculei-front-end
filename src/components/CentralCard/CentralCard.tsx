@@ -3,7 +3,7 @@ import Data from "./Data";
 import IndiceCorrecao from "./IndiceCorrecao";
 import InputValor from "./InputValor";
 import Descricao from "./Descricao";
-import Juros from "../Juros";
+import Juros from "./Juros";
 import Calcular from "./Calcular";
 import Limpar from "./Limpar";
 import type { FormState, JurosState } from "../../App";
@@ -38,20 +38,20 @@ function CentralCard({
     form.indiceCorrecao === "tjrj119602009ipcaeselic";
 
   return (
-    <div className="flex flex-col mx-auto bg-slate-50 rounded-lg pb-6 w-[95%] md:w-full max-w-[1200px] h-auto md:ml-95 p-4 md:p-6 gap-5 shadow-sm border border-slate-400">
+    <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 gap-5 shadow-sm border border-slate-400">
       <div className="text-gray-600 font-bold text-2xl md:text-3xl mb-4 md:mb-6">
         <h1 className="underline">Atualização Monetária</h1>
       </div>
 
       {/* Linha 1: Tipo de Cálculo + Índice de Correção */}
-      <div className="flex flex-col md:flex-row w-full gap-2 md:gap-3">
-        <div className="flex-1 w-full">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+        <div className="w-full md:w-auto">
           <TipoCalculo
             value={form.tipoCalculo}
             onChange={(v) => onFormChange("tipoCalculo", v)}
           />
         </div>
-        <div className="flex-1 w-full">
+        <div className="w-full md:w-auto">
           <IndiceCorrecao
             value={form.indiceCorrecao}
             onChange={(v) => onFormChange("indiceCorrecao", v)}
