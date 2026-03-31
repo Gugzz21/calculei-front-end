@@ -29,11 +29,11 @@ function Lancamentos({
   onRemover,
 }: LancamentosProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = lancamentos.length || 1;
+  const itemsPerPage = 5;
 
   const totalPages = Math.ceil(lancamentos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = lancamentos;
+  const currentItems = lancamentos.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
