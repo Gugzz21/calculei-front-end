@@ -15,11 +15,15 @@ const JUROS_LABEL_DESCRICAO: Record<string, string> = {
   jurossimples12: "Juros simples de 12% ao ano (1% ao mês).",
   selic: "Taxa SELIC acumulada no período, conforme Banco Central do Brasil.",
   cdi: "Taxa CDI acumulada no período, conforme Banco Central do Brasil.",
-  poupanca: "Poupança Nova: Taxa Selic quando abaixo de 8,5% a.a., ou 0,5% a.m. + TR.",
+  poupancanova: "Poupança Nova: Taxa Selic quando abaixo de 8,5% a.a., ou 0,5% a.m. + TR.",
+  poupancaantiga: "Poupança Antiga: 0,5% a.m. até 03/05/2012; 0,5% a.m. + TR a partir de 04/05/2012.",
+  poupanca: "Poupança (Antiga + Nova): 0,5% a.m. até 03/05/2012; Taxa Selic quando abaixo de 8,5% a.a., ou 0,5% a.m. + TR a partir de 04/05/2012.",
+  taxalegal: "Taxa Legal: 1% a.m. até 10/01/2003; 0,5% a.m. de 11/01/2003 a 09/01/2006; 1% a.m. a partir de 10/01/2006.",
+  especificartaxa: "Taxa a ser especificada pelo usuário.",
 };
 
 function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm }: JurosProps) {
-  const { enabled, indice, dataInicio, dataFim } = juros;
+  const { enabled, indice, dataInicio, dataFim, taxa } = juros;
 
   // Quando SELIC é o índice de correção, desativa o toggle de juros também
   const jurosDesativado = selicSelecionada;
@@ -66,14 +70,38 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm 
                 onChange={(e) => onJurosChange("indice", e.target.value)}
                 className="bg-white border border-blue-400 h-[45px] w-full md:w-[280px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
               >
-                <option value="codigocivil">Juros do Código Civil - Lei nº 10406/02</option>
                 <option value="jurossimples6">Juros Simples 6% a.a.</option>
                 <option value="jurossimples12">Juros Simples 12% a.a.</option>
                 <option value="selic">SELIC</option>
                 <option value="cdi">CDI</option>
-                <option value="poupanca">Poupança (Nova)</option>
+                <option value="poupancanova">Poupança Nova</option>
+                <option value="poupancaantiga">Poupança Antiga</option>
+                <option value="poupanca">Poupança (Antiga + Nova)</option>
+                <option value="taxalegal">TAXA LEGAL</option>
+                <option value="especificartaxa">Especificar Taxa</option>
               </select>
             </div>
+            
+            {/* Taxa de juros (condicional) */}
+            {(indice === 'jurossimples6' || indice === 'jurossimples12' || indice === 'especificartaxa') && (
+              <div className="flex flex-col gap-1 w-full md:w-auto">
+                <strong className="text-[13px] text-gray-700 font-semibold">Taxa de juros</strong>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={taxa}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^\d,]/g, "");
+                      onJurosChange("taxa", val);
+                    }}
+                    className="bg-white border border-blue-400 h-[45px] w-full md:w-[220px] pl-3 pr-16 rounded-md text-sm text-gray-700 outline-none"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">
+                    % a.a.
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="w-full md:w-auto">
               <Data

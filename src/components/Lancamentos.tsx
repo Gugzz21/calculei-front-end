@@ -51,6 +51,9 @@ function Lancamentos({
 
   return (
     <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
+      <div className="flex items-center justify-end text-gray-400 text-[18px] font-bold">
+        <h1>Página {currentPage} de {totalPages}</h1>
+      </div>
       <div className="flex items-center justify-between">
         <h1 className="text-[24px] text-gray-700 font-bold underline">
           Lançamentos
@@ -217,7 +220,7 @@ function Lancamentos({
                   </select>
                 </div>
               </div>
-              
+
               <div className="flex flex-col md:flex-row items-center gap-4">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">Ir para:</span>
@@ -248,49 +251,46 @@ function Lancamentos({
                 </div>
 
                 <div className="flex gap-2">
-                <button
-                  onClick={handlePrev}
-                  disabled={currentPage === 1}
-                  className={`flex items-center justify-center w-8 h-8 rounded border ${
-                    currentPage === 1
+                  <button
+                    onClick={handlePrev}
+                    disabled={currentPage === 1}
+                    className={`flex items-center justify-center w-8 h-8 rounded border ${currentPage === 1
                       ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                       : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
-                  } transition-colors`}
-                  title="Página Anterior"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
+                      } transition-colors`}
+                    title="Página Anterior"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
 
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }).map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentPage(idx + 1)}
-                      className={`w-8 h-8 rounded border text-sm font-medium ${
-                        currentPage === idx + 1
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }).map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentPage(idx + 1)}
+                        className={`w-8 h-8 rounded border text-sm font-medium ${currentPage === idx + 1
                           ? "border-blue-500 bg-blue-50 text-blue-600"
                           : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      {idx + 1}
-                    </button>
-                  ))}
-                </div>
+                          }`}
+                      >
+                        {idx + 1}
+                      </button>
+                    ))}
+                  </div>
 
-                <button
-                  onClick={handleNext}
-                  disabled={currentPage === totalPages}
-                  className={`flex items-center justify-center w-8 h-8 rounded border ${
-                    currentPage === totalPages
+                  <button
+                    onClick={handleNext}
+                    disabled={currentPage === totalPages}
+                    className={`flex items-center justify-center w-8 h-8 rounded border ${currentPage === totalPages
                       ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                       : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
-                  } transition-colors`}
-                  title="Próxima Página"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+                      } transition-colors`}
+                    title="Próxima Página"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
-            </div>
             </div>
           )}
         </div>

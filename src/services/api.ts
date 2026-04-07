@@ -37,6 +37,10 @@ const JUROS_ENDPOINT_MAP: Record<string, string> = {
   selic: "/selic-mensal/calculate/between-dates",
   cdi: "/cdi/calculate/between-dates",
   poupanca: "/poupanca/nova/calculate/between-dates",
+  poupancanova: "/poupanca/nova/calculate/between-dates",
+  poupancaantiga: null as unknown as string,
+  taxalegal: null as unknown as string,
+  especificartaxa: null as unknown as string,
   codigocivil: null as unknown as string, // cálculo local
   jurossimples6: null as unknown as string,  // cálculo local
   jurossimples12: null as unknown as string, // cálculo local
@@ -65,7 +69,8 @@ export async function calcularIndice(
 
 export async function calcularJuros(
   indiceJuros: string,
-  req: CalcRequest
+  req: CalcRequest,
+  taxaAnual?: number
 ): Promise<CalcResponse | null> {
   const endpoint = JUROS_ENDPOINT_MAP[indiceJuros];
 
@@ -77,12 +82,17 @@ export async function calcularJuros(
     const dias = Math.floor((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
     const meses = dias / 30;
     let taxaMensal = 0;
-    if (indiceJuros === "jurossimples6") taxaMensal = 0.005;
-    else if (indiceJuros === "jurossimples12") taxaMensal = 0.01;
-    else if (indiceJuros === "codigocivil") {
-      const corte = new Date("2003-01-10");
-      // Simplificação: usar 1% a.m. (12% a.a.) para período após corte
-      taxaMensal = d1 < corte ? 0.005 : 0.01;
+
+    if (taxaAnual !== undefined && !isNaN(taxaAnual) && (indiceJuros === "jurossimples6" || indiceJuros === "jurossimples12" || indiceJuros === "especificartaxa")) {
+      taxaMensal = (taxaAnual / 100) / 12;
+    } else {
+      if (indiceJuros === "jurossimples6") taxaMensal = 0.005;
+      else if (indiceJuros === "jurossimples12") taxaMensal = 0.01;
+      else if (indiceJuros === "codigocivil" || indiceJuros === "taxalegal") {
+        const corte = new Date("2003-01-10");
+        // Simplificação: usar 1% a.m. (12% a.a.) para período após corte
+        taxaMensal = d1 < corte ? 0.005 : 0.01;
+      }
     }
     const jurosSimples = valor * taxaMensal * meses;
     return {

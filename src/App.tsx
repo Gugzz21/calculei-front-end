@@ -34,6 +34,7 @@ export interface JurosState {
   indice: string;
   dataInicio: string;
   dataFim: string;
+  taxa: string; // % a.a. como string para facilitar input de decima em PT-BR
 }
 
 function App() {
@@ -50,9 +51,10 @@ function App() {
 
   const [juros, setJuros] = useState<JurosState>({
     enabled: false,
-    indice: 'codigocivil',
+    indice: 'taxalegal',
     dataInicio: '',
     dataFim: '',
+    taxa: '12,00',
   });
 
   const [lancamentos, setLancamentos] = useState<LancamentoItem[]>([]);
@@ -64,7 +66,17 @@ function App() {
   };
 
   const handleJurosChange = (field: keyof JurosState, value: string | boolean) => {
-    setJuros(prev => ({ ...prev, [field]: value }));
+    setJuros(prev => {
+      const newState = { ...prev, [field]: value };
+      
+      // Quando muda o índice, define taxas padrão para os itens específicos
+      if (field === 'indice') {
+        if (value === 'jurossimples6') newState.taxa = '6,00';
+        else if (value === 'jurossimples12' || value === 'especificartaxa') newState.taxa = '12,00';
+      }
+      
+      return newState;
+    });
   };
 
   const calcular = async () => {
@@ -100,7 +112,7 @@ function App() {
             valor: valorAtualizado,
             dateInit: juros.dataInicio,
             dateFim: juros.dataFim,
-          });
+          }, parseFloat(juros.taxa.replace(',', '.')));
           if (respJuros) {
             const valorComJuros = getValorAtualizado(respJuros);
             valorJuros = valorComJuros - valorAtualizado;
@@ -143,7 +155,7 @@ function App() {
       tipoCalculo: 'dfazendanaotributario',
       descricao: 'ressarci',
     });
-    setJuros({ enabled: false, indice: 'codigocivil', dataInicio: '', dataFim: '' });
+    setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00' });
     setErro(null);
   };
 
