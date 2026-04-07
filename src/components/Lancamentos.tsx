@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LancamentoItem } from "../App";
-import { FaFilePdf } from "react-icons/fa";
+import { FaFilePdf, FaImage } from "react-icons/fa";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import React, { useRef } from 'react';
+import { toJpeg } from 'html-to-image';
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
   loading?: boolean;
   onRemover: (id: number) => void;
 }
+
 
 function formatBRL(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -30,6 +35,7 @@ function Lancamentos({
 }: LancamentosProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const tableRef = useRef<HTMLDivElement>(null);
 
   const totalPages = Math.max(1, Math.ceil(lancamentos.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -49,6 +55,144 @@ function Lancamentos({
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
+  const exportarParaPDF = () => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFontSize(16);
+    doc.setTextColor(40);
+    doc.text('Relatório de Lançamentos', 14, 15);
+
+    const colunas = [
+      'Descrição', 'Data Inicial', 'Valor Principal', 'Data Cálculo',
+      'Índice', 'Valor Atualizado', 'Dias', '% Correção', 'Juros', 'Total'
+    ];
+
+    const linhas = lancamentos.map((l) => [
+      l.descricao,
+      formatDate(l.dataInicial),
+      formatBRL(l.valorPrincipal),
+      formatDate(l.dataCalculo),
+      l.indiceCorrecao,
+      formatBRL(l.valorAtualizado),
+      l.dias.toString(),
+      formatPercent(l.percentualCorrecao),
+      formatBRL(l.juros),
+      formatBRL(l.total),
+    ]);
+
+    const columnStyles: { [key: number]: any } = {
+      0: { cellWidth: 'auto', halign: 'left' },
+      1: { cellWidth: 25, halign: 'center' },
+      2: { cellWidth: 28, halign: 'right' },
+      3: { cellWidth: 25, halign: 'center' },
+      4: { cellWidth: 30, halign: 'left' },
+      5: { cellWidth: 28, halign: 'right' },
+      6: { cellWidth: 15, halign: 'center' },
+      7: { cellWidth: 22, halign: 'right' },
+      8: { cellWidth: 28, halign: 'right' },
+      9: { cellWidth: 28, halign: 'right' },
+    };
+
+    autoTable(doc, {
+      head: [colunas],
+      body: linhas,
+      startY: 25,
+      margin: { left: 14, right: 14 },
+      styles: {
+        fontSize: 8,
+        cellPadding: 3,
+        valign: 'middle',
+        // --- AQUI ESTÁ A MUDANÇA ---
+        lineWidth: 0.1,           // Espessura da linha
+        lineColor: [180, 180, 180] // Cor da linha (cinza médio)
+      },
+      headStyles: {
+        fillColor: [209, 213, 219],
+        textColor: 0,
+        fontStyle: 'bold',
+        lineWidth: 0.2,           // Linha um pouco mais grossa no cabeçalho
+      },
+      columnStyles: columnStyles,
+      // Desativei o alternateRowStyles para a linha separadora aparecer melhor em todos os itens
+      alternateRowStyles: {
+        fillColor: [255, 255, 255]
+      }
+    });
+
+    if (lancamentos.length > 1) {
+      const finalY = (doc as any).lastAutoTable.finalY;
+
+      const totals = {
+        principal: lancamentos.reduce((s, l) => s + l.valorPrincipal, 0),
+        atualizado: lancamentos.reduce((s, l) => s + l.valorAtualizado, 0),
+        dias: lancamentos.reduce((s, l) => s + l.dias, 0),
+        juros: lancamentos.reduce((s, l) => s + l.juros, 0),
+        total: lancamentos.reduce((s, l) => s + l.total, 0),
+      };
+
+      autoTable(doc, {
+        body: [[
+          'TOTAL GERAL', '', formatBRL(totals.principal), '', '',
+          formatBRL(totals.atualizado), totals.dias.toString(), '',
+          formatBRL(totals.juros), formatBRL(totals.total),
+        ]],
+        startY: finalY,
+        margin: { left: 14, right: 14 },
+        styles: {
+          fontSize: 8,
+          fontStyle: 'bold',
+          fillColor: [243, 244, 246],
+          textColor: [0, 0, 0],
+          lineWidth: 0.1,           // Linha no total para fechar a tabela
+          lineColor: [180, 180, 180]
+        },
+        columnStyles: columnStyles,
+      });
+    }
+
+    const totalPages = (doc.internal as any).getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.text(`Página ${i} de ${totalPages}`, pageWidth - 14, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+    }
+
+    doc.save('relatorio-lancamentos.pdf');
+  };
+
+  const baixarImagem = async () => {
+    console.log('baixarImagem chamado');
+    const elemento = tableRef.current;
+    if (!elemento) {
+      console.warn('tableRef.current é null');
+      alert('Nenhuma tabela encontrada. Adicione lançamentos primeiro.');
+      return;
+    }
+    try {
+      const dataUrl = await toJpeg(elemento, {
+        quality: 0.95,
+        backgroundColor: '#ffffff',
+        pixelRatio: 2,
+      });
+      const link = document.createElement('a');
+      link.download = 'tabela-lancamentos.jpg';
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      console.log('Download iniciado.');
+    } catch (error) {
+      console.error('Erro ao gerar imagem:', error);
+      alert('Erro ao gerar imagem: ' + String(error));
+    }
+  };
+
   return (
     <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
       <div className="flex items-center justify-end text-gray-400 text-[18px] font-bold">
@@ -58,7 +202,24 @@ function Lancamentos({
         <h1 className="text-[24px] text-gray-700 font-bold underline">
           Lançamentos
         </h1>
-        <FaFilePdf className="text-red-600 hover:text-red-700 transition-colors h-6 w-6" />
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={exportarParaPDF}
+            title="Exportar para PDF"
+            className="p-0 m-0 bg-transparent border-none cursor-pointer flex items-center"
+          >
+            <FaFilePdf className="text-red-600 hover:text-red-700 transition-colors h-6 w-6" />
+          </button>
+          <button
+            type="button"
+            onClick={baixarImagem}
+            title="Baixar como Imagem (JPG)"
+            className="p-0 m-0 bg-transparent border-none cursor-pointer flex items-center"
+          >
+            <FaImage className="text-blue-600 hover:text-blue-800 transition-colors h-6 w-6" />
+          </button>
+        </div>
       </div>
 
       {lancamentos.length === 0 && !loading ? (
@@ -67,7 +228,7 @@ function Lancamentos({
           Calcular.
         </p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div ref={tableRef} className="flex flex-col gap-4">
           <div className="overflow-x-auto w-full">
             <table className="text-sm text-gray-700 w-full">
               <thead>
@@ -131,7 +292,6 @@ function Lancamentos({
                       <button
                         onClick={() => {
                           onRemover(l.id);
-                          // Adjust page if last item on current page is deleted
                           if (currentItems.length === 1 && currentPage > 1) {
                             setCurrentPage((prev) => prev - 1);
                           }
@@ -146,7 +306,6 @@ function Lancamentos({
                 ))}
               </tbody>
 
-              {/* Totais (Calcula sobre todos os itens e mostra apenas na última página) */}
               {lancamentos.length > 1 && currentPage === totalPages && (
                 <tfoot>
                   <tr className="border-t-2 border-gray-400 text-sm font-bold text-gray-700 bg-gray-100 divide-x divide-slate-400">
@@ -181,7 +340,6 @@ function Lancamentos({
             </table>
           </div>
 
-          {/* Paginação */}
           {lancamentos.length > 0 && (
             <div className="flex flex-col md:flex-row justify-between items-center mt-4 border-t border-gray-200 pt-4 gap-4">
               <div className="flex flex-col md:flex-row items-center gap-4">
