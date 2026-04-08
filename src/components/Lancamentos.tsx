@@ -4,8 +4,8 @@ import type { LancamentoItem } from "../App";
 import { FaFilePdf, FaImage } from "react-icons/fa";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import React, { useRef } from 'react';
-import { toJpeg } from 'html-to-image';
+import { useRef } from 'react';
+
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
@@ -166,31 +166,185 @@ function Lancamentos({
     doc.save('relatorio-lancamentos.pdf');
   };
 
-  const baixarImagem = async () => {
-    console.log('baixarImagem chamado');
-    const elemento = tableRef.current;
-    if (!elemento) {
-      console.warn('tableRef.current é null');
-      alert('Nenhuma tabela encontrada. Adicione lançamentos primeiro.');
+  const baixarImagem = () => {
+    if (lancamentos.length === 0) {
+      alert('Nenhum lançamento para exportar.');
       return;
     }
-    try {
-      const dataUrl = await toJpeg(elemento, {
-        quality: 0.95,
-        backgroundColor: '#ffffff',
-        pixelRatio: 2,
-      });
+
+    // Definição das colunas: label, largura (px), alinhamento
+    const cols = [
+      { label: 'Descrição',       width: 160, align: 'left'   as const },
+      { label: 'Data Inicial',    width: 90,  align: 'center' as const },
+      { label: 'Valor Principal', width: 110, align: 'right'  as const },
+      { label: 'Data Cálculo',    width: 90,  align: 'center' as const },
+      { label: 'Índice',          width: 110, align: 'left'   as const },
+      { label: 'Valor Atualizado',width: 115, align: 'right'  as const },
+      { label: 'Dias',            width: 55,  align: 'center' as const },
+      { label: '%Correção',       width: 85,  align: 'right'  as const },
+      { label: 'Juros',           width: 100, align: 'right'  as const },
+      { label: 'Total',           width: 110, align: 'right'  as const },
+    ];
+
+    const scale      = 2;
+    const padX       = 28;
+    const padY       = 24;
+    const rowH       = 32;
+    const headH      = 38;
+    const titleH     = 56;
+    const hasTotals  = lancamentos.length > 1;
+    const tableW     = cols.reduce((s, c) => s + c.width, 0);
+    const canvasW    = tableW + padX * 2;
+    const canvasH    = padY + titleH + headH + rowH * lancamentos.length + (hasTotals ? rowH : 0) + padY;
+
+    const canvas     = document.createElement('canvas');
+    canvas.width     = canvasW * scale;
+    canvas.height    = canvasH * scale;
+    const ctx        = canvas.getContext('2d')!;
+    ctx.scale(scale, scale);
+
+    // ── fundo branco ──────────────────────────────────────────
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvasW, canvasH);
+
+    // ── título ────────────────────────────────────────────────
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 15px Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Relatório de Lançamentos', padX, padY + 20);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '11px Arial, sans-serif';
+    ctx.fillText(`Total de registros: ${lancamentos.length}`, padX, padY + 38);
+
+    // helper: desenha texto com clipping na célula
+    const drawCell = (
+      text: string, cx: number, cy: number, cw: number, ch: number,
+      align: 'left' | 'center' | 'right'
+    ) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(cx + 2, cy, cw - 4, ch);
+      ctx.clip();
+      const tx = align === 'right'  ? cx + cw - 8
+               : align === 'center' ? cx + cw / 2
+               : cx + 8;
+      ctx.textAlign = align;
+      ctx.fillText(text, tx, cy + ch / 2 + 4);
+      ctx.restore();
+    };
+
+    // ── cabeçalho ────────────────────────────────────────────
+    let y = padY + titleH;
+    ctx.fillStyle = '#d1d5db';
+    ctx.fillRect(padX, y, tableW, headH);
+    ctx.strokeStyle = '#9ca3af';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(padX, y, tableW, headH);
+
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 10px Arial, sans-serif';
+    let x = padX;
+    for (const col of cols) {
+      // linha vertical separando colunas
+      if (x > padX) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y + headH);
+        ctx.stroke();
+      }
+      drawCell(col.label.toUpperCase(), x, y, col.width, headH, col.align);
+      x += col.width;
+    }
+
+    // ── linhas de dados ───────────────────────────────────────
+    y += headH;
+    for (let i = 0; i < lancamentos.length; i++) {
+      const l = lancamentos[i];
+      ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+      ctx.fillRect(padX, y, tableW, rowH);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(padX, y, tableW, rowH);
+
+      const vals = [
+        l.descricao,
+        formatDate(l.dataInicial),
+        formatBRL(l.valorPrincipal),
+        formatDate(l.dataCalculo),
+        l.indiceCorrecao,
+        formatBRL(l.valorAtualizado),
+        String(l.dias),
+        formatPercent(l.percentualCorrecao),
+        formatBRL(l.juros),
+        formatBRL(l.total),
+      ];
+
+      x = padX;
+      for (let j = 0; j < cols.length; j++) {
+        if (x > padX) {
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x, y + rowH);
+          ctx.stroke();
+        }
+        ctx.fillStyle = j === 5 ? '#1d4ed8' : j === 9 ? '#15803d' : '#374151';
+        ctx.font = (j === 0 || j === 9) ? 'bold 11px Arial, sans-serif' : '11px Arial, sans-serif';
+        drawCell(vals[j], x, y, cols[j].width, rowH, cols[j].align);
+        x += cols[j].width;
+      }
+      y += rowH;
+    }
+
+    // ── linha de totais ───────────────────────────────────────
+    if (hasTotals) {
+      const tPrincipal  = lancamentos.reduce((s, l) => s + l.valorPrincipal, 0);
+      const tAtualizado = lancamentos.reduce((s, l) => s + l.valorAtualizado, 0);
+      const tDias       = lancamentos.reduce((s, l) => s + l.dias, 0);
+      const tJuros      = lancamentos.reduce((s, l) => s + l.juros, 0);
+      const tGeral      = lancamentos.reduce((s, l) => s + l.total, 0);
+
+      ctx.fillStyle = '#f3f4f6';
+      ctx.fillRect(padX, y, tableW, rowH);
+      ctx.strokeStyle = '#9ca3af';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(padX, y, tableW, rowH);
+
+      const totVals = [
+        'Total Geral', '', formatBRL(tPrincipal), '', '',
+        formatBRL(tAtualizado), String(tDias), '',
+        formatBRL(tJuros), formatBRL(tGeral),
+      ];
+      x = padX;
+      for (let j = 0; j < cols.length; j++) {
+        if (x > padX) {
+          ctx.strokeStyle = '#9ca3af';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x, y + rowH);
+          ctx.stroke();
+        }
+        ctx.fillStyle = j === 5 ? '#1d4ed8' : j === 9 ? '#15803d' : '#111827';
+        ctx.font = 'bold 11px Arial, sans-serif';
+        drawCell(totVals[j], x, y, cols[j].width, rowH, cols[j].align);
+        x += cols[j].width;
+      }
+    }
+
+    // ── download ──────────────────────────────────────────────
+    canvas.toBlob((blob) => {
+      if (!blob) { alert('Erro ao gerar imagem.'); return; }
+      const url  = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = 'tabela-lancamentos.jpg';
-      link.href = dataUrl;
+      link.href = url;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      console.log('Download iniciado.');
-    } catch (error) {
-      console.error('Erro ao gerar imagem:', error);
-      alert('Erro ao gerar imagem: ' + String(error));
-    }
+      URL.revokeObjectURL(url);
+    }, 'image/jpeg', 0.95);
   };
 
   return (
