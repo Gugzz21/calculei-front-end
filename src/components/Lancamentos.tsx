@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import type { LancamentoItem } from "../App";
 import { FaFilePdf, FaImage } from "react-icons/fa";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useRef } from 'react';
+import { MdPictureAsPdf } from "react-icons/md";
+import { BsFileEarmarkPdf } from "react-icons/bs";
 
 
 interface LancamentosProps {
@@ -69,15 +71,14 @@ function Lancamentos({
     doc.text('Relatório de Lançamentos', 14, 15);
 
     const colunas = [
-      'Descrição', 'Data Inicial', 'Valor Principal', 'Data Cálculo',
+      'Descrição', 'Data Inicial', 'Data Calculo', 'Valor Principal',
       'Índice', 'Valor Atualizado', 'Dias', '% Correção', 'Juros', 'Total'
     ];
 
     const linhas = lancamentos.map((l) => [
       l.descricao,
-      formatDate(l.dataInicial),
+      `Data Inicial: ${formatDate(l.dataInicial)}\nData Cálculo: ${formatDate(l.dataCalculo)}`,
       formatBRL(l.valorPrincipal),
-      formatDate(l.dataCalculo),
       l.indiceCorrecao,
       formatBRL(l.valorAtualizado),
       l.dias.toString(),
@@ -88,19 +89,18 @@ function Lancamentos({
 
     const columnStyles: { [key: number]: any } = {
       0: { cellWidth: 'auto', halign: 'left' },
-      1: { cellWidth: 25, halign: 'center' },
+      1: { cellWidth: 35, halign: 'left', fontSize: 7 }, // Coluna de Datas com fonte menor
       2: { cellWidth: 28, halign: 'right' },
-      3: { cellWidth: 25, halign: 'center' },
-      4: { cellWidth: 30, halign: 'left' },
-      5: { cellWidth: 28, halign: 'right' },
-      6: { cellWidth: 15, halign: 'center' },
-      7: { cellWidth: 22, halign: 'right' },
+      3: { cellWidth: 30, halign: 'left' },
+      4: { cellWidth: 28, halign: 'right' },
+      5: { cellWidth: 15, halign: 'center' },
+      6: { cellWidth: 22, halign: 'right' },
+      7: { cellWidth: 28, halign: 'right' },
       8: { cellWidth: 28, halign: 'right' },
-      9: { cellWidth: 28, halign: 'right' },
     };
 
     autoTable(doc, {
-      head: [colunas],
+      head: [colunas],    
       body: linhas,
       startY: 25,
       margin: { left: 14, right: 14 },
@@ -138,7 +138,7 @@ function Lancamentos({
 
       autoTable(doc, {
         body: [[
-          'TOTAL GERAL', '', formatBRL(totals.principal), '', '',
+          'TOTAL GERAL', '', formatBRL(totals.principal), '',
           formatBRL(totals.atualizado), totals.dias.toString(), '',
           formatBRL(totals.juros), formatBRL(totals.total),
         ]],
@@ -174,33 +174,32 @@ function Lancamentos({
 
     // Definição das colunas: label, largura (px), alinhamento
     const cols = [
-      { label: 'Descrição',       width: 160, align: 'left'   as const },
-      { label: 'Data Inicial',    width: 90,  align: 'center' as const },
-      { label: 'Valor Principal', width: 110, align: 'right'  as const },
-      { label: 'Data Cálculo',    width: 90,  align: 'center' as const },
-      { label: 'Índice',          width: 110, align: 'left'   as const },
-      { label: 'Valor Atualizado',width: 115, align: 'right'  as const },
-      { label: 'Dias',            width: 55,  align: 'center' as const },
-      { label: '%Correção',       width: 85,  align: 'right'  as const },
-      { label: 'Juros',           width: 100, align: 'right'  as const },
-      { label: 'Total',           width: 110, align: 'right'  as const },
+      { label: 'Descrição', width: 160, align: 'left' as const },
+      { label: 'Datas', width: 100, align: 'left' as const },
+      { label: 'Valor Principal', width: 110, align: 'right' as const },
+      { label: 'Índice', width: 110, align: 'left' as const },
+      { label: 'Valor Atualizado', width: 115, align: 'right' as const },
+      { label: 'Dias', width: 55, align: 'center' as const },
+      { label: '%Correção', width: 85, align: 'right' as const },
+      { label: 'Juros', width: 100, align: 'right' as const },
+      { label: 'Total', width: 110, align: 'right' as const },
     ];
 
-    const scale      = 2;
-    const padX       = 28;
-    const padY       = 24;
-    const rowH       = 32;
-    const headH      = 38;
-    const titleH     = 56;
-    const hasTotals  = lancamentos.length > 1;
-    const tableW     = cols.reduce((s, c) => s + c.width, 0);
-    const canvasW    = tableW + padX * 2;
-    const canvasH    = padY + titleH + headH + rowH * lancamentos.length + (hasTotals ? rowH : 0) + padY;
+    const scale = 2;
+    const padX = 28;
+    const padY = 24;
+    const rowH = 32;
+    const headH = 38;
+    const titleH = 56;
+    const hasTotals = lancamentos.length > 1;
+    const tableW = cols.reduce((s, c) => s + c.width, 0);
+    const canvasW = tableW + padX * 2;
+    const canvasH = padY + titleH + headH + rowH * lancamentos.length + (hasTotals ? rowH : 0) + padY;
 
-    const canvas     = document.createElement('canvas');
-    canvas.width     = canvasW * scale;
-    canvas.height    = canvasH * scale;
-    const ctx        = canvas.getContext('2d')!;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasW * scale;
+    canvas.height = canvasH * scale;
+    const ctx = canvas.getContext('2d')!;
     ctx.scale(scale, scale);
 
     // ── fundo branco ──────────────────────────────────────────
@@ -225,11 +224,19 @@ function Lancamentos({
       ctx.beginPath();
       ctx.rect(cx + 2, cy, cw - 4, ch);
       ctx.clip();
-      const tx = align === 'right'  ? cx + cw - 8
-               : align === 'center' ? cx + cw / 2
-               : cx + 8;
+      const tx = align === 'right' ? cx + cw - 8
+        : align === 'center' ? cx + cw / 2
+          : cx + 8;
       ctx.textAlign = align;
-      ctx.fillText(text, tx, cy + ch / 2 + 4);
+
+      if (text.includes('\n')) {
+        const lines = text.split('\n');
+        ctx.font = '9px Arial, sans-serif'; // Fonte menor para datas múltiplas
+        ctx.fillText(lines[0], tx, cy + ch / 2 - 2);
+        ctx.fillText(lines[1], tx, cy + ch / 2 + 10);
+      } else {
+        ctx.fillText(text, tx, cy + ch / 2 + 4);
+      }
       ctx.restore();
     };
 
@@ -268,9 +275,8 @@ function Lancamentos({
 
       const vals = [
         l.descricao,
-        formatDate(l.dataInicial),
+        `I: ${formatDate(l.dataInicial)}\nC: ${formatDate(l.dataCalculo)}`,
         formatBRL(l.valorPrincipal),
-        formatDate(l.dataCalculo),
         l.indiceCorrecao,
         formatBRL(l.valorAtualizado),
         String(l.dias),
@@ -299,11 +305,11 @@ function Lancamentos({
 
     // ── linha de totais ───────────────────────────────────────
     if (hasTotals) {
-      const tPrincipal  = lancamentos.reduce((s, l) => s + l.valorPrincipal, 0);
+      const tPrincipal = lancamentos.reduce((s, l) => s + l.valorPrincipal, 0);
       const tAtualizado = lancamentos.reduce((s, l) => s + l.valorAtualizado, 0);
-      const tDias       = lancamentos.reduce((s, l) => s + l.dias, 0);
-      const tJuros      = lancamentos.reduce((s, l) => s + l.juros, 0);
-      const tGeral      = lancamentos.reduce((s, l) => s + l.total, 0);
+      const tDias = lancamentos.reduce((s, l) => s + l.dias, 0);
+      const tJuros = lancamentos.reduce((s, l) => s + l.juros, 0);
+      const tGeral = lancamentos.reduce((s, l) => s + l.total, 0);
 
       ctx.fillStyle = '#f3f4f6';
       ctx.fillRect(padX, y, tableW, rowH);
@@ -312,7 +318,7 @@ function Lancamentos({
       ctx.strokeRect(padX, y, tableW, rowH);
 
       const totVals = [
-        'Total Geral', '', formatBRL(tPrincipal), '', '',
+        'Total Geral', '', formatBRL(tPrincipal), '',
         formatBRL(tAtualizado), String(tDias), '',
         formatBRL(tJuros), formatBRL(tGeral),
       ];
@@ -336,7 +342,7 @@ function Lancamentos({
     // ── download ──────────────────────────────────────────────
     canvas.toBlob((blob) => {
       if (!blob) { alert('Erro ao gerar imagem.'); return; }
-      const url  = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = 'tabela-lancamentos.jpg';
       link.href = url;
@@ -349,29 +355,101 @@ function Lancamentos({
 
   return (
     <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
-      <div className="flex items-center justify-end text-gray-400 text-[18px] font-bold">
-        <h1>Página {currentPage} de {totalPages}</h1>
-      </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between text-gray-400 text-[18px] font-bold gap-3">
         <h1 className="text-[24px] text-gray-700 font-bold underline">
           Lançamentos
         </h1>
+        <h1 className="text-[24px] text-gray-400">
+          Página {currentPage} de {totalPages}
+        </h1>
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Ir para:</span>
+            <input
+              type="number"
+              min={1}
+              max={totalPages}
+              value={pageInput}
+              onChange={(e) => setPageInput(e.target.value)}
+              onBlur={() => {
+                let p = parseInt(pageInput);
+                if (isNaN(p) || p < 1) p = 1;
+                if (p > totalPages) p = totalPages;
+                setCurrentPage(p);
+                setPageInput(p.toString());
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  let p = parseInt(e.currentTarget.value);
+                  if (isNaN(p) || p < 1) p = 1;
+                  if (p > totalPages) p = totalPages;
+                  setCurrentPage(p);
+                  setPageInput(p.toString());
+                }
+              }}
+              className="w-16 h-8 text-center border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={handlePrev}
+              disabled={currentPage === 1}
+              className={`flex items-center justify-center w-8 h-8 rounded border ${currentPage === 1
+                ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
+                } transition-colors`}
+              title="Página Anterior"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentPage(idx + 1)}
+                  className={`w-8 h-8 rounded border text-sm font-medium ${currentPage === idx + 1
+                    ? "border-blue-500 bg-blue-50 text-blue-600"
+                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                    }`}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={handleNext}
+              disabled={currentPage === totalPages}
+              className={`flex items-center justify-center w-8 h-8 rounded border ${currentPage === totalPages
+                ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
+                } transition-colors`}
+              title="Próxima Página"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-end">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={exportarParaPDF}
             title="Exportar para PDF"
-            className="p-0 m-0 bg-transparent border-none cursor-pointer flex items-center"
+            className="bg-gray-100 group p-0 m-0 border border-blue-600 hover:border-blue-800 hover:text-blue-800 cursor-pointer flex items-center w-45 h-10 flex justify-start rounded-lg transition-all"
           >
-            <FaFilePdf className="text-red-600 hover:text-red-700 transition-colors h-6 w-6" />
+            <BsFileEarmarkPdf className="text-blue-600 group-hover:text-blue-800 transition-colors h-6 w-6 ml-2" /> <p className="pl-1 text-blue-500 group-hover:text-blue-800 transition-colors text-[14px]">Exportar para PDF</p>
           </button>
           <button
             type="button"
             onClick={baixarImagem}
             title="Baixar como Imagem (JPG)"
-            className="p-0 m-0 bg-transparent border-none cursor-pointer flex items-center"
+            className="bg-gray-100 group p-0 m-0 border border-blue-600 hover:border-blue-800 hover:text-blue-800 cursor-pointer flex items-center w-45 h-10 flex justify-start rounded-lg transition-all"
           >
-            <FaImage className="text-blue-600 hover:text-blue-800 transition-colors h-6 w-6" />
+            <ImageIcon className="text-blue-600 group-hover:text-blue-800 transition-colors h-6 w-6 ml-2" /> <p className="pl-1 text-blue-500 group-hover:text-blue-800 transition-colors text-[14px]">Baixar como Imagem</p>
           </button>
         </div>
       </div>
@@ -388,57 +466,63 @@ function Lancamentos({
               <thead>
                 <tr className="border-b-2 border-gray-300 text-left text-[12px] text-black bg-gray-300 uppercase divide-x divide-slate-500">
                   <th className="pb-2 pt-2 pl-2 pr-4 underline px-6">
+                    #
+                  </th>
+                  <th className="pb-2 pt-2 pr-4 underline px-6">
                     Descrição
                   </th>
                   <th className="pb-2 pt-2 pr-4 underline px-6">
-                    Data Inicial
+                    Data
                   </th>
                   <th className="pb-2 pt-2 pr-4 underline px-6">
                     Valor Principal
                   </th>
                   <th className="pb-2 pt-2 pr-4 underline px-6">
-                    Data do Cálculo
-                  </th>
-                  <th className="pb-2 pt-2 pr-4 underline px-6">
                     Índice de Correção
                   </th>
+                  <th className="pb-2 pt-2 pr-4 underline px-6">%Correção</th>
                   <th className="pb-2 pt-2 pr-4 underline px-6">
                     Valor Atualizado
                   </th>
                   <th className="pb-2 pt-2 pr-4 underline px-6">Dias</th>
-                  <th className="pb-2 pt-2 pr-4 underline px-6">%Correção</th>
+
                   <th className="pb-2 pt-2 pr-4 underline px-6">Juros</th>
                   <th className="pb-2 pt-2 pr-4 underline px-6">Total</th>
                   <th className="pb-2 pt-2 pr-4 underline px-6">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-500">
-                {currentItems.map((l) => (
+                {currentItems.map((l, index) => (
                   <tr
                     key={l.id}
                     className="hover:bg-gray-50 transition-colors divide-x divide-slate-500"
                   >
                     <td className="py-3 pl-4 pr-6 font-medium">
+                      {startIndex + index + 1}
+                    </td>
+                    <td className="py-3 pl-4 pr-6 font-medium">
                       {l.descricao}
                     </td>
-                    <td className="py-3 pl-4 pr-6">
-                      {formatDate(l.dataInicial)}
+                    <td className="py-3 pl-4 pr-6 text-[11px] leading-tight">
+                      <div className="flex flex-col">
+                        <span className="text-gray-600 font-medium">Data Inicial: {formatDate(l.dataInicial)}</span>
+                        <span className="text-gray-600 font-bold">Data Cálculo: {formatDate(l.dataCalculo)}</span>
+                      </div>
                     </td>
                     <td className="py-3 pl-4 pr-6">
                       {formatBRL(l.valorPrincipal)}
                     </td>
-                    <td className="py-3 pl-4 pr-6">
-                      {formatDate(l.dataCalculo)}
-                    </td>
                     <td className="py-3 pl-4 pr-6">{l.indiceCorrecao}</td>
+                    <td className="py-3 pl-4 pr-6">
+                      {formatPercent(l.percentualCorrecao)}
+                    </td>
                     <td className="py-3 pl-4 pr-6 text-blue-700 font-semibold">
                       {formatBRL(l.valorAtualizado)}
                     </td>
                     <td className="py-3 pl-4 pr-6">{l.dias}</td>
-                    <td className="py-3 pl-4 pr-6">
-                      {formatPercent(l.percentualCorrecao)}
-                    </td>
+
                     <td className="py-3 pl-4 pr-6">{formatBRL(l.juros)}</td>
+
                     <td className="py-3 pl-4 pr-6 text-green-700 font-bold">
                       {formatBRL(l.total)}
                     </td>
@@ -463,7 +547,7 @@ function Lancamentos({
               {lancamentos.length > 1 && currentPage === totalPages && (
                 <tfoot>
                   <tr className="border-t-2 border-gray-400 text-sm font-bold text-gray-700 bg-gray-100 divide-x divide-slate-400">
-                    <td className="py-3 pl-4 pr-6" colSpan={2}>
+                    <td className="py-3 pl-4 pr-6" colSpan={3}>
                       Total Geral
                     </td>
                     <td className="py-3 pl-4 pr-6">
@@ -477,10 +561,9 @@ function Lancamentos({
                         lancamentos.reduce((s, l) => s + l.valorAtualizado, 0),
                       )}
                     </td>
-                    <td className="py-3 pl-4 pr-6">
+                    <td className="py-3 pl-4 pr-6 text-center">
                       {lancamentos.reduce((s, l) => s + l.dias, 0)}
                     </td>
-                    <td className="py-3 pl-4 pr-6"></td>
                     <td className="py-3 pl-4 pr-6">
                       {formatBRL(lancamentos.reduce((s, l) => s + l.juros, 0))}
                     </td>

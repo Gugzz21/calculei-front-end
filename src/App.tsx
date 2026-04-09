@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import './App.css'
 import Header from './components/Header'
 import CentralCard from './components/CentralCard/CentralCard'
@@ -7,6 +7,7 @@ import Lancamentos from './components/Lancamentos'
 import { calcularIndice, calcularJuros, getValorAtualizado } from './services/api'
 
 export interface LancamentoItem {
+  numero: ReactNode
   id: number;
   descricao: string;
   dataInicial: string;
@@ -68,13 +69,13 @@ function App() {
   const handleJurosChange = (field: keyof JurosState, value: string | boolean) => {
     setJuros(prev => {
       const newState = { ...prev, [field]: value };
-      
+
       // Quando muda o índice, define taxas padrão para os itens específicos
       if (field === 'indice') {
         if (value === 'jurossimples6') newState.taxa = '6,00';
         else if (value === 'jurossimples12' || value === 'especificartaxa') newState.taxa = '12,00';
       }
-      
+
       return newState;
     });
   };
@@ -134,6 +135,7 @@ function App() {
         percentualCorrecao,
         juros: valorJuros,
         total,
+        numero: undefined
       };
 
       await minWait;
