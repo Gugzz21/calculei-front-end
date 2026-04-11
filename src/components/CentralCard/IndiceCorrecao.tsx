@@ -8,7 +8,7 @@ function IndiceCorrecao({ value, onChange }: IndiceCorrecaoProps) {
     <div className="flex flex-col gap-1">
       <strong className="text-[14px] text-gray-700 font-semibold">Índice de correção monetária</strong>
       <select
-        className="bg-white border border-blue-400 h-[45px] w-full md:w-[505px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
+        className="bg-white border border-gray-300 h-[45px] w-full md:w-[330px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >

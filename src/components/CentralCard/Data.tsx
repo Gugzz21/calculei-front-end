@@ -12,7 +12,7 @@ function Data({ title, value, onChange, max, min }: DataProps) {
       <strong className="text-[14px] text-gray-700 font-semibold">
         {title}
       </strong>
-      <div className="bg-white border border-blue-400 w-full md:w-[180px] h-[45px] flex items-center px-3 rounded-md">
+      <div className="bg-white border border-gray-300 w-full md:w-[180px] h-[45px] flex items-center px-3 rounded-md">
         <input
           type="date"
           value={value}

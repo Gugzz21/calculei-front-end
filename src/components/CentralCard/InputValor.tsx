@@ -42,7 +42,7 @@ function InputValor({ value, onChange }: InputValorProps) {
   return (
     <div className="flex flex-col gap-1 w-full md:w-auto">
       <strong className="text-[14px] text-gray-700 font-semibold">Valor</strong>
-      <div className="bg-white border border-blue-400 h-[45px] flex items-center px-3 gap-2 rounded-md w-full md:w-[340px]">
+      <div className="bg-white border border-gray-300 h-[45px] flex items-center px-3 gap-2 rounded-md w-full md:w-[220px]">
         <input
           ref={inputRef}
           type="text"
