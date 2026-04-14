@@ -433,20 +433,30 @@ function Lancamentos({
           <button
             type="button"
             onClick={exportarParaPDF}
+            disabled={lancamentos.length === 0}
             title="Gerar PDF"
-            className="w-[150px] h-[40px] bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm"
+            className={`w-[150px] h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm ${
+              lancamentos.length === 0
+                ? "bg-[#f1f3f5] border border-[#d2d6dc] text-[#adb5bd] cursor-not-allowed"
+                : "bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer"
+            }`}
           >
-            <MdPictureAsPdf style={{ fill: 'white', backgroundColor: '#073365'}} className="h-[20px] w-[20px]" />
+            <MdPictureAsPdf style={{ fill: lancamentos.length === 0 ? '#adb5bd' : 'white', backgroundColor: lancamentos.length === 0 ? 'transparent' : '#073365' }} className="h-[20px] w-[20px] rounded-[3px]" />
             <span className="text-[14px]">Gerar PDF</span>
           </button>
           <button
             type="button"
             onClick={baixarImagem}
+            disabled={lancamentos.length === 0}
             title="Printar e copiar"
-            className="w-[200px] h-[40px] bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm"
+            className={`w-[200px] h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm ${
+              lancamentos.length === 0
+                ? "bg-[#f1f3f5] border border-[#d2d6dc] text-[#adb5bd] cursor-not-allowed"
+                : "bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer"
+            }`}
           >
             <ImageOutlinedIcon className="h-[20px] w-[20px]" />
-            <span className="text-[14px]">Printar e baixar</span>
+            <span className="text-[14px]">Printar e salvar</span>
           </button>
         </div>
       </div>

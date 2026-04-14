@@ -16,8 +16,8 @@ function Calcular({ onClick, loading, disabled }: CalcularProps) {
         title={disabled && !loading ? "Preencha todos os campos obrigatórios (valor, data inicial, data do cálculo)" : undefined}
         className={`flex justify-center items-center px-4 gap-3 w-full md:w-[288px] h-[40px] rounded-md font-semibold text-sm transition-colors
           ${isDisabled
-            ? "bg-[#073365] text-white cursor-not-allowed"
-            : "bg-[#073365] text-white hover:bg-gray-700 cursor-pointer"
+            ? "bg-[#f1f3f5] text-[#adb5bd] cursor-not-allowed"
+            : "bg-[#073365] text-white hover:bg-[#062953] cursor-pointer"
           }`}
       >
         <Calculator className="w-5 h-5" />
