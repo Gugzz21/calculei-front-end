@@ -435,11 +435,10 @@ function Lancamentos({
             onClick={exportarParaPDF}
             disabled={lancamentos.length === 0}
             title="Gerar PDF"
-            className={`w-[150px] h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm ${
-              lancamentos.length === 0
-                ? "bg-[#f1f3f5] border border-[#d2d6dc] text-[#adb5bd] cursor-not-allowed"
-                : "bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer"
-            }`}
+            className={`w-[150px] h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm ${lancamentos.length === 0
+              ? "bg-[#f1f3f5] border border-[#d2d6dc] text-[#adb5bd] cursor-not-allowed"
+              : "bg-white border border-[#ADB4C2] text-[#1F2022] hover:bg-slate-50 cursor-pointer"
+              }`}
           >
             <MdPictureAsPdf className="h-[20px] w-[20px]" />
             <span className="text-[14px]">Gerar PDF</span>
@@ -449,11 +448,10 @@ function Lancamentos({
             onClick={baixarImagem}
             disabled={lancamentos.length === 0}
             title="Printar e copiar"
-            className={`w-[200px] h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm ${
-              lancamentos.length === 0
-                ? "bg-[#f1f3f5] border border-[#d2d6dc] text-[#adb5bd] cursor-not-allowed"
-                : "bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer"
-            }`}
+            className={`w-[200px] h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm ${lancamentos.length === 0
+              ? "bg-[#f1f3f5] border border-[#d2d6dc] text-[#adb5bd] cursor-not-allowed"
+              : "bg-white border border-[#ADB4C2] text-[#1F2022] hover:bg-slate-50 cursor-pointer"
+              }`}
           >
             <ImageOutlinedIcon className="h-[20px] w-[20px]" />
             <span className="text-[14px]">Printar e salvar</span>
