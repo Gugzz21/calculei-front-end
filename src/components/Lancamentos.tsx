@@ -441,7 +441,7 @@ function Lancamentos({
                 : "bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer"
             }`}
           >
-            <MdPictureAsPdf style={{ fill: lancamentos.length === 0 ? '#adb5bd' : 'white', backgroundColor: lancamentos.length === 0 ? 'transparent' : '#073365' }} className="h-[20px] w-[20px] rounded-[3px]" />
+            <MdPictureAsPdf className="h-[20px] w-[20px]" />
             <span className="text-[14px]">Gerar PDF</span>
           </button>
           <button
