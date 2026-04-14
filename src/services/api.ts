@@ -22,13 +22,10 @@ const ENDPOINT_MAP: Record<string, string> = {
   ipcae: "/ipcae/calculate/between-dates",
   igpm: "/igpm/calculate/between-dates",
   tr: "/tr/calculate/between-dates",
-  inpc: "/inpc/calculate/between-dates",
   igpdi: "/igpdi/calculate/between-dates",
-  ipcbr: "/ipcbr/calculate/between-dates",
   cdi: "/cdi/calculate/between-dates",
   selic: "/selic-mensal/calculate/between-dates",
   semcorrecaomonetaria: null as unknown as string,
-  tjrj119602009ortnotnbnttrufiripcae: "/ipcae/calculate/between-dates",
   tjrj119602009ipcaeselic: "/selic-mensal/calculate/between-dates",
 };
 

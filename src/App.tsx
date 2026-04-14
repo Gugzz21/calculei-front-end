@@ -44,8 +44,8 @@ function App() {
   const [form, setForm] = useState<FormState>({
     valor: '',
     dataInicial: '',
-    dataCalculo: '',
-    indiceCorrecao: 'tjrj119602009ortnotnbnttrufiripcae',
+    dataCalculo: today,
+    indiceCorrecao: 'ipcae',
     tipoCalculo: 'dfazendanaotributario',
     descricao: 'ressarci',
   });
@@ -152,8 +152,8 @@ function App() {
     setForm({
       valor: '',
       dataInicial: '',
-      dataCalculo: '',
-      indiceCorrecao: 'tjrj119602009ortnotnbnttrufiripcae',
+      dataCalculo: today,
+      indiceCorrecao: 'ipcae',
       tipoCalculo: 'dfazendanaotributario',
       descricao: 'ressarci',
     });
@@ -207,13 +207,10 @@ const INDICE_LABEL: Record<string, string> = {
   ipcae: 'IPCA-E',
   igpm: 'IGP-M',
   tr: 'TR',
-  inpc: 'INPC',
   igpdi: 'IGP-DI',
-  ipcbr: 'IPC-BR',
   cdi: 'CDI',
   selic: 'SELIC',
   semcorrecaomonetaria: 'Sem Correção',
-  tjrj119602009ortnotnbnttrufiripcae: 'TJRJ 11.960/09',
   tjrj119602009ipcaeselic: 'TJRJ IPCA/SELIC',
 };
 

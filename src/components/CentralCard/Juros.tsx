@@ -38,7 +38,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm 
           <select
             value={indice}
             onChange={(e) => onJurosChange("indice", e.target.value)}
-            className="bg-white border border-gray-300 h-[45px] w-full md:w-[280px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
+            className="bg-white border border-gray-300 h-[45px] w-full md:w-[330px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
           >
             <option value="jurossimples6">Juros Simples 6% a.a.</option>
             <option value="jurossimples12">Juros Simples 12% a.a.</option>

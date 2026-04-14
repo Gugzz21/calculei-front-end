@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LancamentoItem } from "../App";
-import { FaFilePdf, FaImage } from "react-icons/fa";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useRef } from 'react';
-import { MdPictureAsPdf } from "react-icons/md";
-import { BsFileEarmarkPdf } from "react-icons/bs";
-
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
+import MdPictureAsPdf from '@mui/icons-material/PictureAsPdf';
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
@@ -100,7 +98,7 @@ function Lancamentos({
     };
 
     autoTable(doc, {
-      head: [colunas],    
+      head: [colunas],
       body: linhas,
       startY: 25,
       margin: { left: 14, right: 14 },
@@ -356,11 +354,8 @@ function Lancamentos({
   return (
     <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
       <div className="flex items-center justify-between text-gray-400 text-[18px] font-bold gap-3">
-        <h1 className="text-[24px] text-gray-700 font-bold underline">
+        <h1 className="text-[24px] text-[#1F2022] font-bold">
           Lançamentos
-        </h1>
-        <h1 className="text-[24px] text-gray-400">
-          Página {currentPage} de {totalPages}
         </h1>
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="flex items-center gap-2">
@@ -433,23 +428,25 @@ function Lancamentos({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-end">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-start">
+        <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={exportarParaPDF}
-            title="Exportar para PDF"
-            className="bg-gray-100 group p-0 m-0 border border-blue-600 hover:border-blue-800 hover:text-blue-800 cursor-pointer flex items-center w-45 h-10 flex justify-start rounded-lg transition-all"
+            title="Gerar PDF"
+            className="w-[150px] h-[40px] bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm"
           >
-            <BsFileEarmarkPdf className="text-blue-600 group-hover:text-blue-800 transition-colors h-6 w-6 ml-2" /> <p className="pl-1 text-blue-500 group-hover:text-blue-800 transition-colors text-[14px]">Exportar para PDF</p>
+            <MdPictureAsPdf style={{ fill: 'white', backgroundColor: '#073365'}} className="h-[20px] w-[20px]" />
+            <span className="text-[14px]">Gerar PDF</span>
           </button>
           <button
             type="button"
             onClick={baixarImagem}
-            title="Baixar como Imagem (JPG)"
-            className="bg-gray-100 group p-0 m-0 border border-blue-600 hover:border-blue-800 hover:text-blue-800 cursor-pointer flex items-center w-45 h-10 flex justify-start rounded-lg transition-all"
+            title="Printar e copiar"
+            className="w-[200px] h-[40px] bg-white border border-[#073365] text-[#073365] hover:bg-slate-50 cursor-pointer flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm"
           >
-            <ImageIcon className="text-blue-600 group-hover:text-blue-800 transition-colors h-6 w-6 ml-2" /> <p className="pl-1 text-blue-500 group-hover:text-blue-800 transition-colors text-[14px]">Baixar como Imagem</p>
+            <ImageOutlinedIcon className="h-[20px] w-[20px]" />
+            <span className="text-[14px]">Printar e baixar</span>
           </button>
         </div>
       </div>
