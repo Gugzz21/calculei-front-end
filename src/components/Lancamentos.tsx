@@ -6,6 +6,7 @@ import autoTable from 'jspdf-autotable';
 import { useRef } from 'react';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import MdPictureAsPdf from '@mui/icons-material/PictureAsPdf';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
@@ -69,8 +70,8 @@ function Lancamentos({
     doc.text('Relatório de Lançamentos', 14, 15);
 
     const colunas = [
-      'Descrição', 'Data Inicial', 'Data Calculo', 'Valor Principal',
-      'Índice', 'Valor Atualizado', 'Dias', '% Correção', 'Juros', 'Total'
+      'Descrição', 'Datas', 'Valor Principal', 'Índice',
+      'Valor Atualizado', 'Dias', '% Correção', 'Juros', 'Total'
     ];
 
     const linhas = lancamentos.map((l) => [
@@ -453,7 +454,7 @@ function Lancamentos({
               : "bg-white border border-[#ADB4C2] text-[#1F2022] hover:bg-slate-50 cursor-pointer"
               }`}
           >
-            <ImageOutlinedIcon className="h-[20px] w-[20px]" />
+            <CameraAltIcon className="h-[20px] w-[20px]" />
             <span className="text-[14px]">Printar e salvar</span>
           </button>
         </div>
