@@ -5,18 +5,19 @@ import type { LancamentoRecuperado } from "./types";
 import { formatBRL, formatDate, formatPercent, gerarUUID } from "./utils";
 import { salvarHistorico } from "../../services/api";
 
-/** Estilos de coluna compartilhados pelos dois tipos de PDF */
+// ─── Estilos compartilhados ───────────────────────────────────────────────────
+
 const COL_STYLES: { [key: number]: any } = {
   0: { cellWidth: "auto", halign: "left" },
-  1: { cellWidth: 32,   halign: "left", fontSize: 7 },
-  2: { cellWidth: 26,   halign: "right" },
-  3: { cellWidth: 24,   halign: "left" },
-  4: { cellWidth: 26,   halign: "right" },
-  5: { cellWidth: 13,   halign: "center" },
-  6: { cellWidth: 20,   halign: "right" },
-  7: { cellWidth: 24,   halign: "left" },
-  8: { cellWidth: 26,   halign: "right" },
-  9: { cellWidth: 26,   halign: "right" },
+  1: { cellWidth: 32,     halign: "left", fontSize: 7 },
+  2: { cellWidth: 26,     halign: "right" },
+  3: { cellWidth: 24,     halign: "left" },
+  4: { cellWidth: 26,     halign: "right" },
+  5: { cellWidth: 13,     halign: "center" },
+  6: { cellWidth: 20,     halign: "right" },
+  7: { cellWidth: 24,     halign: "left" },
+  8: { cellWidth: 26,     halign: "right" },
+  9: { cellWidth: 26,     halign: "right" },
 };
 
 const COLUNAS_PDF = [
@@ -24,7 +25,8 @@ const COLUNAS_PDF = [
   "Valor Atualizado", "Dias", "% Correção", "Índice Juros", "Juros", "Total",
 ];
 
-/** Adiciona linha de Total Geral ao PDF */
+// ─── Helpers internos ─────────────────────────────────────────────────────────
+
 function adicionarTotalGeral(
   doc: jsPDF,
   items: { valorPrincipal: number; valorAtualizado: number; dias: number; juros: number; total: number }[]
@@ -54,23 +56,91 @@ function adicionarTotalGeral(
   });
 }
 
-/** Adiciona numeração de páginas ao PDF */
-function adicionarPaginacao(doc: jsPDF) {
+/**
+ * Desenha o bloco de Token de Recuperação na última página do PDF.
+ * Fica após a tabela, com fundo amarelo e aviso sobre guarda do token.
+ */
+function adicionarBlocoToken(doc: jsPDF, token: string) {
+  // Desce à última página para escrever após a tabela
+  const totalPgs  = (doc.internal as any).getNumberOfPages();
+  doc.setPage(totalPgs);
+
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const total = (doc.internal as any).getNumberOfPages();
+
+  // Calcula Y de partida: 6 mm após o fim da última tabela
+  const lastTableY: number = (doc as any).lastAutoTable?.finalY ?? 40;
+  const startY = lastTableY + 8;
+
+  // Altura do bloco
+  const boxH = 26;
+  const margin = 14;
+  const boxW = pageWidth - margin * 2;
+
+  // Verifica se há espaço suficiente; se não, adiciona nova página
+  if (startY + boxH > pageHeight - 14) {
+    doc.addPage();
+    doc.setPage((doc.internal as any).getNumberOfPages());
+  }
+
+  const y = startY + boxH > pageHeight - 14
+    ? 20          // nova página
+    : startY;
+
+  // ── Fundo amarelo-âmbar ───────────────────────────────────────────────────
+  doc.setFillColor(255, 251, 235);          // amber-50
+  doc.setDrawColor(251, 191, 36);           // amber-400
+  doc.setLineWidth(0.4);
+  doc.roundedRect(margin, y, boxW, boxH, 2, 2, "FD");
+
+  // ── Ícone de aviso (texto emoji aproximado) ───────────────────────────────
+  doc.setFontSize(9);
+  doc.setTextColor(146, 64, 14);            // amber-800
+  doc.setFont("helvetica", "bold");
+  doc.text("⚠  TOKEN DE RECUPERAÇÃO", margin + 4, y + 7);
+
+  // ── Token em destaque ─────────────────────────────────────────────────────
+  doc.setFont("courier", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  doc.text(token, margin + 4, y + 15);
+
+  // ── Aviso ─────────────────────────────────────────────────────────────────
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
+  doc.setTextColor(120, 60, 0);
+  doc.text(
+    "Guarde este token em local seguro. Com ele você pode recuperar e reimprimir este relatório a qualquer momento no sistema.",
+    margin + 4,
+    y + 22,
+    { maxWidth: boxW - 8 }
+  );
+}
+
+function adicionarPaginacao(doc: jsPDF) {
+  const pageWidth  = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const total      = (doc.internal as any).getNumberOfPages();
   for (let i = 1; i <= total; i++) {
     doc.setPage(i);
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-    doc.text(`Página ${i} de ${total}`, pageWidth - 14, pageHeight - 10, { align: "right" });
+    doc.setTextColor(120);
+    doc.text(`Página ${i} de ${total}`, pageWidth - 14, pageHeight - 6, { align: "right" });
   }
 }
 
+// ─── Exportação principal ─────────────────────────────────────────────────────
+
 /**
  * Gera e baixa o PDF dos lançamentos ativos.
- * Também salva no backend (POST /history/save) e retorna o token gerado.
+ * O token de recuperação é gerado, salvo no backend e inserido no próprio PDF.
+ * Retorna void (não mais exibe popup).
  */
-export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<string> {
+export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<void> {
+  // Gerar token ANTES de montar o PDF para incluí-lo no documento
+  const token = gerarUUID();
+
   const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
   doc.setFontSize(16);
@@ -102,11 +172,16 @@ export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<st
   });
 
   if (lancamentos.length > 1) adicionarTotalGeral(doc, lancamentos);
+
+  // ── Bloco do token no PDF ──────────────────────────────────────────────────
+  adicionarBlocoToken(doc, token);
+
+  // ── Paginação (depois do bloco para não sobrescrever) ─────────────────────
   adicionarPaginacao(doc);
+
   doc.save("relatorio-lancamentos.pdf");
 
-  // Salvar no backend e retornar token
-  const token = gerarUUID();
+  // ── Salvar no backend (após download para não bloquear) ───────────────────
   await salvarHistorico({
     data: new Date().toISOString().split("T")[0],
     token,
@@ -131,9 +206,9 @@ export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<st
       })),
     },
   });
-
-  return token;
 }
+
+// ─── PDF de recuperação ───────────────────────────────────────────────────────
 
 /**
  * Gera e baixa o PDF a partir de lançamentos recuperados por token.

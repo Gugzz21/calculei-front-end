@@ -1,29 +1,29 @@
 import { useState, useEffect, useRef } from "react";
 import type { LancamentoItem } from "../../App";
 
-import Paginacao        from "./Paginacao";
+import Paginacao from "./Paginacao";
 import TabelaLancamentos from "./TabelaLancamentos";
-import BotoesExport     from "./BotoesExport";
-import ModalToken       from "./ModalToken";
-import ModalRecuperar   from "./ModalRecuperar";
+import BotoesExport from "./BotoesExport";
+import ModalRecuperar from "./ModalRecuperar";
 import { exportarParaPDF } from "./exportPDF";
-import { baixarImagem }    from "./exportImagem";
+import { baixarImagem } from "./exportImagem";
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
   loading?: boolean;
   onRemover: (id: number) => void;
+  onRecuperar: (itensRecuperados: LancamentoItem[]) => void;
 }
 
-function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosProps) {
+function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: LancamentosProps) {
   // ── Paginação ──────────────────────────────────────────────────────────────
-  const [currentPage, setCurrentPage]   = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [pageInput, setPageInput]       = useState("1");
+  const [pageInput, setPageInput] = useState("1");
   const tableRef = useRef<HTMLDivElement>(null);
 
-  const totalPages   = Math.max(1, Math.ceil(lancamentos.length / itemsPerPage));
-  const startIndex   = (currentPage - 1) * itemsPerPage;
+  const totalPages = Math.max(1, Math.ceil(lancamentos.length / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = lancamentos.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
@@ -36,16 +36,14 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
   };
 
   // ── Modais ─────────────────────────────────────────────────────────────────
-  const [modalToken, setModalToken]         = useState<string | null>(null);
   const [modalRecuperar, setModalRecuperar] = useState(false);
-  const [salvandoPDF, setSalvandoPDF]       = useState(false);
+  const [salvandoPDF, setSalvandoPDF] = useState(false);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   const handleGerarPDF = async () => {
     setSalvandoPDF(true);
     try {
-      const token = await exportarParaPDF(lancamentos);
-      setModalToken(token);
+      await exportarParaPDF(lancamentos);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Erro desconhecido.";
       if (msg.includes("histórico")) {
@@ -68,8 +66,15 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <>
-      {modalToken && <ModalToken token={modalToken} onClose={() => setModalToken(null)} />}
-      {modalRecuperar && <ModalRecuperar onClose={() => setModalRecuperar(false)} />}
+      {modalRecuperar &&
+        <ModalRecuperar
+          onClose={() =>
+            setModalRecuperar(false)}
+          onRecuperar={(itens) => {
+            onRecuperar(itens);
+            setModalRecuperar(false);
+          }}
+        />}
 
       <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
 

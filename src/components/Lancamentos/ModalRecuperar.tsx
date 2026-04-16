@@ -1,6 +1,7 @@
 import { useState } from "react";
 import MdPictureAsPdf from "@mui/icons-material/PictureAsPdf";
 import { buscarPorToken } from "../../services/api";
+import type { LancamentoItem } from "../../App";
 import type { LancamentoRecuperado, DadosRecuperados } from "./types";
 import { gerarPDFRecuperado } from "./exportPDF";
 import { formatBRL, formatDate } from "./utils";
@@ -17,11 +18,33 @@ function extrairLancamentos(raw: object): LancamentoRecuperado[] {
   return [];
 }
 
-interface ModalRecuperarProps {
-  onClose: () => void;
+/** Converte LancamentoRecuperado[] → LancamentoItem[] (formato da tabela principal) */
+function converterParaLancamentoItem(itens: LancamentoRecuperado[]): LancamentoItem[] {
+  return itens.map((l, index) => ({
+    id: l.id ?? Date.now() + index,
+    numero: index + 1,
+    descricao: l.descricao,
+    dataInicial: l.dataInicial,
+    dataCalculo: l.dataCalculo,
+    valorPrincipal: l.valorPrincipal,
+    indiceCorrecao: l.indiceCorrecao,
+    valorAtualizado: l.valorAtualizado,
+    dias: l.dias,
+    percentualCorrecao: l.percentualCorrecao,
+    indiceJuros: l.indiceJuros,
+    dataInicioJuros: l.dataInicioJuros ?? "",
+    dataFimJuros: l.dataFimJuros ?? "",
+    juros: l.juros,
+    total: l.total,
+  }));
 }
 
-function ModalRecuperar({ onClose }: ModalRecuperarProps) {
+interface ModalRecuperarProps {
+  onClose: () => void;
+  onRecuperar: (itens: LancamentoItem[]) => void;
+}
+
+function ModalRecuperar({ onClose, onRecuperar }: ModalRecuperarProps) {
   const [tokenInput, setTokenInput] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sucesso" | "gerando" | "erro">("idle");
   const [mensagem, setMensagem] = useState("");
@@ -36,8 +59,11 @@ function ModalRecuperar({ onClose }: ModalRecuperarProps) {
     setMetaDados(null);
     try {
       const resultado = await buscarPorToken(tokenInput.trim());
-      setLancamentosRecuperados(extrairLancamentos(resultado));
+      const recuperados = extrairLancamentos(resultado);
+      setLancamentosRecuperados(recuperados);
       setMetaDados(resultado as DadosRecuperados);
+      // Converte e envia para a tabela principal imediatamente
+      onRecuperar(converterParaLancamentoItem(recuperados));
       setStatus("sucesso");
     } catch (e: unknown) {
       setMensagem(e instanceof Error ? e.message : "Erro desconhecido.");

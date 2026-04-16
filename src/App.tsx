@@ -84,6 +84,10 @@ function App() {
     });
   };
 
+  const recuperarLancamentos = (itensRecuperados: LancamentoItem[]) => {
+    setLancamentos(itensRecuperados);
+  }
+
   const calcular = async () => {
     setErro(null);
     const valorNum = form.valor ? parseInt(form.valor, 10) / 100 : 0;
@@ -213,6 +217,7 @@ function App() {
             lancamentos={lancamentos}
             loading={loading}
             onRemover={removerLancamento}
+            onRecuperar={recuperarLancamentos}
           />
         </div>
       </div>
