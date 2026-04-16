@@ -3,7 +3,7 @@ import './App.css'
 import Header from './components/Header'
 import CentralCard from './components/CentralCard/CentralCard'
 import Footer from './components/Footer'
-import Lancamentos from './components/Lancamentos'
+import Lancamentos from './components/Lancamentos/Lancamentos'
 import { calcularIndice, calcularJuros, getValorAtualizado } from './services/api'
 
 export interface LancamentoItem {
@@ -17,6 +17,10 @@ export interface LancamentoItem {
   valorAtualizado: number;
   dias: number;
   percentualCorrecao: number;
+  // Juros
+  indiceJuros: string;        // label do índice de juros aplicado (ou "—" se não houver)
+  dataInicioJuros: string;    // data início dos juros (ou "")
+  dataFimJuros: string;       // data fim dos juros (ou "")
   juros: number;
   total: number;
 }
@@ -35,7 +39,7 @@ export interface JurosState {
   indice: string;
   dataInicio: string;
   dataFim: string;
-  taxa: string; // % a.a. como string para facilitar input de decima em PT-BR
+  taxa: string; // % a.a. como string para facilitar input de decimal PT-BR
 }
 
 function App() {
@@ -93,7 +97,8 @@ function App() {
     setLoading(true);
     try {
       const minWait = new Promise(resolve => setTimeout(resolve, 500));
-      // Correção monetária
+
+      // ── Correção Monetária ──────────────────────────────────────────────────
       const respCorrecao = await calcularIndice(form.indiceCorrecao, {
         valor: valorNum,
         dateInit: form.dataInicial,
@@ -104,20 +109,33 @@ function App() {
       const dias = respCorrecao?.dias ?? 0;
       const percentualCorrecao = respCorrecao?.percentualAcumulado ?? respCorrecao?.fatorAcumulado ?? 0;
 
-      // Juros (se habilitado e SELIC não está selecionada como correção)
+      // ── Juros ───────────────────────────────────────────────────────────────
       let valorJuros = 0;
-      const selicSelecionada = form.indiceCorrecao === 'selic' || form.indiceCorrecao === 'tjrj119602009ipcaeselic';
+      let indiceJurosLabel = '—';
+      let dataInicioJurosLabel = '';
+      let dataFimJurosLabel = '';
+
+      const selicSelecionada =
+        form.indiceCorrecao === 'selic' || form.indiceCorrecao === 'tjrj119602009ipcaeselic';
+
       if (juros.enabled && !selicSelecionada && juros.dataInicio && juros.dataFim) {
         if (juros.dataFim > juros.dataInicio) {
-          const respJuros = await calcularJuros(juros.indice, {
-            valor: valorAtualizado,
-            dateInit: juros.dataInicio,
-            dateFim: juros.dataFim,
-          }, parseFloat(juros.taxa.replace(',', '.')));
+          const respJuros = await calcularJuros(
+            juros.indice,
+            {
+              valor: valorAtualizado,
+              dateInit: juros.dataInicio,
+              dateFim: juros.dataFim,
+            },
+            parseFloat(juros.taxa.replace(',', '.'))
+          );
           if (respJuros) {
             const valorComJuros = getValorAtualizado(respJuros);
             valorJuros = valorComJuros - valorAtualizado;
           }
+          indiceJurosLabel = JUROS_LABEL[juros.indice] ?? juros.indice;
+          dataInicioJurosLabel = juros.dataInicio;
+          dataFimJurosLabel = juros.dataFim;
         }
       }
 
@@ -133,6 +151,9 @@ function App() {
         valorAtualizado,
         dias,
         percentualCorrecao,
+        indiceJuros: indiceJurosLabel,
+        dataInicioJuros: dataInicioJurosLabel,
+        dataFimJuros: dataFimJurosLabel,
         juros: valorJuros,
         total,
         numero: undefined
@@ -212,6 +233,19 @@ const INDICE_LABEL: Record<string, string> = {
   selic: 'SELIC',
   semcorrecaomonetaria: 'Sem Correção',
   tjrj119602009ipcaeselic: 'TJRJ IPCA/SELIC',
+};
+
+const JUROS_LABEL: Record<string, string> = {
+  selic: 'SELIC',
+  cdi: 'CDI',
+  poupancanova: 'Poupança Nova',
+  poupancaantiga: 'Poupança Antiga',
+  poupanca: 'Poupança',
+  taxalegal: 'Taxa Legal',
+  codigocivil: 'Código Civil',
+  especificartaxa: 'Taxa Especificada',
+  jurossimples6: 'Juros Simples 6% a.a.',
+  jurossimples12: 'Juros Simples 12% a.a.',
 };
 
 const DESCRICAO_LABEL: Record<string, string> = {
