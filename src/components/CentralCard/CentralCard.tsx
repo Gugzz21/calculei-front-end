@@ -102,11 +102,10 @@ function CentralCard({
                   className="peer sr-only"
                 />
                 <div
-                  className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${
-                    juros.enabled
-                      ? "bg-blue-600 border-blue-600"
-                      : "bg-white border-gray-400 group-hover:border-blue-400"
-                  }`}
+                  className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${juros.enabled
+                    ? "bg-blue-600 border-blue-600"
+                    : "bg-white border-gray-400 group-hover:border-blue-400"
+                    }`}
                 >
                   {juros.enabled && (
                     <svg className="w-[11px] h-[11px] text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
@@ -141,10 +140,10 @@ function CentralCard({
         </div>
 
         {form.tipoCalculo === "multadiaria" && (
-          <div className="w-full md:w-auto flex flex-row gap-4 items-center justify-start mt-4">
-            <div className="text-sm font-medium text-gray-700">Total de dias: {totalDias}</div>
-            <div className="text-sm font-medium text-gray-700">
-              Multa total: R$ {multaTotal.toFixed(2).replace('.', ',')}
+          <div className="w-full md:w-auto flex flex-row gap-4 items-center pt-6">
+            <div className="text-sm font-medium text-gray-700 border border-[#E3D21A] bg-[#FFFADF] p-2 h-[66px] w-[148px] rounded-md">Total de dias: <br />{totalDias}</div>
+            <div className="text-sm font-medium text-gray-700 border border-[#E3D21A] bg-[#FFFADF] p-2 h-[66px] w-[148px] rounded-md">
+              Multa total: <br /> R$ {multaTotal.toFixed(2).replace('.', ',')}
             </div>
           </div>
         )}
