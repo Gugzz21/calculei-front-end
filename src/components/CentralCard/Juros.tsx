@@ -2,6 +2,7 @@ import { useState } from "react";
 import Data from "./Data";
 import type { JurosState } from "../../App";
 import { calcularJuros } from "../../services/api";
+import { PercentIcon } from "lucide-react";
 
 interface JurosProps {
   juros: JurosState;
@@ -178,7 +179,8 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
             disabled={loading}
             className="flex items-center justify-center h-[45px] px-6 gap-2 bg-white border border-gray-300 rounded-md text-sm text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>
+            <PercentIcon size={18} />
+
             {loading ? "Aplicando..." : "Aplicar"}
           </button>
         </div>
