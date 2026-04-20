@@ -40,16 +40,6 @@ export interface JurosState {
   dataInicio: string;
   dataFim: string;
   taxa: string; // % a.a. como string para facilitar input de decimal PT-BR
-  aplicados: {
-    id: number;
-    indice: string;
-    taxa: string;
-    dataInicio: string;
-    dataFim: string;
-    dias: number;
-    fator: number;
-    percentual: number;
-  }[];
 }
 
 function App() {
@@ -70,7 +60,6 @@ function App() {
     dataInicio: '',
     dataFim: '',
     taxa: '12,00',
-    aplicados: [],
   });
 
   const [lancamentos, setLancamentos] = useState<LancamentoItem[]>([]);
@@ -81,7 +70,7 @@ function App() {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleJurosChange = (field: keyof JurosState, value: string | boolean | any[]) => {
+  const handleJurosChange = (field: keyof JurosState, value: string | boolean) => {
     setJuros(prev => {
       const newState = { ...prev, [field]: value };
 
@@ -133,26 +122,24 @@ function App() {
       const selicSelecionada =
         form.indiceCorrecao === 'selic' || form.indiceCorrecao === 'tjrj119602009ipcaeselic';
 
-      if (juros.enabled && !selicSelecionada && juros.aplicados && juros.aplicados.length > 0) {
-        for (const aplicado of juros.aplicados) {
-          if (aplicado.dataFim > aplicado.dataInicio) {
-            const respJuros = await calcularJuros(
-              aplicado.indice,
-              {
-                valor: valorAtualizado,
-                dateInit: aplicado.dataInicio,
-                dateFim: aplicado.dataFim,
-              },
-              parseFloat(aplicado.taxa.replace(',', '.'))
-            );
-            if (respJuros) {
-              const valorComJuros = getValorAtualizado(respJuros);
-              valorJuros += (valorComJuros - valorAtualizado);
-            }
-            indiceJurosLabel = JUROS_LABEL[aplicado.indice] ?? aplicado.indice;
-            dataInicioJurosLabel = aplicado.dataInicio;
-            dataFimJurosLabel = aplicado.dataFim;
+      if (juros.enabled && !selicSelecionada && juros.dataInicio && juros.dataFim) {
+        if (juros.dataFim > juros.dataInicio) {
+          const respJuros = await calcularJuros(
+            juros.indice,
+            {
+              valor: valorAtualizado,
+              dateInit: juros.dataInicio,
+              dateFim: juros.dataFim,
+            },
+            parseFloat(juros.taxa.replace(',', '.'))
+          );
+          if (respJuros) {
+            const valorComJuros = getValorAtualizado(respJuros);
+            valorJuros = valorComJuros - valorAtualizado;
           }
+          indiceJurosLabel = JUROS_LABEL[juros.indice] ?? juros.indice;
+          dataInicioJurosLabel = juros.dataInicio;
+          dataFimJurosLabel = juros.dataFim;
         }
       }
 
@@ -195,7 +182,7 @@ function App() {
       tipoCalculo: 'dfazendanaotributario',
       descricao: 'ressarci',
     });
-    setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00', aplicados: [] });
+    setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00' });
     setErro(null);
   };
 

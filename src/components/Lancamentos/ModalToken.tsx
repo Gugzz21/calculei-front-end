@@ -20,8 +20,8 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 flex flex-col gap-5 border border-gray-200">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-[20px] font-bold text-gray-900">PDF gerado com sucesso!</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-[20px] font-bold text-gray-900">Imagem gerada com sucesso!</h2>
+            <p className="text-sm text-gray-500 mt-1">  
               Guarde o token abaixo para recuperar seus lançamentos futuramente.
             </p>
           </div>
@@ -44,11 +44,10 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
             </code>
             <button
               onClick={copiar}
-              className={`shrink-0 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
-                copiado
-                  ? "bg-green-100 text-green-700 border border-green-300"
-                  : "bg-blue-50 text-blue-700 border border-blue-300 hover:bg-blue-100"
-              }`}
+              className={`shrink-0 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${copiado
+                ? "bg-green-100 text-green-700 border border-green-300"
+                : "bg-blue-50 text-blue-700 border border-blue-300 hover:bg-blue-100"
+                }`}
             >
               {copiado ? "✓ Copiado" : "Copiar"}
             </button>

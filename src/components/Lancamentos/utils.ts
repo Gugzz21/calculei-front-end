@@ -23,3 +23,8 @@ export function gerarUUID(): string {
     return v.toString(16);
   });
 }
+
+
+export function getUUID(): string {
+  return gerarUUID();
+}

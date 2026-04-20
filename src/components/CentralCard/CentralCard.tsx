@@ -16,7 +16,7 @@ interface CentralCardProps {
   erro: string | null;
   isFormValid: boolean;
   onFormChange: (field: keyof FormState, value: string) => void;
-  onJurosChange: (field: keyof JurosState, value: string | boolean) => void;
+  onJurosChange: (field: keyof JurosState, value: string | boolean | any[]) => void;
   onCalcular: () => void;
   onLimpar: () => void;
 }
@@ -37,15 +37,26 @@ function CentralCard({
     form.indiceCorrecao === "selic" ||
     form.indiceCorrecao === "tjrj119602009ipcaeselic";
 
+
+  let totalDias = 0;
+  if (form.dataInicial && form.dataCalculo) {
+    const dInicial = new Date(form.dataInicial).getTime();
+    const dCalculo = new Date(form.dataCalculo).getTime();
+
+    totalDias = (dCalculo - dInicial) > 0 ? (dCalculo - dInicial) / (1000 * 60 * 60 * 24) : 0;
+  }
+  const valorNumerico = form.valor ? parseInt(form.valor, 10) / 100 : 0;
+  const multaTotal = valorNumerico * 0.01 * totalDias;
+
   return (
-    <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 gap-5 shadow-sm border border-slate-400">
+    <div className="flex flex-col bg-white rounded-xl pb-6 p-4 w-full md:p-8 gap-6 shadow-md border border-slate-200">
       {/* Título */}
-      <div className="text-[#1F2022] font-bold text-2xl md:text-3xl mb-2">
-        <h1>Atualização Monetária</h1>
+      <div className="border-b border-slate-100 pb-4">
+        <h1 className="text-[#1F2022] font-bold text-2xl md:text-3xl">Atualização Monetária</h1>
       </div>
 
-      {/* Linha 1: Tipo de cálculo | Descrição | Data do cálculo */}
-      <div className="flex flex-col md:flex-row gap-4 md:gap-[20px] w-full">
+      {/* Linha 1: Tipo de cálculo | Descrição | Índice de correção */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-[24px] w-full">
         <div className="w-full md:w-auto">
           <TipoCalculo
             value={form.tipoCalculo}
@@ -53,9 +64,70 @@ function CentralCard({
           />
         </div>
         <div className="w-full md:w-auto">
+          <IndiceCorrecao
+            value={form.indiceCorrecao}
+            onChange={(v) => onFormChange("indiceCorrecao", v)}
+          />
+        </div>
+        <div className="w-full md:w-auto">
           <Descricao
             value={form.descricao}
             onChange={(v) => onFormChange("descricao", v)}
+          />
+        </div>
+      </div>
+
+      {/* Linha 2: Valor (com checkbox abaixo) | Data inicial | Data do cálculo */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-[24px] items-start w-full">
+
+        {/* Valor + Aplicar juros? abaixo */}
+        <div className="flex flex-col gap-2 w-full md:w-auto">
+          <InputValor
+            value={form.valor}
+            onChange={(v) => onFormChange("valor", v)}
+          />
+          {!selicSelecionada && (
+            <label
+              htmlFor="aplicar-juros"
+              className={`flex items-center gap-2 select-none group w-fit mt-1 ${isFormValid ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+              title={!isFormValid ? "Preencha o Valor e as Datas primeiro" : ""}
+            >
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  id="aplicar-juros"
+                  checked={juros.enabled}
+                  onChange={(e) => onJurosChange("enabled", e.target.checked)}
+                  disabled={!isFormValid}
+                  className="peer sr-only"
+                />
+                <div
+                  className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${
+                    juros.enabled
+                      ? "bg-blue-600 border-blue-600"
+                      : "bg-white border-gray-400 group-hover:border-blue-400"
+                  }`}
+                >
+                  {juros.enabled && (
+                    <svg className="w-[11px] h-[11px] text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span className={`text-[13px] font-medium transition-colors duration-150 ${isFormValid ? 'text-gray-600 group-hover:text-gray-800' : 'text-gray-500'}`}>
+                Aplicar juros?
+              </span>
+            </label>
+          )}
+        </div>
+
+        <div className="w-full md:w-auto">
+          <Data
+            title="Data inicial"
+            value={form.dataInicial}
+            onChange={(v) => onFormChange("dataInicial", v)}
+            max={today}
           />
         </div>
         <div className="w-full md:w-auto">
@@ -67,60 +139,30 @@ function CentralCard({
             min={form.dataInicial || undefined}
           />
         </div>
-      </div>
 
-      {/* Linha 2: Índice de correção | Valor | Data inicial | Aplicar juros? */}
-      <div className="flex flex-col md:flex-row gap-4 md:gap-[20px] items-start md:items-end w-full">
-        <div className="w-full md:w-auto">
-          <IndiceCorrecao
-            value={form.indiceCorrecao}
-            onChange={(v) => onFormChange("indiceCorrecao", v)}
-          />
-        </div>
-        <div className="w-full md:w-auto">
-          <InputValor
-            value={form.valor}
-            onChange={(v) => onFormChange("valor", v)}
-          />
-        </div>
-        <div className="w-full md:w-auto">
-          <Data
-            title="Data inicial"
-            value={form.dataInicial}
-            onChange={(v) => onFormChange("dataInicial", v)}
-            max={today}
-          />
-        </div>
-
-        {/* Checkbox Aplicar juros? inline */}
-        {!selicSelecionada && (
-          <div className="flex items-center gap-3 mb-[12px] md:ml-[10px]">
-            <input
-              type="checkbox"
-              id="aplicar-juros"
-              checked={juros.enabled}
-              onChange={(e) => onJurosChange("enabled", e.target.checked)}
-              className="w-[18px] h-[18px] cursor-pointer"
-            />
-            <label
-              htmlFor="aplicar-juros"
-              className="text-[15px] text-[#333333] cursor-pointer select-none"
-            >
-              Aplicar juros?
-            </label>
+        {form.tipoCalculo === "multadiaria" && (
+          <div className="w-full md:w-auto flex flex-row gap-4 items-center justify-start mt-4">
+            <div className="text-sm font-medium text-gray-700">Total de dias: {totalDias}</div>
+            <div className="text-sm font-medium text-gray-700">
+              Multa total: R$ {multaTotal.toFixed(2).replace('.', ',')}
+            </div>
           </div>
         )}
+
       </div>
 
       {/* Painel expandido de juros (quando checkbox ativo) */}
       {juros.enabled && !selicSelecionada && (
-        <Juros
-          juros={juros}
-          selicSelecionada={selicSelecionada}
-          onJurosChange={onJurosChange}
-          today={today}
-          dataInicialForm={form.dataInicial}
-        />
+        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+          <Juros
+            juros={juros}
+            selicSelecionada={selicSelecionada}
+            onJurosChange={onJurosChange}
+            today={today}
+            dataInicialForm={form.dataInicial}
+            dataCalculoForm={form.dataCalculo}
+          />
+        </div>
       )}
 
       {/* Erro */}

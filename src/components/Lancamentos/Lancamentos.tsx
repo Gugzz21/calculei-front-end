@@ -4,6 +4,7 @@ import type { LancamentoItem } from "../../App";
 import Paginacao from "./Paginacao";
 import TabelaLancamentos from "./TabelaLancamentos";
 import BotoesExport from "./BotoesExport";
+import ModalToken from "./ModalToken";
 import ModalRecuperar from "./ModalRecuperar";
 import { exportarParaPDF } from "./exportPDF";
 import { baixarImagem } from "./exportImagem";
@@ -36,8 +37,9 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: L
   };
 
   // ── Modais ─────────────────────────────────────────────────────────────────
+  const [modalToken, setModalToken]         = useState<string | null>(null);
   const [modalRecuperar, setModalRecuperar] = useState(false);
-  const [salvandoPDF, setSalvandoPDF] = useState(false);
+  const [salvandoPDF, setSalvandoPDF]       = useState(false);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   const handleGerarPDF = async () => {
@@ -56,7 +58,14 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: L
     }
   };
 
-  const handleBaixarImagem = () => baixarImagem(lancamentos);
+  const handleBaixarImagem = async () => {
+    try {
+      const token = await baixarImagem(lancamentos);
+      if (token) setModalToken(token);
+    } catch {
+      alert("Erro ao gerar imagem.");
+    }
+  };
 
   const handleRemover = (id: number, isLastInPage: boolean) => {
     onRemover(id);
@@ -66,6 +75,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: L
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <>
+      {modalToken && <ModalToken token={modalToken} onClose={() => setModalToken(null)} />}
       {modalRecuperar &&
         <ModalRecuperar
           onClose={() =>

@@ -1,36 +1,43 @@
 import type { LancamentoItem } from "../../App";
-import { formatBRL, formatDate, formatPercent } from "./utils";
+import { formatBRL, formatDate, formatPercent, gerarUUID } from "./utils";
+import { salvarHistorico } from "../../services/api";
 
-/** Gera e baixa uma imagem JPEG da tabela de lançamentos usando Canvas */
-export function baixarImagem(lancamentos: LancamentoItem[]): void {
+/**
+ * Gera e baixa uma imagem JPEG da tabela de lançamentos usando Canvas.
+ * Também salva os dados no backend e retorna o token gerado.
+ */
+export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<string> {
   if (lancamentos.length === 0) {
     alert("Nenhum lançamento para exportar.");
-    return;
+    return "";
   }
 
+  // ── Gera token ANTES de tudo ────────────────────────────────────────────────
+  const token = gerarUUID();
+
   const cols = [
-    { label: "Descrição",       width: 140, align: "left"   as const },
-    { label: "Datas",           width: 95,  align: "left"   as const },
-    { label: "Valor Principal", width: 105, align: "right"  as const },
-    { label: "Índice",          width: 90,  align: "left"   as const },
-    { label: "Valor Atualizado",width: 110, align: "right"  as const },
-    { label: "Dias",            width: 48,  align: "center" as const },
-    { label: "%Correção",       width: 80,  align: "right"  as const },
-    { label: "Ind. Juros",      width: 90,  align: "left"   as const },
-    { label: "Juros",           width: 95,  align: "right"  as const },
-    { label: "Total",           width: 105, align: "right"  as const },
+    { label: "Descrição",        width: 140, align: "left"   as const },
+    { label: "Datas",            width: 95,  align: "left"   as const },
+    { label: "Valor Principal",  width: 105, align: "right"  as const },
+    { label: "Índice",           width: 90,  align: "left"   as const },
+    { label: "Valor Atualizado", width: 110, align: "right"  as const },
+    { label: "Dias",             width: 48,  align: "center" as const },
+    { label: "%Correção",        width: 80,  align: "right"  as const },
+    { label: "Ind. Juros",       width: 90,  align: "left"   as const },
+    { label: "Juros",            width: 95,  align: "right"  as const },
+    { label: "Total",            width: 105, align: "right"  as const },
   ];
 
-  const scale   = 2;
-  const padX    = 28;
-  const padY    = 24;
-  const rowH    = 32;
-  const headH   = 38;
-  const titleH  = 56;
+  const scale     = 2;
+  const padX      = 28;
+  const padY      = 24;
+  const rowH      = 32;
+  const headH     = 38;
+  const titleH    = 56;
   const hasTotals = lancamentos.length > 1;
-  const tableW  = cols.reduce((s, c) => s + c.width, 0);
-  const canvasW = tableW + padX * 2;
-  const canvasH = padY + titleH + headH + rowH * lancamentos.length + (hasTotals ? rowH : 0) + padY;
+  const tableW    = cols.reduce((s, c) => s + c.width, 0);
+  const canvasW   = tableW + padX * 2;
+  const canvasH   = padY + titleH + headH + rowH * lancamentos.length + (hasTotals ? rowH : 0) + padY;
 
   const canvas = document.createElement("canvas");
   canvas.width  = canvasW * scale;
@@ -61,8 +68,8 @@ export function baixarImagem(lancamentos: LancamentoItem[]): void {
     ctx.rect(cx + 2, cy, cw - 4, ch);
     ctx.clip();
     const tx = align === "right" ? cx + cw - 8
-      : align === "center"      ? cx + cw / 2
-      :                           cx + 8;
+      : align === "center"       ? cx + cw / 2
+      :                            cx + 8;
     ctx.textAlign = align;
     if (text.includes("\n")) {
       const lines = text.split("\n");
@@ -160,16 +167,32 @@ export function baixarImagem(lancamentos: LancamentoItem[]): void {
     }
   }
 
-  // Download
-  canvas.toBlob((blob) => {
-    if (!blob) { alert("Erro ao gerar imagem."); return; }
-    const url  = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.download = "tabela-lancamentos.jpg";
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }, "image/jpeg", 0.95);
+  // ── Download da imagem ──────────────────────────────────────────────────────
+  await new Promise<void>((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) { alert("Erro ao gerar imagem."); resolve(); return; }
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "tabela-lancamentos.jpg";
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      resolve();
+    }, "image/jpeg", 0.95);
+  });
+
+  // ── Salvar no backend ───────────────────────────────────────────────────────
+  await salvarHistorico({
+    data: new Date().toISOString().split("T")[0],
+    token,
+    json: {
+      geradoEm: new Date().toISOString(),
+      totalLancamentos: lancamentos.length,
+      lancamentos: lancamentos.map((l) => ({ ...l })),
+    },
+  });
+
+  return token;
 }
