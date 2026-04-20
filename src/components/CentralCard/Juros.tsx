@@ -49,6 +49,8 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
     setErroLocal(null);
     setLoading(true);
     try {
+      // Pequeno delay para feedback visual
+      await new Promise((resolve) => setTimeout(resolve, 400));
       const novosAplicados: any[] = [];
       const dataCorte = "2003-01-10";
       const dataInicioPosCorte = "2003-01-11";
