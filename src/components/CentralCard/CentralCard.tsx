@@ -152,7 +152,7 @@ function CentralCard({
 
       {/* Painel expandido de juros (quando checkbox ativo) */}
       {juros.enabled && !selicSelecionada && (
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+        <div className="border border-gray-300 rounded-lg p-4">
           <Juros
             juros={juros}
             selicSelecionada={selicSelecionada}

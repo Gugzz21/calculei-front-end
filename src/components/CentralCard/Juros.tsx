@@ -190,7 +190,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
 
       {/* Descrição do índice selecionado */}
       {indice && (
-        <div className="bg-gray-100 border border-gray-200 rounded-md p-3">
+        <div className="bg-[#eaecf0] border border-[#979797]  w-[66%] mt-[6px] rounded-md p-3">
           <p className="text-[13px] text-gray-600 leading-relaxed">
             *{JUROS_LABEL_DESCRICAO[indice]}
           </p>
