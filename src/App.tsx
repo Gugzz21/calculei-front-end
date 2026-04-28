@@ -1,213 +1,110 @@
-import { useState, type ReactNode } from 'react'
-import './App.css'
-import Header from './components/Header'
-import CentralCard from './components/CentralCard/CentralCard'
-import Footer from './components/Footer'
-import Lancamentos from './components/Lancamentos/Lancamentos'
-import { calcularIndice, calcularJuros, getValorAtualizado } from './services/api'
+import { useState } from 'react';
+import './App.css';
+import Header from './components/Header';
+import CentralCard from './components/CentralCard/CentralCard';
+import Footer from './components/Footer';
+import Lancamentos from './components/Lancamentos/Lancamentos';
+import { calcularLancamento } from './services/calcular';
+import { TIPO_CALCULO_INDICE_MAP } from './constants/dominios';
+import type { FormState, JurosState, LancamentoItem } from './types';
 
-export interface LancamentoItem {
-  numero: ReactNode
-  id: number;
-  descricao: string;
-  dataInicial: string;
-  valorPrincipal: number;
-  dataCalculo: string;
-  indiceCorrecao: string;
-  valorAtualizado: number;
-  dias: number;
-  percentualCorrecao: number;
-  // Juros
-  indiceJuros: string;        // label do índice de juros aplicado (ou "—" se não houver)
-  dataInicioJuros: string;    // data início dos juros (ou "")
-  dataFimJuros: string;       // data fim dos juros (ou "")
-  juros: number;
-  total: number;
-}
-
-export interface FormState {
-  valor: string; // raw digits string
-  dataInicial: string;
-  dataCalculo: string;
-  indiceCorrecao: string;
-  tipoCalculo: string;
-  descricao: string;
-}
-
-export interface JurosState {
-  enabled: boolean;
-  indice: string;
-  dataInicio: string;
-  dataFim: string;
-  taxa: string; // % a.a. como string para facilitar input de decimal PT-BR
-  aplicados: {
-    id: number;
-    indice: string;
-    taxa: string;
-    dataInicio: string;
-    dataFim: string;
-    dias: number;
-    fator: number;
-    percentual: number;
-  }[];
-}
+export type { FormState, JurosState, LancamentoItem };
 
 function App() {
   const today = new Date().toISOString().split('T')[0];
 
   const [form, setForm] = useState<FormState>({
-    valor: '',
-    dataInicial: '',
-    dataCalculo: today,
-    indiceCorrecao: 'ipcae',
-    tipoCalculo: 'dfazendanaotributario',
-    descricao: 'ressarci',
+    valor:           '',
+    dataInicial:     '',
+    dataCalculo:     today,
+    indiceCorrecao:  'ipcae',
+    tipoCalculo:     'dfazendanaotributario',
+    descricao:       'ressarci',
   });
 
   const [juros, setJuros] = useState<JurosState>({
-    enabled: false,
-    indice: 'taxalegal',
+    enabled:    false,
+    indice:     'taxalegal',
     dataInicio: '',
-    dataFim: '',
-    taxa: '12,00',
-    aplicados: [],
+    dataFim:    '',
+    taxa:       '12,00',
+    aplicados:  [],
   });
 
   const [lancamentos, setLancamentos] = useState<LancamentoItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
+  const [loading, setLoading]         = useState(false);
+  const [erro, setErro]               = useState<string | null>(null);
+
+  // ── Handlers ──────────────────────────────────────────────────────────────────
 
   const handleFormChange = (field: keyof FormState, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm(prev => {
+      const next = { ...prev, [field]: value };
+
+      // Ao trocar o tipo de cálculo, pré-seleciona o índice correspondente
+      if (field === 'tipoCalculo') {
+        const indicePreDefinido = TIPO_CALCULO_INDICE_MAP[value];
+        if (indicePreDefinido) next.indiceCorrecao = indicePreDefinido;
+      }
+
+      return next;
+    });
   };
 
   const handleJurosChange = (field: keyof JurosState, value: string | boolean | any[]) => {
     setJuros(prev => {
-      const newState = { ...prev, [field]: value };
+      const next = { ...prev, [field]: value };
 
-      // Quando muda o índice, define taxas padrão para os itens específicos
       if (field === 'indice') {
-        if (value === 'jurossimples6') newState.taxa = '6,00';
-        else if (value === 'jurossimples12' || value === 'especificartaxa') newState.taxa = '12,00';
+        if (value === 'jurossimples6')                        next.taxa = '6,00';
+        else if (value === 'jurossimples12' || value === 'especificartaxa') next.taxa = '12,00';
       }
 
-      return newState;
+      return next;
     });
   };
 
-  const recuperarLancamentos = (itensRecuperados: LancamentoItem[]) => {
-    setLancamentos(itensRecuperados);
-  }
-
-  const calcular = async () => {
+  const handleCalcular = async () => {
     setErro(null);
-    const valorNum = form.valor ? parseInt(form.valor, 10) / 100 : 0;
-
-    if (!valorNum) { setErro('Informe o valor.'); return; }
-    if (!form.dataInicial) { setErro('Informe a data inicial.'); return; }
-    if (!form.dataCalculo) { setErro('Informe a data do cálculo.'); return; }
-    if (form.dataCalculo > today) { setErro('Data do cálculo não pode ser futura.'); return; }
-    if (form.dataCalculo <= form.dataInicial) { setErro('Data do cálculo deve ser posterior à data inicial.'); return; }
-
     setLoading(true);
     try {
       const minWait = new Promise(resolve => setTimeout(resolve, 500));
-
-      // ── Correção Monetária ──────────────────────────────────────────────────
-      const respCorrecao = await calcularIndice(form.indiceCorrecao, {
-        valor: valorNum,
-        dateInit: form.dataInicial,
-        dateFim: form.dataCalculo,
-      });
-
-      const valorAtualizado = respCorrecao ? getValorAtualizado(respCorrecao) : valorNum;
-      const dias = respCorrecao?.dias ?? 0;
-      const percentualCorrecao = respCorrecao?.percentualAcumulado ?? respCorrecao?.fatorAcumulado ?? 0;
-
-      // ── Juros ───────────────────────────────────────────────────────────────
-      let valorJuros = 0;
-      let indiceJurosLabel = '—';
-      let dataInicioJurosLabel = '';
-      let dataFimJurosLabel = '';
-
-      const selicSelecionada =
-        form.indiceCorrecao === 'selic' || form.indiceCorrecao === 'tjrj119602009ipcaeselic';
-
-      if (juros.enabled && !selicSelecionada && juros.aplicados && juros.aplicados.length > 0) {
-        for (const aplicado of juros.aplicados) {
-          if (aplicado.dataFim > aplicado.dataInicio) {
-            const respJuros = await calcularJuros(
-              aplicado.indice,
-              {
-                valor: valorAtualizado,
-                dateInit: aplicado.dataInicio,
-                dateFim: aplicado.dataFim,
-              },
-              parseFloat(aplicado.taxa.replace(',', '.'))
-            );
-            if (respJuros) {
-              const valorComJuros = getValorAtualizado(respJuros);
-              valorJuros += (valorComJuros - valorAtualizado);
-            }
-            indiceJurosLabel = JUROS_LABEL[aplicado.indice] ?? aplicado.indice;
-            dataInicioJurosLabel = aplicado.dataInicio;
-            dataFimJurosLabel = aplicado.dataFim;
-          }
-        }
-      }
-
-      const total = valorAtualizado + valorJuros;
-
-      const novo: LancamentoItem = {
-        id: Date.now(),
-        descricao: DESCRICAO_LABEL[form.descricao] ?? form.descricao,
-        dataInicial: form.dataInicial,
-        valorPrincipal: valorNum,
-        dataCalculo: form.dataCalculo,
-        indiceCorrecao: INDICE_LABEL[form.indiceCorrecao] ?? form.indiceCorrecao,
-        valorAtualizado,
-        dias,
-        percentualCorrecao,
-        indiceJuros: indiceJurosLabel,
-        dataInicioJuros: dataInicioJurosLabel,
-        dataFimJuros: dataFimJurosLabel,
-        juros: valorJuros,
-        total,
-        numero: undefined
-      };
-
+      const novo = await calcularLancamento(form, juros, today);
       await minWait;
       setLancamentos(prev => [...prev, novo]);
     } catch (e: unknown) {
-      if (e instanceof Error) setErro(e.message);
-      else setErro('Erro ao calcular. Verifique se o servidor Java está rodando.');
+      setErro(e instanceof Error ? e.message : 'Erro ao calcular. Verifique se o servidor Java está rodando.');
     } finally {
       setLoading(false);
     }
   };
 
-  const limpar = () => {
+  const handleLimpar = () => {
     setForm({
-      valor: '',
-      dataInicial: '',
-      dataCalculo: today,
-      indiceCorrecao: 'ipcae',
-      tipoCalculo: 'dfazendanaotributario',
-      descricao: 'ressarci',
+      valor:           '',
+      dataInicial:     '',
+      dataCalculo:     today,
+      indiceCorrecao:  'ipcae',
+      tipoCalculo:     'dfazendanaotributario',
+      descricao:       'ressarci',
     });
     setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00', aplicados: [] });
     setErro(null);
   };
 
-  // Botão Calcular só fica habilitado quando os campos obrigatórios estão preenchidos
-  const isFormValid =
-    !!form.valor &&
-    !!form.dataInicial &&
-    !!form.dataCalculo;
-
-  const removerLancamento = (id: number) => {
+  const handleRemoverLancamento = (id: number) => {
     setLancamentos(prev => prev.filter(l => l.id !== id));
   };
+
+  const handleRecuperarLancamentos = (itens: LancamentoItem[]) => {
+    setLancamentos(itens);
+  };
+
+  // ── Computed ──────────────────────────────────────────────────────────────────
+
+  const isFormValid = !!form.valor && !!form.dataInicial && !!form.dataCalculo;
+
+  // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
     <div className="flex flex-col bg-gray-200 min-h-screen w-full overflow-x-hidden">
@@ -222,15 +119,15 @@ function App() {
           isFormValid={isFormValid}
           onFormChange={handleFormChange}
           onJurosChange={handleJurosChange}
-          onCalcular={calcular}
-          onLimpar={limpar}
+          onCalcular={handleCalcular}
+          onLimpar={handleLimpar}
         />
         <div className='w-full pt-4'>
           <Lancamentos
             lancamentos={lancamentos}
             loading={loading}
-            onRemover={removerLancamento}
-            onRecuperar={recuperarLancamentos}
+            onRemover={handleRemoverLancamento}
+            onRecuperar={handleRecuperarLancamentos}
           />
         </div>
       </div>
@@ -241,38 +138,4 @@ function App() {
   );
 }
 
-const INDICE_LABEL: Record<string, string> = {
-  ipca: 'IPCA',
-  ipcae: 'IPCA-E',
-  igpm: 'IGP-M',
-  tr: 'TR',
-  igpdi: 'IGP-DI',
-  cdi: 'CDI',
-  selic: 'SELIC',
-  semcorrecaomonetaria: 'Sem Correção',
-  tjrj119602009ipcaeselic: 'TJRJ IPCA/SELIC',
-};
-
-const JUROS_LABEL: Record<string, string> = {
-  selic: 'SELIC',
-  cdi: 'CDI',
-  poupancanova: 'Poupança Nova',
-  poupancaantiga: 'Poupança Antiga',
-  poupanca: 'Poupança',
-  taxalegal: 'Taxa Legal',
-  codigocivil: 'Código Civil',
-  especificartaxa: 'Taxa Especificada',
-  jurossimples6: 'Juros Simples 6% a.a.',
-  jurossimples12: 'Juros Simples 12% a.a.',
-};
-
-const DESCRICAO_LABEL: Record<string, string> = {
-  ressarci: 'Ressarcimento',
-  ressarcimentoaoetario: 'Ressarc. ao Etário',
-  debitosdfp: 'Débitos da Fazenda',
-  multacivil: 'Multa Civil',
-  honorariosadvocaticios: 'Honorários Adv.',
-  outros: 'Outros',
-};
-
-export default App
+export default App;

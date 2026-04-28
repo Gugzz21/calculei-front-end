@@ -1,3 +1,5 @@
+import { DESCRICAO_OPCOES } from "../../constants/dominios";
+
 interface DescricaoProps {
   value: string;
   onChange: (value: string) => void;
@@ -12,12 +14,9 @@ function Descricao({ value, onChange }: DescricaoProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        <option value="ressarci">Ressarcimento</option>
-        <option value="ressarcimentoaoetario">Ressarcimento ao etário</option>
-        <option value="debitosdfp">Débitos da Fazenda Pública</option>
-        <option value="multacivil">Multa Civil</option>
-        <option value="honorariosadvocaticios">Honorários Advocatícios</option>
-        <option value="outros">Outros</option>
+        {DESCRICAO_OPCOES.map(({ value: v, label }) => (
+          <option key={v} value={v}>{label}</option>
+        ))}
       </select>
     </div>
   );

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Data from "./Data";
-import type { JurosState } from "../../App";
+import type { JurosState } from "../../types";
 import { calcularJuros } from "../../services/api";
+import { JUROS_DESCRICAO, JUROS_INDICE_OPCOES } from "../../constants/dominios";
 import { PercentIcon } from "lucide-react";
 
 interface JurosProps {
@@ -13,29 +14,15 @@ interface JurosProps {
   dataCalculoForm: string;
 }
 
-const JUROS_LABEL_DESCRICAO: Record<string, string> = {
-  codigo: "6% ao ano ou 0,5% ao mês até 10/01/2003; 12% ao ano ou 1% ao mês a partir de 11/01/2003.",
-  jurossimples6: "Juros simples de 6% ao ano (0,5% ao mês).",
-  jurossimples12: "Juros simples de 12% ao ano (1% ao mês).",
-  selic: "Taxa SELIC acumulada no período, conforme Banco Central do Brasil.",
-  cdi: "Taxa CDI acumulada no período, conforme Banco Central do Brasil.",
-  poupancanova: "Poupança Nova: Taxa Selic quando abaixo de 8,5% a.a., ou 0,5% a.m. + TR.",
-  poupancaantiga: "Poupança Antiga: 0,5% a.m. até 03/05/2012; 0,5% a.m. + TR a partir de 04/05/2012.",
-  poupanca: "Poupança (Antiga + Nova): 0,5% a.m. até 03/05/2012; Taxa Selic quando abaixo de 8,5% a.a., ou 0,5% a.m. + TR a partir de 04/05/2012.",
-  taxalegal: "Taxa Legal: 1% a.m. até 10/01/2003; 0,5% a.m. de 11/01/2003 a 09/01/2006; 1% a.m. a partir de 10/01/2006.",
-  especificartaxa: "Taxa a ser especificada pelo usuário.",
-};
-
 function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm, dataCalculoForm }: JurosProps) {
   const { indice, taxa, aplicados = [] } = juros;
   const dataInicio = juros.dataInicio || dataInicialForm;
-  const dataFim = juros.dataFim || dataCalculoForm;
+  const dataFim    = juros.dataFim    || dataCalculoForm;
 
-  const [loading, setLoading] = useState(false);
-  const [erroLocal, setErroLocal] = useState<string | null>(null);
+  const [loading, setLoading]       = useState(false);
+  const [erroLocal, setErroLocal]   = useState<string | null>(null);
 
-  const jurosDesativado = selicSelecionada;
-  if (jurosDesativado) return null;
+  if (selicSelecionada) return null;
 
   const handleAplicar = async () => {
     if (!dataInicio || !dataFim) {
@@ -46,21 +33,18 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
       setErroLocal("A data final deve ser maior que a data inicial.");
       return;
     }
+
     setErroLocal(null);
     setLoading(true);
-    try {
-      // Pequeno delay para feedback visual
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      const novosAplicados: any[] = [];
-      const dataCorte = "2003-01-10";
-      const dataInicioPosCorte = "2003-01-11";
 
-      const addAplicado = async (
-        idx: string,
-        dInicio: string,
-        dFim: string,
-        taxaAtual: string
-      ) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      const novosAplicados: any[] = [];
+      const DATA_CORTE        = "2003-01-10";
+      const DATA_POS_CORTE    = "2003-01-11";
+
+      const addAplicado = async (idx: string, dInicio: string, dFim: string, taxaAtual: string) => {
         const resp = await calcularJuros(
           idx,
           { valor: 100, dateInit: dInicio, dateFim: dFim },
@@ -68,29 +52,26 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
         );
         if (resp) {
           novosAplicados.push({
-            id: Date.now() + Math.random(),
-            indice: idx,
-            taxa: taxaAtual,
+            id:         Date.now() + Math.random(),
+            indice:     idx,
+            taxa:       taxaAtual,
             dataInicio: dInicio,
-            dataFim: dFim,
-            dias: resp.dias || 0,
-            fator: resp.fatorAcumulado || 0,
+            dataFim:    dFim,
+            dias:       resp.dias || 0,
+            fator:      resp.fatorAcumulado || 0,
             percentual: resp.percentualAcumulado || 0,
           });
         }
       };
 
       if (indice === "codigo" || indice === "codigocivil") {
-        if (dataFim <= dataCorte) {
-          // Apenas a primeira fase (6%)
+        if (dataFim <= DATA_CORTE) {
           await addAplicado("jurossimples6", dataInicio, dataFim, "6,00");
-        } else if (dataInicio >= dataInicioPosCorte) {
-          // Apenas a segunda fase (12%)
+        } else if (dataInicio >= DATA_POS_CORTE) {
           await addAplicado("jurossimples12", dataInicio, dataFim, "12,00");
         } else {
-          // Divide em duas fases
-          await addAplicado("jurossimples6", dataInicio, dataCorte, "6,00");
-          await addAplicado("jurossimples12", dataInicioPosCorte, dataFim, "12,00");
+          await addAplicado("jurossimples6",  dataInicio, DATA_CORTE,     "6,00");
+          await addAplicado("jurossimples12", DATA_POS_CORTE, dataFim, "12,00");
         }
       } else {
         await addAplicado(indice, dataInicio, dataFim, taxa);
@@ -108,6 +89,8 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
     onJurosChange("aplicados", aplicados.filter((a) => a.id !== id));
   };
 
+  const mostraTaxa = ["jurossimples6", "jurossimples12", "especificartaxa"].includes(indice);
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <div className="flex flex-col md:flex-row flex-wrap gap-4 items-start md:items-end w-full">
@@ -120,31 +103,21 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
             onChange={(e) => onJurosChange("indice", e.target.value)}
             className="bg-white border border-gray-300 h-[45px] w-full md:w-[330px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
           >
-            <option value="codigo">Código Civil</option>
-            <option value="jurossimples6">Juros Simples 6% a.a.</option>
-            <option value="jurossimples12">Juros Simples 12% a.a.</option>
-            <option value="selic">SELIC</option>
-            <option value="cdi">CDI</option>
-            <option value="poupancanova">Poupança Nova</option>
-            <option value="poupancaantiga">Poupança Antiga</option>
-            <option value="poupanca">Poupança (Antiga + Nova)</option>
-            <option value="taxalegal">TAXA LEGAL</option>
-            <option value="especificartaxa">Especificar Taxa</option>
+            {JUROS_INDICE_OPCOES.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
           </select>
         </div>
 
         {/* Taxa de juros (condicional) */}
-        {(indice === 'jurossimples6' || indice === 'jurossimples12' || indice === 'especificartaxa') && (
+        {mostraTaxa && (
           <div className="flex flex-col gap-1 w-full md:w-auto">
             <strong className="text-[13px] text-gray-700 font-semibold">Taxa de juros</strong>
             <div className="relative">
               <input
                 type="text"
                 value={taxa}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^\d,]/g, "");
-                  onJurosChange("taxa", val);
-                }}
+                onChange={(e) => onJurosChange("taxa", e.target.value.replace(/[^\d,]/g, ""))}
                 className="bg-white border border-gray-300 h-[45px] w-full md:w-[220px] pl-3 pr-16 rounded-md text-sm text-gray-700 outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">
@@ -182,17 +155,16 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
             className="flex items-center justify-center h-[45px] px-6 gap-2 bg-white border border-gray-300 rounded-md text-sm text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             <PercentIcon size={18} />
-
             {loading ? "Aplicando..." : "Aplicar"}
           </button>
         </div>
       </div>
 
       {/* Descrição do índice selecionado */}
-      {indice && (
-        <div className="bg-[#eaecf0] border border-[#979797]  w-[66%] mt-[6px] rounded-md p-3">
+      {JUROS_DESCRICAO[indice] && (
+        <div className="bg-[#eaecf0] border border-[#979797] w-[66%] mt-[6px] rounded-md p-3">
           <p className="text-[13px] text-gray-600 leading-relaxed">
-            *{JUROS_LABEL_DESCRICAO[indice]}
+            *{JUROS_DESCRICAO[indice]}
           </p>
         </div>
       )}
@@ -218,11 +190,11 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
             <tbody className="bg-white">
               {aplicados.map((item) => (
                 <tr key={item.id} className="border-t border-[#d2daee]">
-                  <td className="py-3 px-4">{new Date(item.dataInicio + "T12:00:00").toLocaleDateString('pt-BR')}</td>
-                  <td className="py-3 px-4">{new Date(item.dataFim + "T12:00:00").toLocaleDateString('pt-BR')}</td>
+                  <td className="py-3 px-4">{new Date(item.dataInicio + "T12:00:00").toLocaleDateString("pt-BR")}</td>
+                  <td className="py-3 px-4">{new Date(item.dataFim   + "T12:00:00").toLocaleDateString("pt-BR")}</td>
                   <td className="py-3 px-4">{item.dias}</td>
                   <td className="py-3 px-4">{item.taxa ? item.taxa.replace(/,00$/, "") : "—"}</td>
-                  <td className="py-3 px-4">{(item.percentual).toFixed(2).replace(".", ",")}%</td>
+                  <td className="py-3 px-4">{item.percentual.toFixed(2).replace(".", ",")}%</td>
                   <td className="py-3 px-4 text-center">
                     <button
                       type="button"

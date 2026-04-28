@@ -1,3 +1,5 @@
+import { TIPO_CALCULO_OPCOES } from "../../constants/dominios";
+
 interface TipoCalculoProps {
   value: string;
   onChange: (value: string) => void;
@@ -14,22 +16,9 @@ function TipoCalculo({ value, onChange }: TipoCalculoProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        <option value="cdparticular">
-          Créditos / Débitos Entre Particulares
-        </option>
-        <option value="cfazenda">Créditos da Fazenda Pública</option>
-        <option value="dfazendatributario">
-          Débitos da Fazenda Pública - Tributários
-        </option>
-        <option value="dfazendanaotributario">
-          Débitos da Fazenda Pública - Não Tributários
-        </option>
-        <option value="previdenciario">Débitos Previdenciários</option>
-        <option value="precatoriostributario">Precatórios - Tributários</option>
-        <option value="precatoriosnaotributario">
-          Precatórios - Não Tributários
-        </option>
-        <option value="multadiaria">Multa diária</option>
+        {TIPO_CALCULO_OPCOES.map(({ value: v, label }) => (
+          <option key={v} value={v}>{label}</option>
+        ))}
       </select>
     </div>
   );

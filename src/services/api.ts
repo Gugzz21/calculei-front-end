@@ -28,6 +28,7 @@ const ENDPOINT_MAP: Record<string, string | null> = {
   selic:                   "/selic-mensal/calculate/between-dates",
   semcorrecaomonetaria:    null, // sem correção — devolve valor bruto
   tjrj119602009ipcaeselic: "/selic-mensal/calculate/between-dates",
+  tjrj6899:                "/ufirrj/calculate/between-dates", // Endpoint provável no backend
 };
 
 // ─── Juros ────────────────────────────────────────────────────────────────────

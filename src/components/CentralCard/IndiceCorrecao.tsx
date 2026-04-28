@@ -1,3 +1,5 @@
+import { INDICE_CORRECAO_OPCOES } from "../../constants/dominios";
+
 interface IndiceCorrecaoProps {
   value: string;
   onChange: (value: string) => void;
@@ -12,15 +14,9 @@ function IndiceCorrecao({ value, onChange }: IndiceCorrecaoProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        <option value="ipcae">IPCA-E</option>
-        <option value="igpm">IGP-M</option>
-        <option value="tr">TR</option>
-        <option value="igpdi">IGP-DI</option>
-        <option value="ipca">IPCA</option>
-        <option value="cdi">CDI</option>
-        <option value="selic">SELIC</option>
-        <option value="semcorrecaomonetaria">SEM CORREÇÃO MONETÁRIA</option>
-        <option value="tjrj119602009ipcaeselic">TJRJ 11.960/2009 IPCA/SELIC</option>
+        {INDICE_CORRECAO_OPCOES.map(({ value: v, label }) => (
+          <option key={v} value={v}>{label}</option>
+        ))}
       </select>
     </div>
   );
