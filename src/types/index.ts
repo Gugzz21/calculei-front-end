@@ -17,6 +17,9 @@ export interface LancamentoItem {
   indiceJuros: string;
   dataInicioJuros: string;
   dataFimJuros: string;
+  diasJuros?: number;
+  fatorJuros?: number;
+  percentualJurosAcumulado?: number;
   juros: number;
   total: number;
 }
@@ -70,6 +73,9 @@ export interface LancamentoRecuperado {
   indiceJuros: string;
   dataInicioJuros?: string;
   dataFimJuros?: string;
+  diasJuros?: number;
+  fatorJuros?: number;
+  percentualJurosAcumulado?: number;
   juros: number;
   total: number;
 }

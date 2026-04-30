@@ -35,6 +35,9 @@ export function converterParaLancamentoItem(itens: any[]): any[] {
     indiceJuros: l.indiceJuros,
     dataInicioJuros: l.dataInicioJuros ?? "",
     dataFimJuros: l.dataFimJuros ?? "",
+    diasJuros: l.diasJuros,
+    fatorJuros: l.fatorJuros,
+    percentualJurosAcumulado: l.percentualJurosAcumulado,
     juros: l.juros,
     total: l.total,
   }));

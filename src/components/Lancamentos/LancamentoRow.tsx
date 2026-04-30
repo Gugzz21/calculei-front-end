@@ -152,17 +152,23 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
 
             <div className="flex flex-col">
               <span className="text-[12px] font-bold text-gray-800 mb-1">Dias de juros</span>
-              <span className="text-[13px] text-gray-600">—</span>
+              <span className="text-[13px] text-gray-600">
+                {item.diasJuros ? item.diasJuros : "—"}
+              </span>
             </div>
 
             <div className="flex flex-col">
               <span className="text-[12px] font-bold text-gray-800 mb-1">Fator de juros</span>
-              <span className="text-[13px] text-gray-600">—</span>
+              <span className="text-[13px] text-gray-600">
+                {item.fatorJuros && item.fatorJuros !== 1 ? item.fatorJuros.toFixed(6) : "—"}
+              </span>
             </div>
 
             <div className="flex flex-col">
               <span className="text-[12px] font-bold text-gray-800 mb-1">Acumulado juros(%)</span>
-              <span className="text-[13px] text-gray-600">—</span>
+              <span className="text-[13px] text-gray-600">
+                {item.percentualJurosAcumulado ? formatPercent(item.percentualJurosAcumulado) : "—"}
+              </span>
             </div>
 
             <div className="flex flex-col">

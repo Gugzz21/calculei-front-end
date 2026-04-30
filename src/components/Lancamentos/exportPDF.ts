@@ -63,14 +63,12 @@ function adicionarTotalGeral(
  * Fica após a tabela, com fundo amarelo e aviso sobre guarda do link.
  */
 function adicionarBlocoToken(doc: jsPDF, link: string) {
-  // Desce à última página para escrever após a tabela
   const totalPgs = (doc.internal as any).getNumberOfPages();
   doc.setPage(totalPgs);
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // Calcula Y de partida: 6 mm após o fim da última tabela
   const lastTableY: number = (doc as any).lastAutoTable?.finalY ?? 40;
   const startY = lastTableY + 8;
 
@@ -79,7 +77,6 @@ function adicionarBlocoToken(doc: jsPDF, link: string) {
   const margin = 14;
   const boxW = pageWidth - margin * 2;
 
-  // Verifica se há espaço suficiente; se não, adiciona nova página
   if (startY + boxH > pageHeight - 14) {
     doc.addPage();
     doc.setPage((doc.internal as any).getNumberOfPages());
@@ -140,7 +137,6 @@ function adicionarPaginacao(doc: jsPDF) {
  * Retorna void (não mais exibe popup).
  */
 export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<void> {
-  // Gerar token ANTES de montar o PDF para incluí-lo no documento
   const token = gerarUUID();
   const link = `${window.location.origin}/?token=${token}`;
 
@@ -204,6 +200,9 @@ export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<vo
         indiceJuros: l.indiceJuros,
         dataInicioJuros: l.dataInicioJuros,
         dataFimJuros: l.dataFimJuros,
+        diasJuros: l.diasJuros,
+        fatorJuros: l.fatorJuros,
+        percentualJurosAcumulado: l.percentualJurosAcumulado,
         juros: l.juros,
         total: l.total,
       })),

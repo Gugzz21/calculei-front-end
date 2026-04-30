@@ -8,13 +8,8 @@ export function formatDate(dateStr: string): string {
 /** Calcula as datas das parcelas duplicadas, respeitando "último dia do mês" */
 export const calcularDatasParcelas = (dataInicialStr: string, numeroParcelas: number): string[] => {
   const datas: string[] = [];
-  // Formato recebido é 'YYYY-MM-DD'
   const [ano, mes, dia] = dataInicialStr.split('-').map(Number);
-
-  // Descobre quantos dias tem o mês da data inicial
   const ultimoDiaMesAtual = new Date(ano, mes, 0).getDate();
-
-  // Verifica se a data inicial é o último dia do mês
   const isUltimoDia = dia === ultimoDiaMesAtual;
 
   for (let i = 1; i <= numeroParcelas; i++) {
@@ -22,10 +17,8 @@ export const calcularDatasParcelas = (dataInicialStr: string, numeroParcelas: nu
     let proximoDia = dia;
 
     if (isUltimoDia) {
-      // Se era último dia, pega o último dia do mês alvo
       proximoDia = new Date(ano, proximoMes + 1, 0).getDate();
     } else {
-      // Previne pular de mês (ex: 30 de Jan -> Fev só tem 28 ou 29 dias)
       const maxDiasMesAlvo = new Date(ano, proximoMes + 1, 0).getDate();
       if (proximoDia > maxDiasMesAlvo) {
         proximoDia = maxDiasMesAlvo;
@@ -34,7 +27,6 @@ export const calcularDatasParcelas = (dataInicialStr: string, numeroParcelas: nu
 
     const novaData = new Date(ano, proximoMes, proximoDia);
 
-    // Formata de volta para YYYY-MM-DD
     const anoFormatado = novaData.getFullYear();
     const mesFormatado = String(novaData.getMonth() + 1).padStart(2, '0');
     const diaFormatado = String(novaData.getDate()).padStart(2, '0');

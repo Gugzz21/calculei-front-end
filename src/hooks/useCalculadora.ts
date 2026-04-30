@@ -40,7 +40,6 @@ export function useCalculadora() {
     setForm(prev => {
       const next = { ...prev, [field]: value };
 
-      // Ao trocar o tipo de cálculo, pré-seleciona o índice correspondente
       if (field === 'tipoCalculo') {
         const indicePreDefinido = TIPO_CALCULO_INDICE_MAP[value];
         if (indicePreDefinido) next.indiceCorrecao = indicePreDefinido;
@@ -72,7 +71,7 @@ export function useCalculadora() {
       await minWait;
 
       if (editandoId !== null) {
-        // ── Modo edição: substitui o lançamento existente mantendo o mesmo id ──
+        // Modo edição
         setLancamentos(prev =>
           prev.map(l => l.id === editandoId ? { ...resultado, id: editandoId } : l)
         );
@@ -82,7 +81,7 @@ export function useCalculadora() {
         }));
         setEditandoId(null);
       } else {
-        // ── Modo adição: acrescenta à lista ──
+        // Modo adição
         setLancamentos(prev => [...prev, resultado]);
         setLancamentosOrigem(prev => ({
           ...prev,
@@ -90,7 +89,6 @@ export function useCalculadora() {
         }));
       }
 
-      // Limpa a tabela de juros (se houver) para o próximo cálculo
       if (juros.enabled && juros.aplicados.length > 0) {
         setJuros(prev => ({ ...prev, aplicados: [] }));
       }
@@ -122,7 +120,6 @@ export function useCalculadora() {
     setForm({ ...origem.form });
     setJuros({ ...origem.juros });
     setEditandoId(id);
-    // Rola suavemente até o topo para o usuário ver o formulário
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -156,16 +153,13 @@ export function useCalculadora() {
     const novoOrigemMap: Record<number, { form: FormState; juros: JurosState }> = {};
 
     try {
-      // Processa cada parcela calculando no backend
       for (let i = 0; i < novasDatas.length; i++) {
         const formParaCalcular = { ...origem.form, dataInicial: novasDatas[i] };
         
-        // Simula delay menor entre requisições apenas para garantir ordem e não sobrecarregar
         const minWait = new Promise(resolve => setTimeout(resolve, 100));
         const resultado = await calcularLancamento(formParaCalcular, origem.juros, today);
         await minWait;
 
-        // O id precisa ser único
         const novoId = Date.now() + i + Math.floor(Math.random() * 1000);
         const itemComIdUnico = { ...resultado, id: novoId };
         

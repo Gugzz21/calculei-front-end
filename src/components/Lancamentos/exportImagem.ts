@@ -14,7 +14,7 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
     return "";
   }
 
-  // ── Gera token ANTES de tudo ────────────────────────────────────────────────
+  // ── Gera token ────────────────────────────────────────────────
   const token = gerarUUID();
   const link = `${window.location.origin}/?token=${token}`;
 
@@ -48,11 +48,9 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
   const ctx = canvas.getContext("2d")!;
   ctx.scale(scale, scale);
 
-  // Fundo branco
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvasW, canvasH);
 
-  // Título
   ctx.fillStyle = "#1e293b";
   ctx.font = "bold 15px Arial, sans-serif";
   ctx.textAlign = "left";
@@ -61,7 +59,6 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
   ctx.font = "11px Arial, sans-serif";
   ctx.fillText(`Total de registros: ${lancamentos.length}`, padX, padY + 38);
 
-  /** Desenha texto dentro de uma célula com clip */
   const drawCell = (
     text: string, cx: number, cy: number, cw: number, ch: number,
     align: "left" | "center" | "right"
@@ -85,7 +82,6 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
     ctx.restore();
   };
 
-  // Cabeçalho
   let y = padY + titleH;
   ctx.fillStyle = "#d1d5db";
   ctx.fillRect(padX, y, tableW, headH);
@@ -103,7 +99,6 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
     x += col.width;
   }
 
-  // Linhas de dados
   y += headH;
   for (let i = 0; i < lancamentos.length; i++) {
     const l = lancamentos[i];
@@ -140,7 +135,6 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
     y += rowH;
   }
 
-  // Linha de totais
   if (hasTotals) {
     const tP = lancamentos.reduce((s, l) => s + l.valorPrincipal, 0);
     const tA = lancamentos.reduce((s, l) => s + l.valorAtualizado, 0);
@@ -206,6 +200,9 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
         indiceJuros: l.indiceJuros,
         dataInicioJuros: l.dataInicioJuros,
         dataFimJuros: l.dataFimJuros,
+        diasJuros: l.diasJuros,
+        fatorJuros: l.fatorJuros,
+        percentualJurosAcumulado: l.percentualJurosAcumulado,
         juros: l.juros,
         total: l.total,
       })),

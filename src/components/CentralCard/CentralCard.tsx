@@ -102,7 +102,6 @@ function CentralCard({
       {/* Linha 2: Valor (com checkbox abaixo) | Data inicial | Data do cálculo */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-[24px] items-start w-full">
 
-        {/* Valor + Aplicar juros? abaixo */}
         <div className="flex flex-col gap-2 w-full md:w-auto">
           <InputValor
             value={form.valor}
@@ -172,7 +171,7 @@ function CentralCard({
 
       </div>
 
-      {/* Painel expandido de juros (quando checkbox ativo) */}
+      {/* Painel expandido de juros */}
       {juros.enabled && !selicSelecionada && (
         <div className="border border-gray-300 rounded-lg p-4">
           <Juros

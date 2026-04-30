@@ -32,12 +32,10 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
 
   const gerarPreview = () => {
     const parcelasNum = parseInt(numeroParcelas, 10);
-    // Se quiser duplicar "em 5", gera 4 novas parcelas. Então precisa ser > 1
     if (isNaN(parcelasNum) || parcelasNum <= 1) {
       setParcelasPreview([]);
       return;
     }
-    // Gera N - 1 parcelas
     const datas = calcularDatasParcelas(lancamentoBase.dataInicial, parcelasNum - 1);
     setParcelasPreview(datas);
   };

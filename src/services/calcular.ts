@@ -48,6 +48,9 @@ export async function calcularLancamento(
   let indiceJurosLabel  = "—";
   let dataInicioJuros   = "";
   let dataFimJuros      = "";
+  let diasJuros         = 0;
+  let fatorJuros        = 1;
+  let percentualJuros   = 0;
 
   if (juros.enabled && !selicSelecionada && juros.aplicados.length > 0) {
     for (const aplicado of juros.aplicados) {
@@ -63,6 +66,13 @@ export async function calcularLancamento(
         );
         if (respJuros) {
           valorJuros += getValorAtualizado(respJuros) - valorAtualizado;
+          diasJuros += respJuros.dias || 0;
+          if (respJuros.fatorAcumulado) {
+            fatorJuros *= respJuros.fatorAcumulado;
+          } else if (respJuros.percentualAcumulado) {
+            fatorJuros *= (1 + respJuros.percentualAcumulado / 100);
+          }
+          percentualJuros += respJuros.percentualAcumulado || 0;
         }
         indiceJurosLabel = JUROS_LABEL[aplicado.indice] ?? aplicado.indice;
         dataInicioJuros  = aplicado.dataInicio;
@@ -86,6 +96,9 @@ export async function calcularLancamento(
     indiceJuros:      indiceJurosLabel,
     dataInicioJuros,
     dataFimJuros,
+    diasJuros,
+    fatorJuros,
+    percentualJurosAcumulado: percentualJuros,
     juros:            valorJuros,
     total:            valorAtualizado + valorJuros,
   };
