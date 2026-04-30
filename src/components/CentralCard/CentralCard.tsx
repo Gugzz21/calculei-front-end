@@ -15,10 +15,12 @@ interface CentralCardProps {
   loading: boolean;
   erro: string | null;
   isFormValid: boolean;
+  editandoId: number | null;
   onFormChange: (field: keyof FormState, value: string) => void;
   onJurosChange: (field: keyof JurosState, value: string | boolean | any[]) => void;
   onCalcular: () => void;
   onLimpar: () => void;
+  onCancelarEdicao: () => void;
 }
 
 function CentralCard({
@@ -28,10 +30,12 @@ function CentralCard({
   loading,
   erro,
   isFormValid,
+  editandoId,
   onFormChange,
   onJurosChange,
   onCalcular,
   onLimpar,
+  onCancelarEdicao,
 }: CentralCardProps) {
   const selicSelecionada =
     form.indiceCorrecao === "selic" ||
@@ -50,6 +54,24 @@ function CentralCard({
 
   return (
     <div className="flex flex-col bg-white rounded-xl pb-6 p-4 w-full md:p-8 gap-6 shadow-md border border-slate-200">
+      {/* Banner de modo edição */}
+      {editandoId !== null && (
+        <div className="flex items-center justify-between bg-amber-50 border border-amber-300 rounded-lg px-4 py-2.5">
+          <div className="flex items-center gap-2 text-amber-800 text-sm font-semibold">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Editando lançamento — altere os campos e clique em Salvar alteração
+          </div>
+          <button
+            onClick={onCancelarEdicao}
+            className="text-amber-600 hover:text-amber-800 text-xs font-semibold underline ml-4 shrink-0"
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
+
       {/* Título */}
       <div className="border-b border-slate-100 pb-4">
         <h1 className="text-[#1F2022] font-bold text-2xl md:text-3xl">Atualização Monetária</h1>
@@ -177,6 +199,7 @@ function CentralCard({
           onClick={onCalcular}
           loading={loading}
           disabled={!isFormValid}
+          editMode={editandoId !== null}
         />
         <Limpar onClick={onLimpar} />
       </div>

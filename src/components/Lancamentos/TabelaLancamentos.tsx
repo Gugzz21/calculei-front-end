@@ -1,5 +1,6 @@
 import type { LancamentoItem } from "../../App";
-import { formatBRL, formatDate, formatPercent } from "./utils";
+import { formatBRL } from "./utils";
+import LancamentoRow from "./LancamentoRow";
 
 interface TabelaLancamentosProps {
   currentItems: LancamentoItem[];
@@ -8,6 +9,7 @@ interface TabelaLancamentosProps {
   currentPage: number;
   totalPages: number;
   onRemover: (id: number, isLastInPage: boolean) => void;
+  onEditar: (id: number) => void;
 }
 
 function TabelaLancamentos({
@@ -17,111 +19,80 @@ function TabelaLancamentos({
   currentPage,
   totalPages,
   onRemover,
+  onEditar,
 }: TabelaLancamentosProps) {
+
+  const handleRemover = (id: number) => {
+    onRemover(id, currentItems.length === 1);
+  };
+
   return (
-    <div className="overflow-x-auto w-full">
-      <table className="text-sm text-gray-700 w-full">
-        <thead>
-          <tr className="border-b-2 border-gray-300 text-left text-[12px] text-black bg-gray-300 uppercase divide-x divide-slate-500">
-            <th className="pb-2 pt-2 pl-2 pr-4 underline px-6">#</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Descrição</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Data</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Valor Principal</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Índice Correção</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">%Correção</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Valor Atualizado</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Dias</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Índice Juros</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Juros</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Total</th>
-            <th className="pb-2 pt-2 pr-4 underline px-6">Ações</th>
-          </tr>
-        </thead>
+    <div className="flex flex-col w-full">
+      {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
+      <div className="hidden md:grid grid-cols-[2.5rem_minmax(0,1fr)_10rem_8rem_9rem_5rem] items-center gap-4 px-4 py-3 bg-gray-200/60 rounded-t-xl border border-gray-300 text-xs font-bold text-gray-600 uppercase tracking-wide">
+        <div className="text-center"></div> {/* Espaço para ícone de expansão */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 shrink-0 text-center">#</div>
+          <div>Descrição</div>
+        </div>
+        <div>Datas</div>
+        <div className="text-right">Principal</div>
+        <div className="text-right">Total Geral</div>
+        <div className="text-center">Ações</div>
+      </div>
 
-        <tbody className="divide-y divide-slate-500">
-          {currentItems.map((l, index) => (
-            <tr
-              key={l.id}
-              className="hover:bg-gray-50 transition-colors divide-x divide-slate-500"
-            >
-              <td className="py-3 pl-4 pr-6 font-medium">{startIndex + index + 1}</td>
-              <td className="py-3 pl-4 pr-6 font-medium">{l.descricao}</td>
-              <td className="py-3 pl-4 pr-6 text-[11px] leading-tight">
-                <div className="flex flex-col">
-                  <span className="text-gray-600 font-medium">
-                    Inicial: {formatDate(l.dataInicial)}
-                  </span>
-                  <span className="text-gray-600 font-bold">
-                    Cálculo: {formatDate(l.dataCalculo)}
-                  </span>
-                </div>
-              </td>
-              <td className="py-3 pl-4 pr-6">{formatBRL(l.valorPrincipal)}</td>
-              <td className="py-3 pl-4 pr-6">{l.indiceCorrecao}</td>
-              <td className="py-3 pl-4 pr-6">{formatPercent(l.percentualCorrecao)}</td>
-              <td className="py-3 pl-4 pr-6 text-blue-700 font-semibold">
-                {formatBRL(l.valorAtualizado)}
-              </td>
-              <td className="py-3 pl-4 pr-6 text-center">{l.dias}</td>
+      {/* ─── CORPO DA TABELA (Lista de Rows) ─── */}
+      <div className="flex flex-col gap-3 mt-3 md:mt-0 md:border-x md:border-gray-200 md:bg-gray-50/30 md:p-3">
+        {currentItems.map((item, index) => (
+          <LancamentoRow
+            key={item.id}
+            item={item}
+            index={startIndex + index + 1}
+            onRemover={handleRemover}
+            onEditar={onEditar}
+          />
+        ))}
+      </div>
 
-              {/* Índice de Juros */}
-              <td className="py-3 pl-4 pr-6 text-[11px] leading-tight">
-                {l.indiceJuros !== "—" ? (
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-indigo-700">{l.indiceJuros}</span>
-                    {l.dataInicioJuros && (
-                      <span className="text-gray-500">
-                        {formatDate(l.dataInicioJuros)} → {formatDate(l.dataFimJuros)}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <span className="text-gray-400">—</span>
-                )}
-              </td>
+      {/* ─── RODAPÉ (Total Geral) ─── */}
+      {/* Exibe apenas na última página com mais de 1 item */}
+      {lancamentos.length > 1 && currentPage === totalPages && (
+        <div className="mt-4 flex flex-col md:flex-row items-center justify-between bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm">
+          <div className="text-sm font-bold text-blue-800 uppercase tracking-wide mb-2 md:mb-0">
+            Resumo Geral ({lancamentos.length} Lançamentos)
+          </div>
 
-              <td className="py-3 pl-4 pr-6">{formatBRL(l.juros)}</td>
-              <td className="py-3 pl-4 pr-6 text-green-700 font-bold">{formatBRL(l.total)}</td>
-              <td className="py-3 pl-4 pr-6">
-                <button
-                  onClick={() => onRemover(l.id, currentItems.length === 1)}
-                  className="text-red-400 hover:text-red-600 transition-colors text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:border-red-400"
-                  title="Remover lançamento"
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-
-        {/* Total Geral — exibe apenas na última página com mais de 1 item */}
-        {lancamentos.length > 1 && currentPage === totalPages && (
-          <tfoot>
-            <tr className="border-t-2 border-gray-400 text-sm font-bold text-gray-700 bg-gray-100 divide-x divide-slate-400">
-              <td className="py-3 pl-4 pr-6" colSpan={3}>Total Geral</td>
-              <td className="py-3 pl-4 pr-6">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full md:w-auto">
+            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end">
+              <span className="text-xs text-blue-600/80 uppercase font-semibold">Total Principal</span>
+              <span className="text-sm font-medium text-blue-800">
                 {formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}
-              </td>
-              <td className="py-3 pl-4 pr-6" colSpan={2}></td>
-              <td className="py-3 pl-4 pr-6 text-blue-700">
+              </span>
+            </div>
+
+            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end">
+              <span className="text-xs text-blue-600/80 uppercase font-semibold">Total Atualizado</span>
+              <span className="text-sm font-medium text-blue-800">
                 {formatBRL(lancamentos.reduce((s, l) => s + l.valorAtualizado, 0))}
-              </td>
-              <td className="py-3 pl-4 pr-6 text-center">
-                {lancamentos.reduce((s, l) => s + l.dias, 0)}
-              </td>
-              <td className="py-3 pl-4 pr-6"></td>
-              <td className="py-3 pl-4 pr-6">
+              </span>
+            </div>
+
+            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end">
+              <span className="text-xs text-purple-600/80 uppercase font-semibold">Total Juros</span>
+              <span className="text-sm font-medium text-purple-700">
                 {formatBRL(lancamentos.reduce((s, l) => s + l.juros, 0))}
-              </td>
-              <td className="py-3 pl-4 pr-6 text-green-700">
+              </span>
+            </div>
+
+            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end pt-2 md:pt-0 border-t border-emerald-200/50 md:border-0">
+              <span className="text-[11px] text-emerald-600 uppercase font-bold">Valor Final Geral</span>
+              <span className="text-lg font-bold text-emerald-700">
                 {formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}
-              </td>
-              <td className="py-3 pl-4 pr-6"></td>
-            </tr>
-          </tfoot>
-        )}
-      </table>
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

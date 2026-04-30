@@ -21,7 +21,7 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-[20px] font-bold text-gray-900">Imagem gerada com sucesso!</h2>
-            <p className="text-sm text-gray-500 mt-1">  
+            <p className="text-sm text-gray-500 mt-1">
               Guarde o link abaixo para recuperar seus lançamentos futuramente.
             </p>
           </div>
@@ -56,13 +56,6 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
             ⚠️ Salve este link em local seguro. Basta colá-lo no navegador para recuperar os dados.
           </p>
         </div>
-
-        <button
-          onClick={onClose}
-          className="w-full py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-colors"
-        >
-          Entendido
-        </button>
       </div>
     </div>
   );

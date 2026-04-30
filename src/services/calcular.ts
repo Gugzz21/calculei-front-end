@@ -32,7 +32,14 @@ export async function calcularLancamento(
 
   const valorAtualizado    = respCorrecao ? getValorAtualizado(respCorrecao) : valorNum;
   const dias               = respCorrecao?.dias ?? 0;
-  const percentualCorrecao = respCorrecao?.percentualAcumulado ?? respCorrecao?.fatorAcumulado ?? 0;
+
+  // 🔍 LOG TEMPORÁRIO — ver todos os campos que o backend devolve
+  console.log('[DEBUG] respCorrecao completo:', JSON.stringify(respCorrecao, null, 2));
+  
+  let percentualCorrecao = respCorrecao?.percentualAcumulado ?? respCorrecao?.fatorAcumulado;
+  if (percentualCorrecao === undefined || percentualCorrecao === null || percentualCorrecao === 0) {
+    percentualCorrecao = valorNum > 0 ? ((valorAtualizado - valorNum) / valorNum) * 100 : 0;
+  }
 
   // ── Juros ────────────────────────────────────────────────────────────────────
   const selicSelecionada = INDICES_COM_JUROS_EMBUTIDOS.includes(form.indiceCorrecao);
