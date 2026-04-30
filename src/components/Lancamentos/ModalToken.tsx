@@ -22,7 +22,7 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
           <div>
             <h2 className="text-[20px] font-bold text-gray-900">Imagem gerada com sucesso!</h2>
             <p className="text-sm text-gray-500 mt-1">  
-              Guarde o token abaixo para recuperar seus lançamentos futuramente.
+              Guarde o link abaixo para recuperar seus lançamentos futuramente.
             </p>
           </div>
           <button
@@ -36,10 +36,10 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Seu Token de Recuperação
+            Seu Link de Recuperação
           </label>
           <div className="flex items-center gap-2">
-            <code className="flex-1 bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 font-mono break-all">
+            <code className="flex-1 bg-gray-100 border border-gray-300 rounded-lg px-3 py-3 text-[11px] text-gray-800 font-mono break-all line-clamp-2">
               {token}
             </code>
             <button
@@ -53,7 +53,7 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
             </button>
           </div>
           <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-1">
-            ⚠️ Salve este código em local seguro. Sem ele não será possível recuperar os dados.
+            ⚠️ Salve este link em local seguro. Basta colá-lo no navegador para recuperar os dados.
           </p>
         </div>
 

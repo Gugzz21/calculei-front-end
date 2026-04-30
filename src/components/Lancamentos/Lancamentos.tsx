@@ -5,7 +5,6 @@ import Paginacao from "./Paginacao";
 import TabelaLancamentos from "./TabelaLancamentos";
 import BotoesExport from "./BotoesExport";
 import ModalToken from "./ModalToken";
-import ModalRecuperar from "./ModalRecuperar";
 import { exportarParaPDF } from "./exportPDF";
 import { baixarImagem } from "./exportImagem";
 
@@ -13,10 +12,9 @@ interface LancamentosProps {
   lancamentos: LancamentoItem[];
   loading?: boolean;
   onRemover: (id: number) => void;
-  onRecuperar: (itensRecuperados: LancamentoItem[]) => void;
 }
 
-function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: LancamentosProps) {
+function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosProps) {
   // ── Paginação ──────────────────────────────────────────────────────────────
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -37,9 +35,8 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: L
   };
 
   // ── Modais ─────────────────────────────────────────────────────────────────
-  const [modalToken, setModalToken]         = useState<string | null>(null);
-  const [modalRecuperar, setModalRecuperar] = useState(false);
-  const [salvandoPDF, setSalvandoPDF]       = useState(false);
+  const [modalToken, setModalToken] = useState<string | null>(null);
+  const [salvandoPDF, setSalvandoPDF] = useState(false);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   const handleGerarPDF = async () => {
@@ -62,8 +59,13 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: L
     try {
       const token = await baixarImagem(lancamentos);
       if (token) setModalToken(token);
-    } catch {
-      alert("Erro ao gerar imagem.");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Erro desconhecido.";
+      if (msg.includes("histórico")) {
+        alert(`Imagem gerada, mas não foi possível salvar o token:\n${msg}`);
+      } else {
+        alert(`Erro ao gerar imagem: ${msg}`);
+      }
     }
   };
 
@@ -76,15 +78,6 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: L
   return (
     <>
       {modalToken && <ModalToken token={modalToken} onClose={() => setModalToken(null)} />}
-      {modalRecuperar &&
-        <ModalRecuperar
-          onClose={() =>
-            setModalRecuperar(false)}
-          onRecuperar={(itens) => {
-            onRecuperar(itens);
-            setModalRecuperar(false);
-          }}
-        />}
 
       <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
 
@@ -108,7 +101,6 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onRecuperar }: L
           salvandoPDF={salvandoPDF}
           onGerarPDF={handleGerarPDF}
           onBaixarImagem={handleBaixarImagem}
-          onRecuperarToken={() => setModalRecuperar(true)}
         />
 
         {/* Conteúdo */}

@@ -14,6 +14,7 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
 
   // ── Gera token ANTES de tudo ────────────────────────────────────────────────
   const token = gerarUUID();
+  const link = `${window.location.origin}/?token=${token}`;
 
   const cols = [
     { label: "Descrição",        width: 140, align: "left"   as const },
@@ -190,9 +191,24 @@ export async function baixarImagem(lancamentos: LancamentoItem[]): Promise<strin
     json: {
       geradoEm: new Date().toISOString(),
       totalLancamentos: lancamentos.length,
-      lancamentos: lancamentos.map((l) => ({ ...l })),
+      lancamentos: lancamentos.map((l) => ({
+        id: l.id,
+        descricao: l.descricao,
+        dataInicial: l.dataInicial,
+        dataCalculo: l.dataCalculo,
+        valorPrincipal: l.valorPrincipal,
+        indiceCorrecao: l.indiceCorrecao,
+        valorAtualizado: l.valorAtualizado,
+        dias: l.dias,
+        percentualCorrecao: l.percentualCorrecao,
+        indiceJuros: l.indiceJuros,
+        dataInicioJuros: l.dataInicioJuros,
+        dataFimJuros: l.dataFimJuros,
+        juros: l.juros,
+        total: l.total,
+      })),
     },
   });
 
-  return token;
+  return link;
 }

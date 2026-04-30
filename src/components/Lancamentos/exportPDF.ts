@@ -57,10 +57,10 @@ function adicionarTotalGeral(
 }
 
 /**
- * Desenha o bloco de Token de Recuperação na última página do PDF.
- * Fica após a tabela, com fundo amarelo e aviso sobre guarda do token.
+ * Desenha o bloco de Link de Recuperação na última página do PDF.
+ * Fica após a tabela, com fundo amarelo e aviso sobre guarda do link.
  */
-function adicionarBlocoToken(doc: jsPDF, token: string) {
+function adicionarBlocoToken(doc: jsPDF, link: string) {
   // Desce à última página para escrever após a tabela
   const totalPgs  = (doc.internal as any).getNumberOfPages();
   doc.setPage(totalPgs);
@@ -97,20 +97,20 @@ function adicionarBlocoToken(doc: jsPDF, token: string) {
   doc.setFontSize(9);
   doc.setTextColor(146, 64, 14);            // amber-800
   doc.setFont("helvetica", "bold");
-  doc.text("⚠  TOKEN DE RECUPERAÇÃO", margin + 4, y + 7);
+  doc.text("⚠  LINK DE RECUPERAÇÃO", margin + 4, y + 7);
 
-  // ── Token em destaque ─────────────────────────────────────────────────────
+  // ── Link em destaque ─────────────────────────────────────────────────────
   doc.setFont("courier", "bold");
-  doc.setFontSize(10);
+  doc.setFontSize(8.5); // Fonte menor para caber o link longo
   doc.setTextColor(30, 30, 30);
-  doc.text(token, margin + 4, y + 15);
+  doc.text(link, margin + 4, y + 15);
 
   // ── Aviso ─────────────────────────────────────────────────────────────────
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7);
   doc.setTextColor(120, 60, 0);
   doc.text(
-    "Guarde este token em local seguro. Com ele você pode recuperar e reimprimir este relatório a qualquer momento no sistema.",
+    "Guarde este link em local seguro. Ao acessá-lo no navegador você poderá recuperar este relatório automaticamente no sistema.",
     margin + 4,
     y + 22,
     { maxWidth: boxW - 8 }
@@ -140,6 +140,7 @@ function adicionarPaginacao(doc: jsPDF) {
 export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<void> {
   // Gerar token ANTES de montar o PDF para incluí-lo no documento
   const token = gerarUUID();
+  const link = `${window.location.origin}/?token=${token}`;
 
   const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
@@ -173,8 +174,8 @@ export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<vo
 
   if (lancamentos.length > 1) adicionarTotalGeral(doc, lancamentos);
 
-  // ── Bloco do token no PDF ──────────────────────────────────────────────────
-  adicionarBlocoToken(doc, token);
+  // ── Bloco do link no PDF ──────────────────────────────────────────────────
+  adicionarBlocoToken(doc, link);
 
   // ── Paginação (depois do bloco para não sobrescrever) ─────────────────────
   adicionarPaginacao(doc);
