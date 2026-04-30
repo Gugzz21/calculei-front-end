@@ -1,5 +1,5 @@
 import type { LancamentoItem } from "../../App";
-import { formatBRL } from "./utils/utils";
+import { formatBRL } from "../../utils/formatters";
 import LancamentoRow from "./LancamentoRow";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 
@@ -12,6 +12,7 @@ interface TabelaLancamentosProps {
   onRemover: (id: number, isLastInPage: boolean) => void;
   onEditar: (id: number) => void;
   onLimparTodos: () => void;
+  onDuplicar: (item: LancamentoItem) => void;
 }
 
 function TabelaLancamentos({
@@ -23,6 +24,7 @@ function TabelaLancamentos({
   onRemover,
   onEditar,
   onLimparTodos,
+  onDuplicar,
 }: TabelaLancamentosProps) {
 
   const handleRemover = (id: number) => {
@@ -55,12 +57,13 @@ function TabelaLancamentos({
       {/* ─── CORPO DA TABELA (Lista de Rows) ─── */}
       <div className="flex flex-col md:block">
         {currentItems.map((item, index) => (
-          <LancamentoRow
-            key={item.id}
-            item={item}
-            index={startIndex + index + 1}
-            onRemover={handleRemover}
+          <LancamentoRow 
+            key={item.id} 
+            item={item} 
+            index={startIndex + index} 
+            onRemover={handleRemover} 
             onEditar={onEditar}
+            onDuplicar={onDuplicar}
           />
         ))}
       </div>

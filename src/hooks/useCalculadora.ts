@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState} from 'react';
 import { calcularLancamento } from '../services/calcular';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
-import { buscarPorToken } from '../services/api';
-import { extrairLancamentos, converterParaLancamentoItem } from '../components/Lancamentos/utils/utils';
 import type { FormState, JurosState, LancamentoItem } from '../types';
+import { useAutoRecovery } from './useAutoRecovery';
 
 export function useCalculadora() {
   const today = new Date().toISOString().split('T')[0];
@@ -33,35 +32,7 @@ export function useCalculadora() {
   const [erro, setErro] = useState<string | null>(null);
 
   // ── Auto Recovery via Link ────────────────────────────────────────────────────
-  const hasRecovered = useRef(false);
-
-  useEffect(() => {
-    if (hasRecovered.current) return;
-    const searchParams = new URLSearchParams(window.location.search);
-    const tokenParams = searchParams.get('token');
-    if (tokenParams) {
-      hasRecovered.current = true;
-      setLoading(true);
-      buscarPorToken(tokenParams)
-        .then((resultado: any) => {
-          const recuperados = extrairLancamentos(resultado);
-          if (recuperados && recuperados.length > 0) {
-            setLancamentos(converterParaLancamentoItem(recuperados));
-            alert("Lançamentos recuperados com sucesso!");
-          } else {
-            setErro("Lançamentos não encontrados para este link.");
-          }
-        })
-        .catch((e) => {
-          setErro("Erro ao recuperar dados do link: " + e.message);
-        })
-        .finally(() => {
-          setLoading(false);
-          // Opcional: remover o parâmetro da URL para não recarregar no refresh
-          window.history.replaceState({}, document.title, window.location.pathname);
-        });
-    }
-  }, []);
+  useAutoRecovery(setLancamentos, setLoading, setErro);
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 
@@ -174,6 +145,44 @@ export function useCalculadora() {
     }
   };
 
+  const handleConfirmarDuplicacao = async (idBase: number, novasDatas: string[]) => {
+    const origem = lancamentosOrigem[idBase];
+    if (!origem) return;
+
+    setLoading(true);
+    setErro(null);
+
+    const novosResultados: LancamentoItem[] = [];
+    const novoOrigemMap: Record<number, { form: FormState; juros: JurosState }> = {};
+
+    try {
+      // Processa cada parcela calculando no backend
+      for (let i = 0; i < novasDatas.length; i++) {
+        const formParaCalcular = { ...origem.form, dataInicial: novasDatas[i] };
+        
+        // Simula delay menor entre requisições apenas para garantir ordem e não sobrecarregar
+        const minWait = new Promise(resolve => setTimeout(resolve, 100));
+        const resultado = await calcularLancamento(formParaCalcular, origem.juros, today);
+        await minWait;
+
+        // O id precisa ser único
+        const novoId = Date.now() + i + Math.floor(Math.random() * 1000);
+        const itemComIdUnico = { ...resultado, id: novoId };
+        
+        novosResultados.push(itemComIdUnico);
+        novoOrigemMap[novoId] = { form: { ...formParaCalcular }, juros: { ...origem.juros } };
+      }
+
+      setLancamentos(prev => [...prev, ...novosResultados]);
+      setLancamentosOrigem(prev => ({ ...prev, ...novoOrigemMap }));
+
+    } catch (e: unknown) {
+      setErro(e instanceof Error ? e.message : 'Erro ao duplicar parcelas.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const isFormValid = !!form.valor && !!form.dataInicial && !!form.dataCalculo;
 
   return {
@@ -192,6 +201,7 @@ export function useCalculadora() {
     handleEditar,
     handleCancelarEdicao,
     handleRemoverLancamento,
-    handleLimparTodosLancamentos
+    handleLimparTodosLancamentos,
+    handleConfirmarDuplicacao
   };
 }

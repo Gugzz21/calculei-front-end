@@ -6,6 +6,7 @@ import Paginacao from "./Paginacao";
 import TabelaLancamentos from "./TabelaLancamentos";
 import BotoesExport from "./BotoesExport";
 import ModalToken from "./ModalToken";
+import ModalDuplicar from "./ModalDuplicar";
 import { exportarParaPDF } from "./exportPDF";
 import { baixarImagem } from "./exportImagem";
 
@@ -15,9 +16,10 @@ interface LancamentosProps {
   onRemover: (id: number) => void;
   onEditar: (id: number) => void;
   onLimparTodos: () => void;
+  onConfirmarDuplicacao: (idOriginal: number, datas: string[]) => void;
 }
 
-function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimparTodos }: LancamentosProps) {
+function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimparTodos, onConfirmarDuplicacao }: LancamentosProps) {
   const tableRef = useRef<HTMLDivElement>(null);
 
   // ── Paginação ──────────────────────────────────────────────────────────────
@@ -39,6 +41,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
 
   // ── Modais ─────────────────────────────────────────────────────────────────
   const [modalToken, setModalToken] = useState<string | null>(null);
+  const [duplicandoItem, setDuplicandoItem] = useState<LancamentoItem | null>(null);
   const [salvandoPDF, setSalvandoPDF] = useState(false);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
@@ -81,6 +84,15 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
   return (
     <>
       {modalToken && <ModalToken token={modalToken} onClose={() => setModalToken(null)} />}
+      <ModalDuplicar
+        isOpen={!!duplicandoItem}
+        onClose={() => setDuplicandoItem(null)}
+        lancamentoBase={duplicandoItem}
+        onConfirmar={(datas) => {
+          if (duplicandoItem) onConfirmarDuplicacao(duplicandoItem.id, datas);
+          setDuplicandoItem(null);
+        }}
+      />
 
       <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
 
@@ -122,6 +134,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
               onRemover={handleRemover}
               onEditar={onEditar}
               onLimparTodos={onLimparTodos}
+              onDuplicar={setDuplicandoItem}
             />
 
             {/* Rodapé: info de paginação + seletor + paginação inferior */}

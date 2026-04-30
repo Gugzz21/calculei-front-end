@@ -26,6 +26,7 @@ function App() {
     handleCancelarEdicao,
     handleRemoverLancamento,
     handleLimparTodosLancamentos,
+    handleConfirmarDuplicacao,
   } = useCalculadora();
 
   return (
@@ -53,6 +54,7 @@ function App() {
             onRemover={handleRemoverLancamento}
             onEditar={handleEditar}
             onLimparTodos={handleLimparTodosLancamentos}
+            onConfirmarDuplicacao={handleConfirmarDuplicacao}
           />
         </div>
       </div>
