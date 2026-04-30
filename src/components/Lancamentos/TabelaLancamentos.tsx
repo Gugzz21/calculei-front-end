@@ -1,6 +1,7 @@
 import type { LancamentoItem } from "../../App";
 import { formatBRL } from "./utils";
 import LancamentoRow from "./LancamentoRow";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 
 interface TabelaLancamentosProps {
   currentItems: LancamentoItem[];
@@ -10,6 +11,7 @@ interface TabelaLancamentosProps {
   totalPages: number;
   onRemover: (id: number, isLastInPage: boolean) => void;
   onEditar: (id: number) => void;
+  onLimparTodos: () => void;
 }
 
 function TabelaLancamentos({
@@ -20,6 +22,7 @@ function TabelaLancamentos({
   totalPages,
   onRemover,
   onEditar,
+  onLimparTodos,
 }: TabelaLancamentosProps) {
 
   const handleRemover = (id: number) => {
@@ -27,22 +30,30 @@ function TabelaLancamentos({
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full border border-gray-300 rounded-lg overflow-hidden bg-white">
       {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
-      <div className="hidden md:grid grid-cols-[2.5rem_minmax(0,1fr)_10rem_8rem_9rem_5rem] items-center gap-4 px-4 py-3 bg-gray-200/60 rounded-t-xl border border-gray-300 text-xs font-bold text-gray-600 uppercase tracking-wide">
+      <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-3 bg-[#e8eff8] border-b border-gray-300 text-[13px] font-bold text-gray-800">
         <div className="text-center"></div> {/* Espaço para ícone de expansão */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 shrink-0 text-center">#</div>
-          <div>Descrição</div>
+        <div>Data inicial</div>
+        <div>Data final</div>
+        <div>Valor</div>
+        <div>Índice</div>
+        <div>Correção</div>
+        <div>Juros</div>
+        <div>Total devido</div>
+        <div className="flex justify-end pr-1 text-gray-500">
+          <button
+            onClick={onLimparTodos}
+            className="p-1 hover:text-red-600 transition-colors rounded"
+            title="Limpar todos os lançamentos"
+          >
+            <DeleteOutlinedIcon fontSize="small" />
+          </button>
         </div>
-        <div>Datas</div>
-        <div className="text-right">Principal</div>
-        <div className="text-right">Total Geral</div>
-        <div className="text-center">Ações</div>
       </div>
 
       {/* ─── CORPO DA TABELA (Lista de Rows) ─── */}
-      <div className="flex flex-col gap-3 mt-3 md:mt-0 md:border-x md:border-gray-200 md:bg-gray-50/30 md:p-3">
+      <div className="flex flex-col md:block">
         {currentItems.map((item, index) => (
           <LancamentoRow
             key={item.id}
@@ -55,43 +66,30 @@ function TabelaLancamentos({
       </div>
 
       {/* ─── RODAPÉ (Total Geral) ─── */}
-      {/* Exibe apenas na última página com mais de 1 item */}
-      {lancamentos.length > 1 && currentPage === totalPages && (
-        <div className="mt-4 flex flex-col md:flex-row items-center justify-between bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm">
-          <div className="text-sm font-bold text-blue-800 uppercase tracking-wide mb-2 md:mb-0">
-            Resumo Geral ({lancamentos.length} Lançamentos)
+      {/* Exibe apenas na última página */}
+      {lancamentos.length > 0 && currentPage === totalPages && (
+        <>
+          {/* Footer Desktop */}
+          <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-4 bg-[#f8f9fa] border-t border-gray-300 text-sm font-bold text-gray-800">
+            <div className="col-span-3 pl-12 text-[15px]">Total</div>
+            <div>{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</div>
+            <div className="col-span-3"></div>
+            <div className="text-[15px]">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</div>
+            <div></div>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 w-full md:w-auto">
-            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end">
-              <span className="text-xs text-blue-600/80 uppercase font-semibold">Total Principal</span>
-              <span className="text-sm font-medium text-blue-800">
-                {formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}
-              </span>
+          {/* Footer Mobile */}
+          <div className="md:hidden mt-4 flex flex-col items-center justify-between bg-[#f8f9fa] border-t border-gray-300 p-4">
+            <div className="w-full flex justify-between items-center mb-2">
+              <span className="text-sm font-bold text-gray-800">Total Valor</span>
+              <span className="text-sm font-bold text-gray-800">{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</span>
             </div>
-
-            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end">
-              <span className="text-xs text-blue-600/80 uppercase font-semibold">Total Atualizado</span>
-              <span className="text-sm font-medium text-blue-800">
-                {formatBRL(lancamentos.reduce((s, l) => s + l.valorAtualizado, 0))}
-              </span>
-            </div>
-
-            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end">
-              <span className="text-xs text-purple-600/80 uppercase font-semibold">Total Juros</span>
-              <span className="text-sm font-medium text-purple-700">
-                {formatBRL(lancamentos.reduce((s, l) => s + l.juros, 0))}
-              </span>
-            </div>
-
-            <div className="flex justify-between md:flex-col w-full md:w-auto md:items-end pt-2 md:pt-0 border-t border-emerald-200/50 md:border-0">
-              <span className="text-[11px] text-emerald-600 uppercase font-bold">Valor Final Geral</span>
-              <span className="text-lg font-bold text-emerald-700">
-                {formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}
-              </span>
+            <div className="w-full flex justify-between items-center">
+              <span className="text-sm font-bold text-gray-800">Total Devido Geral</span>
+              <span className="text-base font-bold text-gray-800">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</span>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

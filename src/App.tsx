@@ -25,6 +25,7 @@ function App() {
     handleEditar,
     handleCancelarEdicao,
     handleRemoverLancamento,
+    handleLimparTodosLancamentos,
   } = useCalculadora();
 
   return (
@@ -51,6 +52,7 @@ function App() {
             loading={loading}
             onRemover={handleRemoverLancamento}
             onEditar={handleEditar}
+            onLimparTodos={handleLimparTodosLancamentos}
           />
         </div>
       </div>

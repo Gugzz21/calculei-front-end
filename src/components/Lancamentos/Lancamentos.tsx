@@ -14,9 +14,10 @@ interface LancamentosProps {
   loading?: boolean;
   onRemover: (id: number) => void;
   onEditar: (id: number) => void;
+  onLimparTodos: () => void;
 }
 
-function Lancamentos({ lancamentos, loading = false, onRemover, onEditar }: LancamentosProps) {
+function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimparTodos }: LancamentosProps) {
   const tableRef = useRef<HTMLDivElement>(null);
 
   // ── Paginação ──────────────────────────────────────────────────────────────
@@ -120,6 +121,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar }: Lanc
               totalPages={totalPages}
               onRemover={handleRemover}
               onEditar={onEditar}
+              onLimparTodos={onLimparTodos}
             />
 
             {/* Rodapé: info de paginação + seletor + paginação inferior */}

@@ -118,6 +118,12 @@ export function useCalculadora() {
           [resultado.id]: { form: { ...form }, juros: { ...juros } },
         }));
       }
+
+      // Limpa a tabela de juros (se houver) para o próximo cálculo
+      if (juros.enabled && juros.aplicados.length > 0) {
+        setJuros(prev => ({ ...prev, aplicados: [] }));
+      }
+
     } catch (e: unknown) {
       setErro(e instanceof Error ? e.message : 'Erro ao calcular. Verifique se o servidor Java está rodando.');
     } finally {
@@ -155,7 +161,17 @@ export function useCalculadora() {
   };
 
   const handleRemoverLancamento = (id: number) => {
-    setLancamentos(prev => prev.filter(l => l.id !== id));
+    if (window.confirm("Tem certeza que deseja remover este lançamento?")) {
+      setLancamentos(prev => prev.filter(l => l.id !== id));
+    }
+  };
+
+  const handleLimparTodosLancamentos = () => {
+    if (window.confirm("Tem certeza que deseja remover todos os lançamentos?")) {
+      setLancamentos([]);
+      setLancamentosOrigem({});
+      setEditandoId(null);
+    }
   };
 
   const isFormValid = !!form.valor && !!form.dataInicial && !!form.dataCalculo;
@@ -175,6 +191,7 @@ export function useCalculadora() {
     handleLimpar,
     handleEditar,
     handleCancelarEdicao,
-    handleRemoverLancamento
+    handleRemoverLancamento,
+    handleLimparTodosLancamentos
   };
 }
