@@ -56,3 +56,5 @@ export function converterParaLancamentoItem(itens: any[]): any[] {
     total: l.total,
   }));
 }
+
+

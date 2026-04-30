@@ -2,22 +2,22 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { LancamentoItem } from "../../App";
 import type { LancamentoRecuperado } from "./types";
-import { formatBRL, formatDate, formatPercent, gerarUUID } from "./utils";
+import { formatBRL, formatDate, formatPercent, gerarUUID } from "./utils/utils";
 import { salvarHistorico } from "../../services/api";
 
 // ─── Estilos compartilhados ───────────────────────────────────────────────────
 
 const COL_STYLES: { [key: number]: any } = {
   0: { cellWidth: "auto", halign: "left" },
-  1: { cellWidth: 32,     halign: "left", fontSize: 7 },
-  2: { cellWidth: 26,     halign: "right" },
-  3: { cellWidth: 24,     halign: "left" },
-  4: { cellWidth: 26,     halign: "right" },
-  5: { cellWidth: 13,     halign: "center" },
-  6: { cellWidth: 20,     halign: "right" },
-  7: { cellWidth: 24,     halign: "left" },
-  8: { cellWidth: 26,     halign: "right" },
-  9: { cellWidth: 26,     halign: "right" },
+  1: { cellWidth: 32, halign: "left", fontSize: 7 },
+  2: { cellWidth: 26, halign: "right" },
+  3: { cellWidth: 24, halign: "left" },
+  4: { cellWidth: 26, halign: "right" },
+  5: { cellWidth: 13, halign: "center" },
+  6: { cellWidth: 20, halign: "right" },
+  7: { cellWidth: 24, halign: "left" },
+  8: { cellWidth: 26, halign: "right" },
+  9: { cellWidth: 26, halign: "right" },
 };
 
 const COLUNAS_PDF = [
@@ -33,11 +33,11 @@ function adicionarTotalGeral(
 ) {
   const finalY = (doc as any).lastAutoTable.finalY;
   const tot = {
-    principal:  items.reduce((s, l) => s + l.valorPrincipal, 0),
+    principal: items.reduce((s, l) => s + l.valorPrincipal, 0),
     atualizado: items.reduce((s, l) => s + l.valorAtualizado, 0),
-    dias:       items.reduce((s, l) => s + l.dias, 0),
-    juros:      items.reduce((s, l) => s + l.juros, 0),
-    total:      items.reduce((s, l) => s + l.total, 0),
+    dias: items.reduce((s, l) => s + l.dias, 0),
+    juros: items.reduce((s, l) => s + l.juros, 0),
+    total: items.reduce((s, l) => s + l.total, 0),
   };
   autoTable(doc, {
     body: [[
@@ -62,7 +62,7 @@ function adicionarTotalGeral(
  */
 function adicionarBlocoToken(doc: jsPDF, link: string) {
   // Desce à última página para escrever após a tabela
-  const totalPgs  = (doc.internal as any).getNumberOfPages();
+  const totalPgs = (doc.internal as any).getNumberOfPages();
   doc.setPage(totalPgs);
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -118,9 +118,9 @@ function adicionarBlocoToken(doc: jsPDF, link: string) {
 }
 
 function adicionarPaginacao(doc: jsPDF) {
-  const pageWidth  = doc.internal.pageSize.getWidth();
+  const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const total      = (doc.internal as any).getNumberOfPages();
+  const total = (doc.internal as any).getNumberOfPages();
   for (let i = 1; i <= total; i++) {
     doc.setPage(i);
     doc.setFont("helvetica", "normal");

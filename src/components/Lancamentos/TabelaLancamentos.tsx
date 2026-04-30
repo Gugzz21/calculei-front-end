@@ -1,5 +1,5 @@
 import type { LancamentoItem } from "../../App";
-import { formatBRL } from "./utils";
+import { formatBRL } from "./utils/utils";
 import LancamentoRow from "./LancamentoRow";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 

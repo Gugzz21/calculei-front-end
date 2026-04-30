@@ -2,35 +2,35 @@ import { useState, useEffect, useRef } from 'react';
 import { calcularLancamento } from '../services/calcular';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
 import { buscarPorToken } from '../services/api';
-import { extrairLancamentos, converterParaLancamentoItem } from '../components/Lancamentos/utils';
+import { extrairLancamentos, converterParaLancamentoItem } from '../components/Lancamentos/utils/utils';
 import type { FormState, JurosState, LancamentoItem } from '../types';
 
 export function useCalculadora() {
   const today = new Date().toISOString().split('T')[0];
 
   const [form, setForm] = useState<FormState>({
-    valor:           '',
-    dataInicial:     '',
-    dataCalculo:     today,
-    indiceCorrecao:  'ipcae',
-    tipoCalculo:     'dfazendanaotributario',
-    descricao:       'ressarci',
+    valor: '',
+    dataInicial: '',
+    dataCalculo: today,
+    indiceCorrecao: 'ipcae',
+    tipoCalculo: 'dfazendanaotributario',
+    descricao: 'ressarci',
   });
 
   const [juros, setJuros] = useState<JurosState>({
-    enabled:    false,
-    indice:     'taxalegal',
+    enabled: false,
+    indice: 'taxalegal',
     dataInicio: '',
-    dataFim:    '',
-    taxa:       '12,00',
-    aplicados:  [],
+    dataFim: '',
+    taxa: '12,00',
+    aplicados: [],
   });
 
   const [lancamentos, setLancamentos] = useState<LancamentoItem[]>([]);
   const [lancamentosOrigem, setLancamentosOrigem] = useState<Record<number, { form: FormState; juros: JurosState }>>({});
-  const [editandoId, setEditandoId]   = useState<number | null>(null);
-  const [loading, setLoading]         = useState(false);
-  const [erro, setErro]               = useState<string | null>(null);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   // ── Auto Recovery via Link ────────────────────────────────────────────────────
   const hasRecovered = useRef(false);
@@ -46,10 +46,10 @@ export function useCalculadora() {
         .then((resultado: any) => {
           const recuperados = extrairLancamentos(resultado);
           if (recuperados && recuperados.length > 0) {
-             setLancamentos(converterParaLancamentoItem(recuperados));
-             alert("Lançamentos recuperados com sucesso!");
+            setLancamentos(converterParaLancamentoItem(recuperados));
+            alert("Lançamentos recuperados com sucesso!");
           } else {
-             setErro("Lançamentos não encontrados para este link.");
+            setErro("Lançamentos não encontrados para este link.");
           }
         })
         .catch((e) => {
@@ -84,7 +84,7 @@ export function useCalculadora() {
       const next = { ...prev, [field]: value };
 
       if (field === 'indice') {
-        if (value === 'jurossimples6')                        next.taxa = '6,00';
+        if (value === 'jurossimples6') next.taxa = '6,00';
         else if (value === 'jurossimples12' || value === 'especificartaxa') next.taxa = '12,00';
       }
 
@@ -133,12 +133,12 @@ export function useCalculadora() {
 
   const handleLimpar = () => {
     setForm({
-      valor:           '',
-      dataInicial:     '',
-      dataCalculo:     today,
-      indiceCorrecao:  'ipcae',
-      tipoCalculo:     'dfazendanaotributario',
-      descricao:       'ressarci',
+      valor: '',
+      dataInicial: '',
+      dataCalculo: today,
+      indiceCorrecao: 'ipcae',
+      tipoCalculo: 'dfazendanaotributario',
+      descricao: 'ressarci',
     });
     setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00', aplicados: [] });
     setEditandoId(null);

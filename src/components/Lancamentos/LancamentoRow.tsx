@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { LancamentoItem } from "../../App";
-import { formatBRL, formatDate, formatPercent } from "./utils";
+import { formatBRL, formatDate, formatPercent } from "./utils/utils";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
@@ -36,7 +36,7 @@ function LancamentoRow({ item, index, onRemover, onEditar }: LancamentoRowProps)
           <div>{formatPercent(item.percentualCorrecao)}</div>
           <div>{item.indiceJuros !== "—" ? "Sim" : "Não"}</div>
           <div>{formatBRL(item.total)}</div>
-          
+
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={(e) => { e.stopPropagation(); onEditar(item.id); }}
@@ -84,7 +84,7 @@ function LancamentoRow({ item, index, onRemover, onEditar }: LancamentoRowProps)
               </button>
             </div>
           </div>
-          
+
           {/* Grade de informações principais do Mobile */}
           <div className="grid grid-cols-2 gap-3 mt-1 ml-7">
             <div className="flex flex-col">
@@ -109,13 +109,12 @@ function LancamentoRow({ item, index, onRemover, onEditar }: LancamentoRowProps)
 
       {/* ─── ÁREA EXPANSÍVEL (Detalhes do Cálculo) ─── */}
       <div
-        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-          isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        }`}
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          }`}
       >
         <div className="overflow-hidden">
           <div className="px-6 md:pl-14 md:pr-4 py-4 md:py-6 bg-white border-t border-gray-100 grid grid-cols-2 md:grid-cols-7 gap-x-4 gap-y-6">
-            
+
             {/* Desktop: Descrição. Mobile: Oculto pois já está na linha principal */}
             <div className="hidden md:flex flex-col">
               <span className="text-[12px] font-bold text-gray-800 mb-1">Descrição</span>
@@ -149,7 +148,7 @@ function LancamentoRow({ item, index, onRemover, onEditar }: LancamentoRowProps)
                     {item.dataInicioJuros ? `${formatDate(item.dataInicioJuros)} à ${formatDate(item.dataFimJuros)}` : "—"}
                   </span>
                 </div>
-                
+
                 <div className="flex flex-col">
                   <span className="text-[12px] font-bold text-gray-800 mb-1">Dias de juros</span>
                   <span className="text-[13px] text-gray-600">—</span>
