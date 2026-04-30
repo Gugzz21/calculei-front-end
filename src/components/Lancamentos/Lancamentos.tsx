@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import type { LancamentoItem } from "../../App";
+import { usePagination } from "../../hooks/usePagination";
 
 import Paginacao from "./Paginacao";
 import TabelaLancamentos from "./TabelaLancamentos";
@@ -12,27 +13,28 @@ interface LancamentosProps {
   lancamentos: LancamentoItem[];
   loading?: boolean;
   onRemover: (id: number) => void;
+  onEditar: (id: number) => void;
 }
 
-function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosProps) {
-  // ── Paginação ──────────────────────────────────────────────────────────────
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [pageInput, setPageInput] = useState("1");
+function Lancamentos({ lancamentos, loading = false, onRemover, onEditar }: LancamentosProps) {
   const tableRef = useRef<HTMLDivElement>(null);
 
-  const totalPages = Math.max(1, Math.ceil(lancamentos.length / itemsPerPage));
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  // ── Paginação ──────────────────────────────────────────────────────────────
+  const {
+    currentPage,
+    itemsPerPage,
+    pageInput,
+    totalPages,
+    startIndex,
+    setPageInput,
+    handleGoToPage,
+    handlePrevPage,
+    handleNextPage,
+    handleItemsPerPageChange,
+    handleItemRemoved
+  } = usePagination({ totalItems: lancamentos.length });
+
   const currentItems = lancamentos.slice(startIndex, startIndex + itemsPerPage);
-
-  useEffect(() => {
-    setPageInput(currentPage.toString());
-  }, [currentPage]);
-
-  const handleGoToPage = (p: number) => {
-    setCurrentPage(p);
-    setPageInput(p.toString());
-  };
 
   // ── Modais ─────────────────────────────────────────────────────────────────
   const [modalToken, setModalToken] = useState<string | null>(null);
@@ -71,7 +73,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
 
   const handleRemover = (id: number, isLastInPage: boolean) => {
     onRemover(id);
-    if (isLastInPage && currentPage > 1) setCurrentPage((p) => p - 1);
+    handleItemRemoved(isLastInPage);
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -90,8 +92,8 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
             pageInput={pageInput}
             onPageInput={setPageInput}
             onGoToPage={handleGoToPage}
-            onPrev={() => currentPage > 1 && setCurrentPage((p) => p - 1)}
-            onNext={() => currentPage < totalPages && setCurrentPage((p) => p + 1)}
+            onPrev={handlePrevPage}
+            onNext={handleNextPage}
           />
         </div>
 
@@ -117,6 +119,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
               currentPage={currentPage}
               totalPages={totalPages}
               onRemover={handleRemover}
+              onEditar={onEditar}
             />
 
             {/* Rodapé: info de paginação + seletor + paginação inferior */}
@@ -143,10 +146,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
                       id="itemsPerPage"
                       className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500 text-gray-700"
                       value={itemsPerPage}
-                      onChange={(e) => {
-                        setItemsPerPage(Number(e.target.value));
-                        setCurrentPage(1);
-                      }}
+                      onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
                     >
                       <option value={5}>5</option>
                       <option value={10}>10</option>
@@ -161,8 +161,8 @@ function Lancamentos({ lancamentos, loading = false, onRemover }: LancamentosPro
                   pageInput={pageInput}
                   onPageInput={setPageInput}
                   onGoToPage={handleGoToPage}
-                  onPrev={() => currentPage > 1 && setCurrentPage((p) => p - 1)}
-                  onNext={() => currentPage < totalPages && setCurrentPage((p) => p + 1)}
+                  onPrev={handlePrevPage}
+                  onNext={handleNextPage}
                 />
               </div>
             )}

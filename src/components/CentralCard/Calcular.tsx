@@ -1,13 +1,19 @@
-import { Calculator } from 'lucide-react';
+import { Calculator, Save } from 'lucide-react';
 
 interface CalcularProps {
   onClick: () => void;
   loading: boolean;
   disabled: boolean;
+  editMode?: boolean;
 }
 
-function Calcular({ onClick, loading, disabled }: CalcularProps) {
+function Calcular({ onClick, loading, disabled, editMode = false }: CalcularProps) {
   const isDisabled = loading || disabled;
+
+  const label = loading
+    ? (editMode ? 'Salvando...' : 'Calculando...')
+    : (editMode ? 'Salvar alteração' : 'Calcular');
+
   return (
     <div className="w-full md:w-auto">
       <button
@@ -17,11 +23,13 @@ function Calcular({ onClick, loading, disabled }: CalcularProps) {
         className={`flex justify-center items-center px-4 gap-3 w-full md:w-[288px] h-[40px] rounded-md font-semibold text-sm transition-colors
           ${isDisabled
             ? "bg-[#f1f3f5] text-[#adb5bd] cursor-not-allowed"
-            : "bg-[#073365] text-white hover:bg-[#062953] cursor-pointer"
+            : editMode
+              ? "bg-amber-500 text-white hover:bg-amber-600 cursor-pointer"
+              : "bg-[#073365] text-white hover:bg-[#062953] cursor-pointer"
           }`}
       >
-        <Calculator className="w-5 h-5" />
-        <span>{loading ? "Calculando..." : "Calcular"}</span>
+        {editMode ? <Save className="w-5 h-5" /> : <Calculator className="w-5 h-5" />}
+        <span>{label}</span>
       </button>
     </div>
   );
