@@ -36,7 +36,7 @@ export async function calcularLancamento(
   // 🔍 LOG TEMPORÁRIO — ver todos os campos que o backend devolve
   console.log('[DEBUG] respCorrecao completo:', JSON.stringify(respCorrecao, null, 2));
   
-  let percentualCorrecao = respCorrecao?.percentualAcumulado ?? respCorrecao?.fatorAcumulado;
+  let percentualCorrecao = respCorrecao?.percentualAcumulado ?? respCorrecao?.fatorAcumulado ?? respCorrecao?.accumulatedFactor;
   if (percentualCorrecao === undefined || percentualCorrecao === null || percentualCorrecao === 0) {
     percentualCorrecao = valorNum > 0 ? ((valorAtualizado - valorNum) / valorNum) * 100 : 0;
   }
@@ -71,8 +71,10 @@ export async function calcularLancamento(
             fatorJuros *= respJuros.fatorAcumulado;
           } else if (respJuros.percentualAcumulado) {
             fatorJuros *= (1 + respJuros.percentualAcumulado / 100);
+          } else if (respJuros.accumulatedFactor) {
+            fatorJuros *= (1 + respJuros.accumulatedFactor / 100);
           }
-          percentualJuros += respJuros.percentualAcumulado || 0;
+          percentualJuros += respJuros.percentualAcumulado ?? respJuros.accumulatedFactor ?? 0;
         }
         indiceJurosLabel = JUROS_LABEL[aplicado.indice] ?? aplicado.indice;
         dataInicioJuros  = aplicado.dataInicio;

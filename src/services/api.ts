@@ -6,14 +6,23 @@ export interface CalcRequest {
   dateFim: string;  // YYYY-MM-DD
 }
 
+/** Payload shape the Spring Boot backend expects */
+interface BackendPayload {
+  amount: number;
+  startDate: string;
+  endDate: string;
+}
+
 export interface CalcResponse {
   dataInicio: string;
   dataFim: string;
   dias: number;
   valorAcumulado?: number;
   valorFinal?: number;
+  valueFinal?: number;
   percentualAcumulado?: number;
   fatorAcumulado?: number;
+  accumulatedFactor?: number;
 }
 
 // ─── Correção Monetária ───────────────────────────────────────────────────────
@@ -54,10 +63,16 @@ export async function calcularIndice(
   const endpoint = ENDPOINT_MAP[indice];
   if (!endpoint) return null; // sem correção monetária
 
+  const payload: BackendPayload = {
+    amount: req.valor,
+    startDate: req.dateInit,
+    endDate: req.dateFim,
+  };
+
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(req),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
@@ -113,10 +128,16 @@ export async function calcularJuros(
     };
   }
 
+  const payload: BackendPayload = {
+    amount: req.valor,
+    startDate: req.dateInit,
+    endDate: req.dateFim,
+  };
+
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(req),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
@@ -129,7 +150,7 @@ export async function calcularJuros(
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 export function getValorAtualizado(resp: CalcResponse): number {
-  return resp.valorAcumulado ?? resp.valorFinal ?? 0;
+  return resp.valorAcumulado ?? resp.valorFinal ?? resp.valueFinal ?? 0;
 }
 
 // ─── Histórico por Token ──────────────────────────────────────────────────────
