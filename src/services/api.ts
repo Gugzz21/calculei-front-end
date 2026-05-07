@@ -55,11 +55,70 @@ const JUROS_ENDPOINT_MAP: Record<string, string | null> = {
   jurossimples12:  null,
 };
 
+// Map de índice para série do BCB
+const BCB_SERIES: Record<string, number> = {
+  ipca: 433,
+  ipcae: 10764,
+  igpm: 189,
+  tr: 226,
+  igpdi: 190,
+  selic: 11, // Selic diária para precisão exata
+  cdi: 12,   // CDI diário para precisão exata
+};
+
+async function fetchFromBcb(
+  indice: string,
+  req: CalcRequest
+): Promise<CalcResponse | null> {
+  const bcbSerieId = BCB_SERIES[indice];
+  if (!bcbSerieId) return null;
+
+  try {
+    const [y1, m1, d1] = req.dateInit.split("-");
+    const [y2, m2, d2] = req.dateFim.split("-");
+    const dataInicial = `${d1}/${m1}/${y1}`;
+    const dataFinal = `${d2}/${m2}/${y2}`;
+    
+    const url = `https://api.bcb.gov.br/dados/serie/bcdata.sgs.${bcbSerieId}/dados?formato=json&dataInicial=${dataInicial}&dataFinal=${dataFinal}`;
+    
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    
+    const data = await res.json();
+    let fatorAcumulado = 1;
+    for (const item of data) {
+      fatorAcumulado *= (1 + parseFloat(item.valor) / 100);
+    }
+    
+    const valorFinal = req.valor * fatorAcumulado;
+    const dias = Math.floor((new Date(req.dateFim).getTime() - new Date(req.dateInit).getTime()) / (1000 * 60 * 60 * 24));
+    
+    return {
+      dataInicio: req.dateInit,
+      dataFim: req.dateFim,
+      dias,
+      valorAcumulado: valorFinal,
+      valorFinal: valorFinal,
+      valueFinal: valorFinal,
+      percentualAcumulado: (fatorAcumulado - 1) * 100,
+      fatorAcumulado: fatorAcumulado,
+      accumulatedFactor: fatorAcumulado,
+    };
+  } catch (e) {
+    console.warn(`Falha ao buscar dados do BCB para a série ${bcbSerieId}`, e);
+    return null;
+  }
+}
+
 // ─── Correção Monetária ───────────────────────────────────────────────────────
 export async function calcularIndice(
   indice: string,
   req: CalcRequest
 ): Promise<CalcResponse | null> {
+  // 1. Tentar Banco Central primeiro para os índices conhecidos
+  const bcbData = await fetchFromBcb(indice, req);
+  if (bcbData) return bcbData;
+
   const endpoint = ENDPOINT_MAP[indice];
   if (!endpoint) return null; // sem correção monetária
 
@@ -126,6 +185,13 @@ export async function calcularJuros(
       valorAcumulado: valor + jurosSimples,
       percentualAcumulado: taxaMensal * meses * 100,
     };
+  }
+
+  // 1. Tentar Banco Central primeiro para os índices conhecidos (ex: selic, cdi)
+  const bcbData = await fetchFromBcb(indiceJuros, req);
+  if (bcbData) {
+    // Se for juros com taxa fixa que o BCB não aplica diretamente ou apenas precisamos da taxa acumulada
+    return bcbData;
   }
 
   const payload: BackendPayload = {

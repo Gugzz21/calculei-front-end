@@ -42,7 +42,7 @@ function InputValor({ value, onChange }: InputValorProps) {
   return (
     <div className="flex flex-col gap-1 w-full md:w-auto">
       <strong className="text-[14px] text-gray-700 font-semibold">Valor</strong>
-      <div className="bg-white border w-[220px] border-gray-300 h-[45px] flex items-center px-3 gap-2 rounded-md w-full md:w-[220px]">
+      <div className="bg-white border border-gray-300 h-[45px] flex items-center px-3 gap-2 rounded-md w-full md:w-[220px]">
         <input
           ref={inputRef}
           type="text"
@@ -51,13 +51,13 @@ function InputValor({ value, onChange }: InputValorProps) {
           onKeyDown={handleKeyDown}
           onChange={() => { }}
           placeholder="R$ 0,00"
-          className="flex-1 outline-none bg-transparent text-sm text-gray-700"
+          className="flex-1 min-w-0 outline-none bg-transparent text-sm text-gray-700"
         />
         {value && (
           <button
             type="button"
             onClick={handleClear}
-            className="text-gray-400 hover:text-red-500 transition-colors text-xs"
+            className="text-gray-400 hover:text-red-500 transition-colors text-xs shrink-0"
             aria-label="Limpar valor"
           >
             ✕

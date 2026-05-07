@@ -15,6 +15,7 @@ interface LancamentoRowProps {
   onRemover: (id: number) => void;
   onEditar: (id: number) => void;
   onDuplicar: (item: LancamentoItem) => void;
+  forceExpand?: boolean;
 }
 
 interface SubComponentProps extends LancamentoRowProps {
@@ -186,23 +187,26 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
 export default function LancamentoRow(props: LancamentoRowProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(props.forceExpand || false);
+
+  // Se forceExpand mudar dinamicamente ou para sempre forçar
+  const isActuallyExpanded = props.forceExpand || isExpanded;
 
   return (
     <div className="flex flex-col bg-white border-b border-gray-200 transition-all hover:bg-gray-50/50">
       {/* ─── LINHA PRINCIPAL (Visível sempre) ─── */}
       <div
         className="flex flex-col md:grid md:grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] md:items-center gap-3 md:gap-4 p-4 md:py-3 md:px-4 cursor-pointer select-none"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => !props.forceExpand && setIsExpanded(!isExpanded)}
       >
-        <LancamentoRowDesktop {...props} isExpanded={isExpanded} />
-        <LancamentoRowMobile {...props} isExpanded={isExpanded} />
+        <LancamentoRowDesktop {...props} isExpanded={isActuallyExpanded} />
+        <LancamentoRowMobile {...props} isExpanded={isActuallyExpanded} />
       </div>
 
       {/* ─── ÁREA EXPANSÍVEL (Detalhes do Cálculo) ─── */}
       <div
         className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-          isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          isActuallyExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >
         <LancamentoRowExpanded item={props.item} />

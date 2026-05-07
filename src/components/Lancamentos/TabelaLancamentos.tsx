@@ -13,6 +13,7 @@ interface TabelaLancamentosProps {
   onEditar: (id: number) => void;
   onLimparTodos: () => void;
   onDuplicar: (item: LancamentoItem) => void;
+  forceExpand?: boolean;
 }
 
 function TabelaLancamentos({
@@ -25,6 +26,7 @@ function TabelaLancamentos({
   onEditar,
   onLimparTodos,
   onDuplicar,
+  forceExpand,
 }: TabelaLancamentosProps) {
 
   const handleRemover = (id: number) => {
@@ -64,6 +66,7 @@ function TabelaLancamentos({
             onRemover={handleRemover} 
             onEditar={onEditar}
             onDuplicar={onDuplicar}
+            forceExpand={forceExpand}
           />
         ))}
       </div>

@@ -43,6 +43,8 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
   const [modalToken, setModalToken] = useState<string | null>(null);
   const [duplicandoItem, setDuplicandoItem] = useState<LancamentoItem | null>(null);
   const [salvandoPDF, setSalvandoPDF] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   const handleGerarPDF = async () => {
@@ -62,17 +64,27 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
   };
 
   const handleBaixarImagem = async () => {
-    try {
-      const token = await baixarImagem(lancamentos);
-      if (token) setModalToken(token);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Erro desconhecido.";
-      if (msg.includes("histórico")) {
-        alert(`Imagem gerada, mas não foi possível salvar o token:\n${msg}`);
-      } else {
-        alert(`Erro ao gerar imagem: ${msg}`);
+    setIsExporting(true);
+    // Aguarda o DOM renderizar o elemento oculto
+    setTimeout(async () => {
+      if (!exportRef.current) {
+        setIsExporting(false);
+        return;
       }
-    }
+      try {
+        const token = await baixarImagem(lancamentos, exportRef.current);
+        if (token) setModalToken(token);
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : "Erro desconhecido.";
+        if (msg.includes("histórico")) {
+          alert(`Imagem gerada, mas não foi possível salvar o token:\n${msg}`);
+        } else {
+          alert(`Erro ao gerar imagem: ${msg}`);
+        }
+      } finally {
+        setIsExporting(false);
+      }
+    }, 300);
   };
 
   const handleRemover = (id: number, isLastInPage: boolean) => {
@@ -184,6 +196,27 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
           </div>
         )}
       </div>
+
+      {/* ── Componente Oculto para Exportação de Imagem ── */}
+      {isExporting && (
+        <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
+          <div ref={exportRef} className="w-[1200px] bg-white p-8">
+            <h2 className="text-[24px] text-[#1F2022] font-bold mb-6">Relatório de Lançamentos</h2>
+            <TabelaLancamentos
+              currentItems={lancamentos}
+              lancamentos={lancamentos}
+              startIndex={0}
+              currentPage={1}
+              totalPages={1}
+              onRemover={() => {}}
+              onEditar={() => {}}
+              onLimparTodos={() => {}}
+              onDuplicar={() => {}}
+              forceExpand={true}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }
