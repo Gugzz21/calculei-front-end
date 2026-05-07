@@ -37,10 +37,7 @@ function CentralCard({
   onLimpar,
   onCancelarEdicao,
 }: CentralCardProps) {
-  const selicSelecionada =
-    form.indiceCorrecao === "selic" ||
-    form.indiceCorrecao === "tjrj119602009ipcaeselic";
-
+  const selicSelecionada = form.indiceCorrecao === "selic";
 
   let totalDias = 0;
   if (form.dataInicial && form.dataCalculo) {
@@ -193,14 +190,21 @@ function CentralCard({
       )}
 
       {/* Botões */}
-      <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
-        <Calcular
-          onClick={onCalcular}
-          loading={loading}
-          disabled={!isFormValid}
-          editMode={editandoId !== null}
-        />
-        <Limpar onClick={onLimpar} />
+      <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
+          <Calcular
+            onClick={onCalcular}
+            loading={loading}
+            disabled={!isFormValid || (juros.enabled && !selicSelecionada && juros.aplicados.length === 0)}
+            editMode={editandoId !== null}
+          />
+          <Limpar onClick={onLimpar} />
+        </div>
+        {juros.enabled && !selicSelecionada && juros.aplicados.length === 0 && (
+          <div className="text-amber-600 text-sm font-medium mt-1 bg-amber-50 border border-amber-200 p-2 rounded-md inline-block w-fit">
+            ⚠️ Atenção: Você marcou para aplicar juros. Por favor, clique no botão "Aplicar" logo acima antes de calcular.
+          </div>
+        )}
       </div>
     </div>
   );

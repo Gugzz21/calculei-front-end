@@ -35,9 +35,9 @@ const ENDPOINT_MAP: Record<string, string | null> = {
   igpdi:                   "/igpdi/calculate/between-dates",
   cdi:                     "/cdi/calculate/between-dates",
   selic:                   "/selic-mensal/calculate/between-dates",
-  semcorrecaomonetaria:    null, // sem correção — devolve valor bruto
+  semcorrecaomonetaria:    null,
   tjrj119602009ipcaeselic: "/selic-mensal/calculate/between-dates",
-  tjrj6899:                "/ufirrj/calculate/between-dates", // Endpoint provável no backend
+  tjrj6899:                "/ufirrj/calculate/between-dates",
 };
 
 // ─── Juros ────────────────────────────────────────────────────────────────────
