@@ -20,7 +20,7 @@ function BotoesExport({
 
   return (
     <div className="flex items-center justify-start">
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
 
         {/* Gerar PDF */}
         <button
@@ -28,9 +28,9 @@ function BotoesExport({
           onClick={onGerarPDF}
           disabled={!temLancamentos || salvandoPDF}
           title="Gerar PDF e salvar token"
-          className={`w-[160px] ${baseBtn} ${!temLancamentos || salvandoPDF ? inativo : ativo}`}
+          className={`flex-1 sm:flex-none sm:w-[160px] ${baseBtn} ${!temLancamentos || salvandoPDF ? inativo : ativo}`}
         >
-          <MdPictureAsPdf className="h-[20px] w-[20px]" />
+          <MdPictureAsPdf className="h-[20px] w-[20px] shrink-0" />
           <span className="text-[14px]">{salvandoPDF ? "Salvando…" : "Gerar PDF"}</span>
         </button>
 
@@ -40,9 +40,9 @@ function BotoesExport({
           onClick={onBaixarImagem}
           disabled={!temLancamentos}
           title="Salvar tabela como imagem"
-          className={`w-[200px] ${baseBtn} ${!temLancamentos ? inativo : ativo}`}
+          className={`flex-1 sm:flex-none sm:w-[200px] ${baseBtn} ${!temLancamentos ? inativo : ativo}`}
         >
-          <CameraAltIcon className="h-[20px] w-[20px]" />
+          <CameraAltIcon className="h-[20px] w-[20px] shrink-0" />
           <span className="text-[14px]">Printar e salvar</span>
         </button>
 

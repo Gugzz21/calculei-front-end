@@ -32,7 +32,7 @@ function App() {
   return (
     <div className="flex flex-col bg-gray-200 min-h-screen w-full overflow-x-hidden">
       <Header />
-      <div className="flex flex-col gap-4 mt-12 md:mt-2 w-[95%] max-w-[1400px] mx-auto pt-12 pb-4">
+      <div className="flex flex-col gap-4 w-full max-w-[1400px] mx-auto px-3 sm:px-4 md:px-8 pt-4 md:pt-8 pb-6">
         <CentralCard
           form={form}
           juros={juros}
@@ -47,18 +47,16 @@ function App() {
           onLimpar={handleLimpar}
           onCancelarEdicao={handleCancelarEdicao}
         />
-        <div className='w-full pt-4'>
-          <Lancamentos
-            lancamentos={lancamentos}
-            loading={loading}
-            onRemover={handleRemoverLancamento}
-            onEditar={handleEditar}
-            onLimparTodos={handleLimparTodosLancamentos}
-            onConfirmarDuplicacao={handleConfirmarDuplicacao}
-          />
-        </div>
+        <Lancamentos
+          lancamentos={lancamentos}
+          loading={loading}
+          onRemover={handleRemoverLancamento}
+          onEditar={handleEditar}
+          onLimparTodos={handleLimparTodosLancamentos}
+          onConfirmarDuplicacao={handleConfirmarDuplicacao}
+        />
       </div>
-      <div className='w-full mt-auto'>
+      <div className="w-full mt-auto">
         <Footer />
       </div>
     </div>

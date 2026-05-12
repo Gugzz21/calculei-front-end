@@ -92,7 +92,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
           <select
             value={indice}
             onChange={(e) => onJurosChange("indice", e.target.value)}
-            className="bg-white border border-gray-300 h-[45px] w-full md:w-[330px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
+            className="bg-white border border-gray-300 h-[45px] w-full sm:w-[330px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
           >
             {jurosIndiceOpcoes.map(({ value, label }) => (
               <option key={value} value={value}>{label}</option>

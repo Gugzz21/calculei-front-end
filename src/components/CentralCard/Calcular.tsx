@@ -15,12 +15,12 @@ function Calcular({ onClick, loading, disabled, editMode = false }: CalcularProp
     : (editMode ? 'Salvar alteração' : 'Calcular');
 
   return (
-    <div className="w-full md:w-auto">
+    <div className="w-full sm:w-auto">
       <button
         onClick={onClick}
         disabled={isDisabled}
         title={disabled && !loading ? "Preencha todos os campos obrigatórios (valor, data inicial, data do cálculo)" : undefined}
-        className={`flex justify-center items-center px-4 gap-3 w-full md:w-[288px] h-[40px] rounded-md font-semibold text-sm transition-colors
+        className={`flex justify-center items-center px-4 gap-3 w-full sm:w-[288px] h-[40px] rounded-md font-semibold text-sm transition-colors
           ${isDisabled
             ? "bg-[#f1f3f5] text-[#adb5bd] cursor-not-allowed"
             : editMode

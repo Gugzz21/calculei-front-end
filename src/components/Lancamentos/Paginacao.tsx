@@ -26,10 +26,21 @@ function Paginacao({
     onGoToPage(p);
   };
 
+  // Limita a 5 páginas visíveis para evitar overflow em mobile
+  const getVisiblePages = (): number[] => {
+    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (currentPage <= 3) return [1, 2, 3, 4, 5];
+    if (currentPage >= totalPages - 2)
+      return [totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    return [currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2];
+  };
+
   return (
-    <div className="flex flex-col md:flex-row items-center gap-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">Ir para:</span>
+    <div className="flex flex-wrap items-center gap-2">
+
+      {/* "Ir para" — oculto em telas muito pequenas */}
+      <div className="hidden sm:flex items-center gap-2">
+        <span className="text-sm text-gray-500 whitespace-nowrap">Ir para:</span>
         <input
           type="number"
           min={1}
@@ -40,11 +51,12 @@ function Paginacao({
           onKeyDown={(e) => {
             if (e.key === "Enter") commit(e.currentTarget.value);
           }}
-          className="w-16 h-8 text-center border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
+          className="w-14 h-8 text-center border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
         />
       </div>
 
-      <div className="flex gap-2">
+      {/* Botões de navegação entre páginas */}
+      <div className="flex gap-1.5">
         <button
           onClick={onPrev}
           disabled={currentPage === 1}
@@ -58,21 +70,19 @@ function Paginacao({
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-1">
-          {Array.from({ length: totalPages }).map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => onGoToPage(idx + 1)}
-              className={`w-8 h-8 rounded border text-sm font-medium ${
-                currentPage === idx + 1
-                  ? "border-blue-500 bg-blue-50 text-blue-600"
-                  : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              {idx + 1}
-            </button>
-          ))}
-        </div>
+        {getVisiblePages().map((page) => (
+          <button
+            key={page}
+            onClick={() => onGoToPage(page)}
+            className={`w-8 h-8 rounded border text-sm font-medium ${
+              currentPage === page
+                ? "border-blue-500 bg-blue-50 text-blue-600"
+                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
 
         <button
           onClick={onNext}

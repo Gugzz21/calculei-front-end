@@ -6,10 +6,10 @@ interface LimparProps {
 
 function Limpar({ onClick }: LimparProps) {
   return (
-    <div className="w-full md:w-auto">
+    <div className="w-full sm:w-auto">
       <button
         onClick={onClick}
-        className="flex justify-center items-center px-4 gap-3 bg-[#D0D8FF] w-full md:w-[200px] h-[40px] rounded-md text-[#073365] font-semibold text-sm hover:bg-[#ddd8ed] transition-colors cursor-pointer"
+        className="flex justify-center items-center px-4 gap-3 bg-[#D0D8FF] w-full sm:w-[200px] h-[40px] rounded-md text-[#073365] font-semibold text-sm hover:bg-[#ddd8ed] transition-colors cursor-pointer"
       >
         <BackspaceIcon className="w-5 h-5 text-[#073365]" />
         <span>Limpar</span>

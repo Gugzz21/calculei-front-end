@@ -106,20 +106,22 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
         }}
       />
 
-      <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-4 md:p-8 mt-6 gap-5 shadow-sm border border-slate-400 overflow-hidden">
+      <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-400 overflow-hidden">
 
         {/* Cabeçalho + paginação superior */}
-        <div className="flex items-center justify-between text-gray-400 text-[18px] font-bold gap-3">
-          <h1 className="text-[24px] text-[#1F2022] font-bold">Lançamentos</h1>
-          <Paginacao
-            currentPage={currentPage}
-            totalPages={totalPages}
-            pageInput={pageInput}
-            onPageInput={setPageInput}
-            onGoToPage={handleGoToPage}
-            onPrev={handlePrevPage}
-            onNext={handleNextPage}
-          />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl text-[#1F2022] font-bold shrink-0">Lançamentos</h1>
+          <div className="flex justify-start sm:justify-end">
+            <Paginacao
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageInput={pageInput}
+              onPageInput={setPageInput}
+              onGoToPage={handleGoToPage}
+              onPrev={handlePrevPage}
+              onNext={handleNextPage}
+            />
+          </div>
         </div>
 
         {/* Botões de exportação */}
@@ -151,8 +153,9 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
 
             {/* Rodapé: info de paginação + seletor + paginação inferior */}
             {lancamentos.length > 0 && (
-              <div className="flex flex-col md:flex-row justify-between items-center mt-4 border-t border-gray-200 pt-4 gap-4">
-                <div className="flex flex-col md:flex-row items-center gap-4">
+              <div className="flex flex-col gap-3 mt-4 border-t border-gray-200 pt-4">
+                {/* Linha de meta-info: total de registros + itens por página */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <span className="text-sm text-gray-500">
                     Mostrando{" "}
                     <span className="font-semibold text-gray-700">{startIndex + 1}</span>{" "}
@@ -166,7 +169,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
                   </span>
 
                   <div className="flex items-center gap-2">
-                    <label htmlFor="itemsPerPage" className="text-sm text-gray-500">
+                    <label htmlFor="itemsPerPage" className="text-sm text-gray-500 whitespace-nowrap">
                       Itens por página:
                     </label>
                     <select
@@ -182,15 +185,18 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
                   </div>
                 </div>
 
-                <Paginacao
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  pageInput={pageInput}
-                  onPageInput={setPageInput}
-                  onGoToPage={handleGoToPage}
-                  onPrev={handlePrevPage}
-                  onNext={handleNextPage}
-                />
+                {/* Paginação inferior */}
+                <div className="flex justify-start sm:justify-end">
+                  <Paginacao
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageInput={pageInput}
+                    onPageInput={setPageInput}
+                    onGoToPage={handleGoToPage}
+                    onPrev={handlePrevPage}
+                    onNext={handleNextPage}
+                  />
+                </div>
               </div>
             )}
           </div>
