@@ -2,8 +2,9 @@ import { useState } from "react";
 import Data from "./Data";
 import type { JurosState } from "../../types";
 import { calcularJuros } from "../../services/api";
-import { JUROS_DESCRICAO, JUROS_INDICE_OPCOES } from "../../constants/dominios";
+import { JUROS_DESCRICAO } from "../../constants/dominios";
 import { PercentIcon } from "lucide-react";
+import { useIndices } from "../../hooks/useIndices";
 
 interface JurosProps {
   juros: JurosState;
@@ -21,6 +22,8 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
 
   const [loading, setLoading]       = useState(false);
   const [erroLocal, setErroLocal]   = useState<string | null>(null);
+  
+  const { jurosIndiceOpcoes } = useIndices();
 
   if (selicSelecionada) return null;
 
@@ -41,8 +44,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
       await new Promise((resolve) => setTimeout(resolve, 400));
 
       const novosAplicados: any[] = [];
-      const DATA_CORTE        = "2003-01-10";
-      const DATA_POS_CORTE    = "2003-01-11";
+
 
       const addAplicado = async (idx: string, dInicio: string, dFim: string, taxaAtual: string) => {
         const resp = await calcularJuros(
@@ -64,18 +66,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
         }
       };
 
-      if (indice === "codigo" || indice === "codigocivil") {
-        if (dataFim <= DATA_CORTE) {
-          await addAplicado("jurossimples6", dataInicio, dataFim, "6,00");
-        } else if (dataInicio >= DATA_POS_CORTE) {
-          await addAplicado("jurossimples12", dataInicio, dataFim, "12,00");
-        } else {
-          await addAplicado("jurossimples6",  dataInicio, DATA_CORTE,     "6,00");
-          await addAplicado("jurossimples12", DATA_POS_CORTE, dataFim, "12,00");
-        }
-      } else {
-        await addAplicado(indice, dataInicio, dataFim, taxa);
-      }
+      await addAplicado(indice, dataInicio, dataFim, taxa);
 
       onJurosChange("aplicados", [...aplicados, ...novosAplicados]);
     } catch (e: any) {
@@ -103,7 +94,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
             onChange={(e) => onJurosChange("indice", e.target.value)}
             className="bg-white border border-gray-300 h-[45px] w-full md:w-[330px] px-3 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
           >
-            {JUROS_INDICE_OPCOES.map(({ value, label }) => (
+            {jurosIndiceOpcoes.map(({ value, label }) => (
               <option key={value} value={value}>{label}</option>
             ))}
           </select>

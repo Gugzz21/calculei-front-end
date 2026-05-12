@@ -36,6 +36,10 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
       setParcelasPreview([]);
       return;
     }
+    if (parcelasNum > 100) {
+      alert("O limite máximo de duplicação é de 100 parcelas.");
+      return;
+    }
     const datas = calcularDatasParcelas(lancamentoBase.dataInicial, parcelasNum - 1);
     setParcelasPreview(datas);
   };

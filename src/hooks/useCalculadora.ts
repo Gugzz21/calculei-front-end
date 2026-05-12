@@ -1,4 +1,4 @@
-import { useState} from 'react';
+import { useState, useRef } from 'react';
 import { calcularLancamento } from '../services/calcular';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
 import type { FormState, JurosState, LancamentoItem } from '../types';
@@ -30,6 +30,9 @@ export function useCalculadora() {
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+
+  // Proteção contra duplo clique: useRef é síncrono, ao contrário do estado React
+  const calculandoRef = useRef(false);
 
   // ── Auto Recovery via Link ────────────────────────────────────────────────────
   useAutoRecovery(setLancamentos, setLoading, setErro);
@@ -63,6 +66,10 @@ export function useCalculadora() {
   };
 
   const handleCalcular = async () => {
+    // Proteção síncrona contra duplo clique (setLoading é assíncrono e chegaria tarde)
+    if (calculandoRef.current) return;
+    calculandoRef.current = true;
+
     setErro(null);
     setLoading(true);
     try {
@@ -97,6 +104,7 @@ export function useCalculadora() {
       setErro(e instanceof Error ? e.message : 'Erro ao calcular. Verifique se o servidor Java está rodando.');
     } finally {
       setLoading(false);
+      calculandoRef.current = false;
     }
   };
 
@@ -149,22 +157,34 @@ export function useCalculadora() {
     setLoading(true);
     setErro(null);
 
-    const novosResultados: LancamentoItem[] = [];
-    const novoOrigemMap: Record<number, { form: FormState; juros: JurosState }> = {};
-
     try {
-      for (let i = 0; i < novasDatas.length; i++) {
-        const formParaCalcular = { ...origem.form, dataInicial: novasDatas[i] };
-        
-        const minWait = new Promise(resolve => setTimeout(resolve, 100));
-        const resultado = await calcularLancamento(formParaCalcular, origem.juros, today);
-        await minWait;
+      // Tamanho do lote de requisições paralelas
+      // Evita sobrecarregar o backend com 100 chamadas simultâneas
+      const LOTE = 5;
 
-        const novoId = Date.now() + i + Math.floor(Math.random() * 1000);
-        const itemComIdUnico = { ...resultado, id: novoId };
-        
-        novosResultados.push(itemComIdUnico);
-        novoOrigemMap[novoId] = { form: { ...formParaCalcular }, juros: { ...origem.juros } };
+      const novosResultados: LancamentoItem[] = [];
+      const novoOrigemMap: Record<number, { form: FormState; juros: JurosState }> = {};
+
+      for (let inicio = 0; inicio < novasDatas.length; inicio += LOTE) {
+        const lote = novasDatas.slice(inicio, inicio + LOTE);
+
+        // Processa o lote em paralelo
+        const resultadosLote = await Promise.all(
+          lote.map((data, indexNoLote) => {
+            const formParaCalcular = { ...origem.form, dataInicial: data };
+            return calcularLancamento(formParaCalcular, origem.juros, today).then(resultado => ({
+              resultado,
+              formParaCalcular,
+              indiceGlobal: inicio + indexNoLote,
+            }));
+          })
+        );
+
+        for (const { resultado, formParaCalcular, indiceGlobal } of resultadosLote) {
+          const novoId = Date.now() + indiceGlobal + Math.floor(Math.random() * 1000);
+          novosResultados.push({ ...resultado, id: novoId });
+          novoOrigemMap[novoId] = { form: { ...formParaCalcular }, juros: { ...origem.juros } };
+        }
       }
 
       setLancamentos(prev => [...prev, ...novosResultados]);
