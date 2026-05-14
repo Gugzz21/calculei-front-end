@@ -19,7 +19,7 @@ function Descricao({ value, onChange }: DescricaoProps) {
 
       {!isOther ? (
         <select
-          className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500"
+          className="bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500"
           value={value}
           onChange={(e) => {
             if (e.target.value === "outros") {
@@ -35,7 +35,7 @@ function Descricao({ value, onChange }: DescricaoProps) {
           ))}
         </select>
       ) : (
-        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500">
+        <div className="flex items-center bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500">
           <input
             type="text"
             className="flex-1 outline-none bg-transparent"

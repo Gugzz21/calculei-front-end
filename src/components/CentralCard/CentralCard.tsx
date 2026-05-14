@@ -49,7 +49,7 @@ function CentralCard({
   const multaTotal = valorNumerico * 0.01 * totalDias;
 
   return (
-    <div className="flex flex-col bg-white/95 dark:bg-slate-700/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-slate-600/60 transition-colors duration-200">
+    <div className="flex flex-col bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-[#21262d]/60 transition-colors duration-200">
 
       {/* ── Banner modo edição ─────────────────────────────────────── */}
       {editandoId !== null && (
@@ -70,7 +70,7 @@ function CentralCard({
       )}
 
       {/* ── Título ─────────────────────────────────────────────────── */}
-      <div className="border-b border-slate-100 dark:border-slate-700/50 pb-3">
+      <div className="border-b border-slate-100 dark:border-[#21262d]/50 pb-3">
         <h1 className="text-slate-800 dark:text-slate-100 font-extrabold tracking-tight text-xl sm:text-2xl md:text-3xl">
           Atualização Monetária
         </h1>
@@ -110,9 +110,8 @@ function CentralCard({
           {!selicSelecionada && (
             <label
               htmlFor="aplicar-juros"
-              className={`flex items-center gap-2 select-none group w-fit mt-1 ${
-                isFormValid ? "cursor-pointer" : "cursor-not-allowed opacity-50"
-              }`}
+              className={`flex items-center gap-2 select-none group w-fit mt-1 ${isFormValid ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                }`}
               title={!isFormValid ? "Preencha o Valor e as Datas primeiro" : ""}
             >
               <div className="relative flex items-center justify-center">
@@ -125,11 +124,10 @@ function CentralCard({
                   className="peer sr-only"
                 />
                 <div
-                  className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${
-                    juros.enabled
+                  className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${juros.enabled
                       ? "bg-blue-600 border-blue-600"
                       : "bg-white border-gray-400 group-hover:border-blue-400"
-                  }`}
+                    }`}
                 >
                   {juros.enabled && (
                     <svg className="w-[11px] h-[11px] text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
@@ -138,9 +136,8 @@ function CentralCard({
                   )}
                 </div>
               </div>
-              <span className={`text-[13px] font-medium transition-colors duration-150 ${
-                isFormValid ? "text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100" : "text-gray-500 dark:text-gray-600"
-              }`}>
+              <span className={`text-[13px] font-medium transition-colors duration-150 ${isFormValid ? "text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100" : "text-gray-500 dark:text-gray-600"
+                }`}>
                 Aplicar juros?
               </span>
             </label>

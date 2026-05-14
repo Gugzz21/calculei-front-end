@@ -17,7 +17,7 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 flex flex-col gap-5 border border-gray-200 dark:border-slate-700">
+      <div className="bg-white dark:bg-[#010409] rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 flex flex-col gap-5 border border-gray-200 dark:border-[#21262d]">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-[20px] font-bold text-gray-900 dark:text-slate-100">Imagem gerada com sucesso!</h2>
@@ -39,14 +39,14 @@ function ModalToken({ token, onClose }: ModalTokenProps) {
             Seu Link de Recuperação
           </label>
           <div className="flex items-center gap-2">
-            <code className="flex-1 bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-3 text-[11px] text-gray-800 dark:text-gray-200 font-mono break-all line-clamp-2">
+            <code className="flex-1 bg-gray-100 dark:bg-[#0d1117] border border-gray-300 dark:border-[#21262d] rounded-lg px-3 py-3 text-[11px] text-gray-800 dark:text-gray-200 font-mono break-all line-clamp-2">
               {token}
             </code>
             <button
               onClick={copiar}
               className={`shrink-0 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${copiado
                 ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800"
-                : "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                : "bg-blue-50 dark:bg-[#007aff]/20 text-blue-700 dark:text-[#007aff] border border-blue-300 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50"
                 }`}
             >
               {copiado ? "✓ Copiado" : "Copiar"}

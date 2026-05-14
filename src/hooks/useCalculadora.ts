@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { calcularLancamento } from '../services/calcular';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
 import type { FormState, JurosState, LancamentoItem } from '../types';
@@ -8,43 +8,27 @@ import toast from 'react-hot-toast';
 export function useCalculadora() {
   const today = new Date().toISOString().split('T')[0];
 
-  const [form, setForm] = useState<FormState>(() => {
-    const saved = localStorage.getItem('calculei_form');
-    if (saved) return JSON.parse(saved);
-    return {
-      valor: '',
-      dataInicial: '',
-      dataCalculo: today,
-      indiceCorrecao: 'ipcae',
-      tipoCalculo: 'dfazendanaotributario',
-      descricao: 'ressarci',
-    };
+  const [form, setForm] = useState<FormState>({
+    valor: '',
+    dataInicial: '',
+    dataCalculo: today,
+    indiceCorrecao: 'ipcae',
+    tipoCalculo: 'dfazendanaotributario',
+    descricao: 'ressarci',
   });
 
-  const [juros, setJuros] = useState<JurosState>(() => {
-    const saved = localStorage.getItem('calculei_juros');
-    if (saved) return JSON.parse(saved);
-    return {
-      enabled: false,
-      indice: 'taxalegal',
-      dataInicio: '',
-      dataFim: '',
-      taxa: '12,00',
-      aplicados: [],
-    };
+  const [juros, setJuros] = useState<JurosState>({
+    enabled: false,
+    indice: 'taxalegal',
+    dataInicio: '',
+    dataFim: '',
+    taxa: '12,00',
+    aplicados: [],
   });
 
-  const [lancamentos, setLancamentos] = useState<LancamentoItem[]>(() => {
-    const saved = localStorage.getItem('calculei_lancamentos');
-    if (saved) return JSON.parse(saved);
-    return [];
-  });
+  const [lancamentos, setLancamentos] = useState<LancamentoItem[]>([]);
 
-  const [lancamentosOrigem, setLancamentosOrigem] = useState<Record<number, { form: FormState; juros: JurosState }>>(() => {
-    const saved = localStorage.getItem('calculei_lancamentosOrigem');
-    if (saved) return JSON.parse(saved);
-    return {};
-  });
+  const [lancamentosOrigem, setLancamentosOrigem] = useState<Record<number, { form: FormState; juros: JurosState }>>({});
 
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,21 +42,13 @@ export function useCalculadora() {
 
   // ── Persistência Local ────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    localStorage.setItem('calculei_form', JSON.stringify(form));
-  }, [form]);
 
-  useEffect(() => {
-    localStorage.setItem('calculei_juros', JSON.stringify(juros));
-  }, [juros]);
 
-  useEffect(() => {
-    localStorage.setItem('calculei_lancamentos', JSON.stringify(lancamentos));
-  }, [lancamentos]);
 
-  useEffect(() => {
-    localStorage.setItem('calculei_lancamentosOrigem', JSON.stringify(lancamentosOrigem));
-  }, [lancamentosOrigem]);
+
+
+
+
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 

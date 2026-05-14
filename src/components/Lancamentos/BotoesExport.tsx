@@ -6,7 +6,7 @@ interface BotoesExportProps {
   salvandoPDF: boolean;
   onGerarPDF: () => void;
   onBaixarImagem: () => void;
-  onExportarCSV: () => void;
+  onExportarExcel: () => void;
 }
 
 function BotoesExport({
@@ -14,11 +14,11 @@ function BotoesExport({
   salvandoPDF,
   onGerarPDF,
   onBaixarImagem,
-  onExportarCSV,
+  onExportarExcel,
 }: BotoesExportProps) {
   const baseBtn = "h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm";
-  const ativo   = "bg-white dark:bg-slate-700 border border-[#ADB4C2] dark:border-slate-500 text-[#1F2022] dark:text-gray-100 hover:bg-slate-50 dark:hover:bg-slate-600 cursor-pointer";
-  const inativo = "bg-[#f1f3f5] dark:bg-slate-800 border border-[#d2d6dc] dark:border-slate-600 text-[#adb5bd] dark:text-gray-500 cursor-not-allowed";
+  const ativo   = "bg-white dark:bg-[#0d1117] border border-[#ADB4C2] dark:border-[#21262d] text-[#1F2022] dark:text-gray-100 hover:bg-slate-50 dark:hover:bg-[#1e232b] cursor-pointer";
+  const inativo = "bg-[#f1f3f5] dark:bg-[#010409] border border-[#d2d6dc] dark:border-[#21262d] text-[#adb5bd] dark:text-gray-500 cursor-not-allowed";
 
   return (
     <div className="flex items-center justify-start">
@@ -48,12 +48,12 @@ function BotoesExport({
           <span className="text-[14px]">Printar e salvar</span>
         </button>
 
-        {/* Exportar CSV */}
+        {/* Exportar Excel */}
         <button
           type="button"
-          onClick={onExportarCSV}
+          onClick={onExportarExcel}
           disabled={!temLancamentos}
-          title="Exportar dados para Excel (CSV)"
+          title="Exportar dados para Excel (.xlsx)"
           className={`flex-1 sm:flex-none sm:w-[160px] ${baseBtn} ${!temLancamentos ? inativo : ativo}`}
         >
           <svg className="h-[20px] w-[20px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

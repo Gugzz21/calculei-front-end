@@ -9,9 +9,10 @@ import ModalToken from "./ModalToken";
 import ModalDuplicar from "./ModalDuplicar";
 import { exportarParaPDF } from "./exportPDF";
 import { baixarImagem } from "./exportImagem";
-import { exportarParaCSV } from "./exportCSV";
+import { exportarParaExcel } from "./exportExcel";
+import toast from "react-hot-toast";
 
-interface LancamentosProps {
+interface LancamentosProps {  
   lancamentos: LancamentoItem[];
   loading?: boolean;
   onRemover: (id: number) => void;
@@ -107,7 +108,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
         }}
       />
 
-      <div className="flex flex-col bg-slate-50 dark:bg-slate-700/95 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-400 dark:border-slate-600/60 overflow-hidden transition-colors duration-200">
+      <div className="flex flex-col bg-slate-50 dark:bg-[#0d1117]/95 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-400 dark:border-[#21262d]/60 overflow-hidden transition-colors duration-200">
 
         {/* Cabeçalho + paginação superior */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -131,8 +132,16 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
           salvandoPDF={salvandoPDF}
           onGerarPDF={handleGerarPDF}
           onBaixarImagem={handleBaixarImagem}
-          onExportarCSV={() => exportarParaCSV(lancamentos)}
-        />
+          onExportarExcel={async () => {
+            try {
+              await exportarParaExcel(lancamentos);
+              toast.success("Excel exportado com sucesso!");
+            } catch (e) {
+              toast.error("Erro ao gerar o Excel.");
+              console.error(e);
+            }
+          }}
+          />
 
         {/* Conteúdo */}
         {lancamentos.length === 0 && !loading ? (
@@ -155,7 +164,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
 
             {/* Rodapé: info de paginação + seletor + paginação inferior */}
             {lancamentos.length > 0 && (
-              <div className="flex flex-col gap-3 mt-4 border-t border-gray-200 dark:border-slate-700 pt-4">
+              <div className="flex flex-col gap-3 mt-4 border-t border-gray-200 dark:border-[#21262d] pt-4">
                 {/* Linha de meta-info: total de registros + itens por página */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -176,7 +185,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
                     </label>
                     <select
                       id="itemsPerPage"
-                      className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200"
+                      className="bg-white dark:bg-[#010409] border border-gray-300 dark:border-[#21262d] rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200"
                       value={itemsPerPage}
                       onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
                     >

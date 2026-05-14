@@ -12,7 +12,7 @@ function TipoCalculo({ value, onChange }: TipoCalculoProps) {
         Tipo de Cálculo
       </strong>
       <select
-        className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 h-[45px] w-full px-3 rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500"
+        className="bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[45px] w-full px-3 rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >

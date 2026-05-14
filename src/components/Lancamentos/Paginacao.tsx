@@ -51,7 +51,7 @@ function Paginacao({
           onKeyDown={(e) => {
             if (e.key === "Enter") commit(e.currentTarget.value);
           }}
-          className="w-14 h-8 text-center border border-gray-300 dark:border-slate-600 rounded text-sm focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200"
+          className="w-14 h-8 text-center border border-gray-300 dark:border-[#21262d] rounded text-sm focus:outline-none focus:border-blue-500 bg-white dark:bg-[#010409] text-gray-700 dark:text-gray-200"
         />
       </div>
 
@@ -62,8 +62,8 @@ function Paginacao({
           disabled={currentPage === 1}
           className={`flex items-center justify-center w-8 h-8 rounded border ${
             currentPage === 1
-              ? "border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-800 cursor-not-allowed"
-              : "border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600"
+              ? "border-gray-200 dark:border-[#21262d] text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-[#010409] cursor-not-allowed"
+              : "border-gray-300 dark:border-[#21262d] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#0d1117] hover:bg-gray-100 dark:hover:bg-[#1e232b]"
           } transition-colors`}
           title="Página Anterior"
         >
@@ -76,8 +76,8 @@ function Paginacao({
             onClick={() => onGoToPage(page)}
             className={`w-8 h-8 rounded border text-sm font-medium ${
               currentPage === page
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                : "border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600"
+                ? "border-blue-500 bg-blue-50 dark:bg-[#007aff]/20 text-blue-600 dark:text-[#007aff]"
+                : "border-gray-300 dark:border-[#21262d] bg-white dark:bg-[#0d1117] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1e232b]"
             }`}
           >
             {page}
@@ -89,8 +89,8 @@ function Paginacao({
           disabled={currentPage === totalPages}
           className={`flex items-center justify-center w-8 h-8 rounded border ${
             currentPage === totalPages
-              ? "border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-slate-800 cursor-not-allowed"
-              : "border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600"
+              ? "border-gray-200 dark:border-[#21262d] text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-[#010409] cursor-not-allowed"
+              : "border-gray-300 dark:border-[#21262d] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#0d1117] hover:bg-gray-100 dark:hover:bg-[#1e232b]"
           } transition-colors`}
           title="Próxima Página"
         >

@@ -114,7 +114,7 @@ function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar
 function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
   return (
     <div className="overflow-hidden">
-      <div className="px-6 md:pl-14 md:pr-4 py-5 md:py-6 bg-slate-50/50 dark:bg-slate-700/50 shadow-inner border-t border-slate-100 dark:border-slate-600 grid grid-cols-2 md:grid-cols-7 gap-x-4 gap-y-6">
+      <div className="px-6 md:pl-14 md:pr-4 py-5 md:py-6 bg-slate-50/50 dark:bg-[#0d1117]/50 shadow-inner border-t border-slate-100 dark:border-[#21262d] grid grid-cols-2 md:grid-cols-7 gap-x-4 gap-y-6">
 
         {/* Desktop: Descrição. Mobile: Oculto pois já está na linha principal */}
         <div className="hidden md:flex flex-col">
@@ -125,7 +125,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
         {/* Mobile: Mostrar campos que foram cortados da grade principal */}
         <div className="flex flex-col md:hidden">
           <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Índice</span>
-          <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md px-2 py-0.5 w-fit">{item.indiceCorrecao}</span>
+          <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-[#21262d] rounded-md px-2 py-0.5 w-fit">{item.indiceCorrecao}</span>
         </div>
         <div className="flex flex-col md:hidden">
           <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Correção</span>
@@ -133,7 +133,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
         </div>
         <div className="flex flex-col md:hidden">
           <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Juros?</span>
-          <span className={`text-[12px] font-semibold px-2 py-0.5 rounded-full w-fit ${item.indiceJuros !== "—" ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300" : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"}`}>
+          <span className={`text-[12px] font-semibold px-2 py-0.5 rounded-full w-fit ${item.indiceJuros !== "—" ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-[#4da3ff]" : "bg-slate-100 dark:bg-[#0d1117] text-slate-500 dark:text-slate-400"}`}>
             {item.indiceJuros !== "—" ? "Sim" : "Não"}
           </span>
         </div>
@@ -194,7 +194,7 @@ export default function LancamentoRow(props: LancamentoRowProps) {
   const isActuallyExpanded = props.forceExpand || isExpanded;
 
   return (
-    <div className="flex flex-col bg-white dark:bg-slate-700 border-b border-slate-100 dark:border-slate-600 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-600/50">
+    <div className="flex flex-col bg-white dark:bg-[#0d1117] border-b border-slate-100 dark:border-[#21262d] transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-[#1e232b]/50">
       {/* ─── LINHA PRINCIPAL (Visível sempre) ─── */}
       <div
         className="flex flex-col md:grid md:grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] md:items-center gap-3 md:gap-4 p-4 md:py-3 md:px-4 cursor-pointer select-none"

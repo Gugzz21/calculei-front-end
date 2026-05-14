@@ -92,7 +92,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
           <select
             value={indice}
             onChange={(e) => onJurosChange("indice", e.target.value)}
-            className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 h-[45px] w-full sm:w-[330px] px-3 rounded-md text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer"
+            className="bg-white dark:bg-[#010409] border border-gray-300 dark:border-[#21262d] h-[45px] w-full sm:w-[330px] px-3 rounded-md text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer"
           >
             {jurosIndiceOpcoes.map(({ value, label }) => (
               <option key={value} value={value}>{label}</option>
@@ -109,7 +109,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
                 type="text"
                 value={taxa}
                 onChange={(e) => onJurosChange("taxa", e.target.value.replace(/[^\d,]/g, ""))}
-                className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 h-[45px] w-full md:w-[220px] pl-3 pr-16 rounded-md text-sm text-gray-700 dark:text-gray-200 outline-none"
+                className="bg-white dark:bg-[#010409] border border-gray-300 dark:border-[#21262d] h-[45px] w-full md:w-[220px] pl-3 pr-16 rounded-md text-sm text-gray-700 dark:text-gray-200 outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">
                 % a.a.
@@ -143,7 +143,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
             type="button"
             onClick={handleAplicar}
             disabled={loading}
-            className="flex items-center justify-center h-[45px] px-6 gap-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center h-[45px] px-6 gap-2 bg-white dark:bg-[#0d1117] border border-gray-300 dark:border-[#21262d] rounded-md text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-[#1e232b] transition-colors disabled:opacity-50"
           >
             <PercentIcon size={18} />
             {loading ? "Aplicando..." : "Aplicar"}
@@ -153,7 +153,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
 
       {/* Descrição do índice selecionado */}
       {JUROS_DESCRICAO[indice] && (
-        <div className="bg-[#eaecf0] dark:bg-slate-800 border border-[#979797] dark:border-slate-600 w-[66%] mt-[6px] rounded-md p-3">
+        <div className="bg-[#eaecf0] dark:bg-[#010409] border border-[#979797] dark:border-[#21262d] w-[66%] mt-[6px] rounded-md p-3">
           <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed">
             *{JUROS_DESCRICAO[indice]}
           </p>
@@ -166,10 +166,10 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
 
       {/* Tabela de juros aplicados */}
       {aplicados.length > 0 && (
-        <div className="w-full overflow-x-auto mt-2 border border-[#d2daee] dark:border-slate-600 rounded-md">
+        <div className="w-full overflow-x-auto mt-2 border border-[#d2daee] dark:border-[#21262d] rounded-md">
           <table className="w-full min-w-[500px] text-left text-[13px]">
             <thead>
-              <tr className="bg-[#e4ebf7] dark:bg-slate-700 text-[#1F2022] dark:text-gray-100">
+              <tr className="bg-[#e4ebf7] dark:bg-[#0d1117] text-[#1F2022] dark:text-gray-100">
                 <th className="py-3 px-4 font-semibold w-[15%]">Data inicial</th>
                 <th className="py-3 px-4 font-semibold w-[15%]">Data final</th>
                 <th className="py-3 px-4 font-semibold w-[15%]">Dias</th>
@@ -178,9 +178,9 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
                 <th className="py-3 px-4 font-semibold w-[10%] text-center"></th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-slate-800">
+            <tbody className="bg-white dark:bg-[#010409]">
               {aplicados.map((item) => (
-                <tr key={item.id} className="border-t border-[#d2daee] dark:border-slate-600 text-gray-800 dark:text-gray-200">
+                <tr key={item.id} className="border-t border-[#d2daee] dark:border-[#21262d] text-gray-800 dark:text-gray-200">
                   <td className="py-3 px-4">{new Date(item.dataInicio + "T12:00:00").toLocaleDateString("pt-BR")}</td>
                   <td className="py-3 px-4">{new Date(item.dataFim   + "T12:00:00").toLocaleDateString("pt-BR")}</td>
                   <td className="py-3 px-4">{item.dias}</td>

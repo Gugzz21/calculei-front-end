@@ -53,8 +53,8 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="p-6 pb-4 border-b border-gray-100 dark:border-slate-700">
+      <div className="bg-white dark:bg-[#010409] rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="p-6 pb-4 border-b border-gray-100 dark:border-[#21262d]">
           <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Duplicar Lançamento</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Lançamento base: <span className="font-semibold text-gray-700 dark:text-gray-200">{lancamentoBase.descricao}</span>
@@ -74,11 +74,11 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
               onKeyDown={handleKeyDown}
               placeholder="Ex: 5"
               min="2"
-              className="flex-1 bg-white dark:bg-slate-700 rounded-lg border border-gray-300 dark:border-slate-600 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
+              className="flex-1 bg-white dark:bg-[#0d1117] rounded-lg border border-gray-300 dark:border-[#21262d] px-4 py-2 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
             />
             <button
               onClick={gerarPreview}
-              className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+              className="bg-blue-50 dark:bg-[#007aff]/20 text-blue-600 dark:text-[#007aff] font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
             >
               Gerar
             </button>
@@ -87,12 +87,12 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
 
           {/* Tabela de Pré-visualização */}
           {parcelasPreview.length > 0 && (
-            <div className="mt-6 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
+            <div className="mt-6 border border-gray-200 dark:border-[#21262d] rounded-lg overflow-hidden">
               <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-slate-700 text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                <thead className="bg-gray-50 dark:bg-[#0d1117] text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
                   <tr>
-                    <th className="px-4 py-3 border-b border-gray-200 dark:border-slate-600 w-24 text-center">Parcela</th>
-                    <th className="px-4 py-3 border-b border-gray-200 dark:border-slate-600">Data Inicial</th>
+                    <th className="px-4 py-3 border-b border-gray-200 dark:border-[#21262d] w-24 text-center">Parcela</th>
+                    <th className="px-4 py-3 border-b border-gray-200 dark:border-[#21262d]">Data Inicial</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
@@ -112,7 +112,7 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
           )}
         </div>
 
-        <div className="p-4 bg-gray-50 dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 flex justify-end gap-3">
+        <div className="p-4 bg-gray-50 dark:bg-[#010409] border-t border-gray-100 dark:border-[#21262d] flex justify-end gap-3">
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-lg text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
@@ -122,7 +122,7 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
           <button
             onClick={handleOk}
             disabled={parcelasPreview.length === 0}
-            className="px-5 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-5 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 dark:bg-[#007aff] dark:hover:bg-[#0066d6] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Confirmar
           </button>
