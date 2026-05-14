@@ -19,7 +19,7 @@ function Descricao({ value, onChange }: DescricaoProps) {
 
       {!isOther ? (
         <select
-          className="bg-white border border-gray-300 h-[45px] w-full px-2.5 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
+          className="bg-white border border-slate-300 h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 outline-none cursor-pointer transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400"
           value={value}
           onChange={(e) => {
             if (e.target.value === "outros") {
@@ -35,7 +35,7 @@ function Descricao({ value, onChange }: DescricaoProps) {
           ))}
         </select>
       ) : (
-        <div className="flex items-center bg-white border border-gray-300 h-[45px] w-full px-2.5 rounded-md text-sm text-gray-700 focus-within:border-blue-500 transition-colors">
+        <div className="flex items-center bg-white border border-slate-300 h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400">
           <input
             type="text"
             className="flex-1 outline-none bg-transparent"

@@ -49,7 +49,7 @@ function CentralCard({
   const multaTotal = valorNumerico * 0.01 * totalDias;
 
   return (
-    <div className="flex flex-col bg-white rounded-xl pb-6 p-3 sm:p-5 md:p-8 gap-5 shadow-md border border-slate-200">
+    <div className="flex flex-col bg-white/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 border border-slate-200/60">
 
       {/* ── Banner modo edição ─────────────────────────────────────── */}
       {editandoId !== null && (
@@ -71,7 +71,7 @@ function CentralCard({
 
       {/* ── Título ─────────────────────────────────────────────────── */}
       <div className="border-b border-slate-100 pb-3">
-        <h1 className="text-[#1F2022] font-bold text-xl sm:text-2xl md:text-3xl">
+        <h1 className="text-slate-800 font-extrabold tracking-tight text-xl sm:text-2xl md:text-3xl">
           Atualização Monetária
         </h1>
       </div>

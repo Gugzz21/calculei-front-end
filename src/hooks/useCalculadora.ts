@@ -1,32 +1,51 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { calcularLancamento } from '../services/calcular';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
 import type { FormState, JurosState, LancamentoItem } from '../types';
 import { useAutoRecovery } from './useAutoRecovery';
+import toast from 'react-hot-toast';
 
 export function useCalculadora() {
   const today = new Date().toISOString().split('T')[0];
 
-  const [form, setForm] = useState<FormState>({
-    valor: '',
-    dataInicial: '',
-    dataCalculo: today,
-    indiceCorrecao: 'ipcae',
-    tipoCalculo: 'dfazendanaotributario',
-    descricao: 'ressarci',
+  const [form, setForm] = useState<FormState>(() => {
+    const saved = localStorage.getItem('calculei_form');
+    if (saved) return JSON.parse(saved);
+    return {
+      valor: '',
+      dataInicial: '',
+      dataCalculo: today,
+      indiceCorrecao: 'ipcae',
+      tipoCalculo: 'dfazendanaotributario',
+      descricao: 'ressarci',
+    };
   });
 
-  const [juros, setJuros] = useState<JurosState>({
-    enabled: false,
-    indice: 'taxalegal',
-    dataInicio: '',
-    dataFim: '',
-    taxa: '12,00',
-    aplicados: [],
+  const [juros, setJuros] = useState<JurosState>(() => {
+    const saved = localStorage.getItem('calculei_juros');
+    if (saved) return JSON.parse(saved);
+    return {
+      enabled: false,
+      indice: 'taxalegal',
+      dataInicio: '',
+      dataFim: '',
+      taxa: '12,00',
+      aplicados: [],
+    };
   });
 
-  const [lancamentos, setLancamentos] = useState<LancamentoItem[]>([]);
-  const [lancamentosOrigem, setLancamentosOrigem] = useState<Record<number, { form: FormState; juros: JurosState }>>({});
+  const [lancamentos, setLancamentos] = useState<LancamentoItem[]>(() => {
+    const saved = localStorage.getItem('calculei_lancamentos');
+    if (saved) return JSON.parse(saved);
+    return [];
+  });
+
+  const [lancamentosOrigem, setLancamentosOrigem] = useState<Record<number, { form: FormState; juros: JurosState }>>(() => {
+    const saved = localStorage.getItem('calculei_lancamentosOrigem');
+    if (saved) return JSON.parse(saved);
+    return {};
+  });
+
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -36,6 +55,24 @@ export function useCalculadora() {
 
   // ── Auto Recovery via Link ────────────────────────────────────────────────────
   useAutoRecovery(setLancamentos, setLoading, setErro);
+
+  // ── Persistência Local ────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    localStorage.setItem('calculei_form', JSON.stringify(form));
+  }, [form]);
+
+  useEffect(() => {
+    localStorage.setItem('calculei_juros', JSON.stringify(juros));
+  }, [juros]);
+
+  useEffect(() => {
+    localStorage.setItem('calculei_lancamentos', JSON.stringify(lancamentos));
+  }, [lancamentos]);
+
+  useEffect(() => {
+    localStorage.setItem('calculei_lancamentosOrigem', JSON.stringify(lancamentosOrigem));
+  }, [lancamentosOrigem]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 
@@ -87,6 +124,7 @@ export function useCalculadora() {
           [editandoId]: { form: { ...form }, juros: { ...juros } },
         }));
         setEditandoId(null);
+        toast.success("Lançamento atualizado com sucesso!");
       } else {
         // Modo adição
         setLancamentos(prev => [...prev, resultado]);
@@ -94,6 +132,7 @@ export function useCalculadora() {
           ...prev,
           [resultado.id]: { form: { ...form }, juros: { ...juros } },
         }));
+        toast.success("Lançamento adicionado com sucesso!");
       }
 
       if (juros.enabled && juros.aplicados.length > 0) {
@@ -101,7 +140,9 @@ export function useCalculadora() {
       }
 
     } catch (e: unknown) {
-      setErro(e instanceof Error ? e.message : 'Erro ao calcular. Verifique se o servidor Java está rodando.');
+      const msg = e instanceof Error ? e.message : 'Erro ao calcular. Verifique se o servidor Java está rodando.';
+      setErro(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
       calculandoRef.current = false;
@@ -139,6 +180,7 @@ export function useCalculadora() {
   const handleRemoverLancamento = (id: number) => {
     if (window.confirm("Tem certeza que deseja remover este lançamento?")) {
       setLancamentos(prev => prev.filter(l => l.id !== id));
+      toast.success("Lançamento removido");
     }
   };
 
@@ -147,6 +189,7 @@ export function useCalculadora() {
       setLancamentos([]);
       setLancamentosOrigem({});
       setEditandoId(null);
+      toast.success("Todos os lançamentos foram removidos");
     }
   };
 
@@ -189,9 +232,12 @@ export function useCalculadora() {
 
       setLancamentos(prev => [...prev, ...novosResultados]);
       setLancamentosOrigem(prev => ({ ...prev, ...novoOrigemMap }));
+      toast.success("Parcelas duplicadas com sucesso!");
 
     } catch (e: unknown) {
-      setErro(e instanceof Error ? e.message : 'Erro ao duplicar parcelas.');
+      const msg = e instanceof Error ? e.message : 'Erro ao duplicar parcelas.';
+      setErro(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

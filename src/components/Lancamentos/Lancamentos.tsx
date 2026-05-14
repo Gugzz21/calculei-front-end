@@ -9,6 +9,7 @@ import ModalToken from "./ModalToken";
 import ModalDuplicar from "./ModalDuplicar";
 import { exportarParaPDF } from "./exportPDF";
 import { baixarImagem } from "./exportImagem";
+import { exportarParaCSV } from "./exportCSV";
 
 interface LancamentosProps {
   lancamentos: LancamentoItem[];
@@ -130,6 +131,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
           salvandoPDF={salvandoPDF}
           onGerarPDF={handleGerarPDF}
           onBaixarImagem={handleBaixarImagem}
+          onExportarCSV={() => exportarParaCSV(lancamentos)}
         />
 
         {/* Conteúdo */}

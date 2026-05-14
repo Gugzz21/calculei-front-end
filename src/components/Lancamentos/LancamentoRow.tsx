@@ -26,9 +26,9 @@ interface SubComponentProps extends LancamentoRowProps {
 
 function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplicar }: SubComponentProps) {
   return (
-    <div className="hidden md:contents text-[13px] text-gray-700">
-      <div className="flex items-center justify-center text-gray-600 transition-colors shrink-0">
-        {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+    <div className="hidden md:contents text-[13px] text-slate-700">
+      <div className="flex items-center justify-center text-slate-400 transition-transform duration-300 shrink-0" style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+        <KeyboardArrowDownIcon fontSize="small" />
       </div>
       <div>{formatDate(item.dataInicial)}</div>
       <div>{formatDate(item.dataCalculo)}</div>
@@ -67,12 +67,12 @@ function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplica
 
 function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar }: SubComponentProps) {
   return (
-    <div className="flex flex-col md:hidden text-[13px] text-gray-700 w-full gap-2">
+    <div className="flex flex-col md:hidden text-[13px] text-slate-700 w-full gap-2">
       {/* Linha Superior: Ícone de expansão + Descrição + Ações */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-gray-800 text-[14px]">
-          <div className="flex items-center justify-center text-gray-500">
-            {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+        <div className="flex items-center gap-2 font-semibold text-slate-800 text-[14px]">
+          <div className="flex items-center justify-center text-slate-400 transition-transform duration-300" style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+            <KeyboardArrowDownIcon fontSize="small" />
           </div>
           {item.descricao}
         </div>
@@ -115,66 +115,68 @@ function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar
 function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
   return (
     <div className="overflow-hidden">
-      <div className="px-6 md:pl-14 md:pr-4 py-4 md:py-6 bg-white border-t border-gray-100 grid grid-cols-2 md:grid-cols-7 gap-x-4 gap-y-6">
+      <div className="px-6 md:pl-14 md:pr-4 py-5 md:py-6 bg-slate-50/50 shadow-inner border-t border-slate-100 grid grid-cols-2 md:grid-cols-7 gap-x-4 gap-y-6">
 
         {/* Desktop: Descrição. Mobile: Oculto pois já está na linha principal */}
         <div className="hidden md:flex flex-col">
-          <span className="text-[12px] font-bold text-gray-800 mb-1">Descrição</span>
-          <span className="text-[13px] text-gray-600">{item.descricao}</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Descrição</span>
+          <span className="text-[13px] font-medium text-slate-700">{item.descricao}</span>
         </div>
 
         {/* Mobile: Mostrar campos que foram cortados da grade principal */}
         <div className="flex flex-col md:hidden">
-          <span className="text-[12px] font-bold text-gray-800 mb-1">Índice</span>
-          <span className="text-[13px] text-gray-600">{item.indiceCorrecao}</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Índice</span>
+          <span className="text-[13px] font-medium text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-0.5 w-fit">{item.indiceCorrecao}</span>
         </div>
         <div className="flex flex-col md:hidden">
-          <span className="text-[12px] font-bold text-gray-800 mb-1">Correção</span>
-          <span className="text-[13px] text-gray-600">{formatPercent(item.percentualCorrecao)}</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Correção</span>
+          <span className="text-[13px] font-medium text-slate-700">{formatPercent(item.percentualCorrecao)}</span>
         </div>
         <div className="flex flex-col md:hidden">
-          <span className="text-[12px] font-bold text-gray-800 mb-1">Juros?</span>
-          <span className="text-[13px] text-gray-600">{item.indiceJuros !== "—" ? "Sim" : "Não"}</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Juros?</span>
+          <span className={`text-[12px] font-semibold px-2 py-0.5 rounded-full w-fit ${item.indiceJuros !== "—" ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-500"}`}>
+            {item.indiceJuros !== "—" ? "Sim" : "Não"}
+          </span>
         </div>
 
         <div className="flex flex-col">
-          <span className="text-[12px] font-bold text-gray-800 mb-1">Valor atualizado</span>
-          <span className="text-[13px] text-gray-600">{formatBRL(item.valorAtualizado)}</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Valor atualizado</span>
+          <span className="text-[13px] font-medium text-slate-700">{formatBRL(item.valorAtualizado)}</span>
         </div>
 
         {item.indiceJuros !== "—" && (
           <>
             <div className="flex flex-col">
-              <span className="text-[12px] font-bold text-gray-800 mb-1">Período de juros</span>
-              <span className="text-[13px] text-gray-600">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Período de juros</span>
+              <span className="text-[13px] font-medium text-slate-700">
                 {item.dataInicioJuros ? `${formatDate(item.dataInicioJuros)} à ${formatDate(item.dataFimJuros)}` : "—"}
               </span>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[12px] font-bold text-gray-800 mb-1">Dias de juros</span>
-              <span className="text-[13px] text-gray-600">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Dias de juros</span>
+              <span className="text-[13px] font-medium text-slate-700">
                 {item.diasJuros ? item.diasJuros : "—"}
               </span>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[12px] font-bold text-gray-800 mb-1">Fator de juros</span>
-              <span className="text-[13px] text-gray-600">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Fator de juros</span>
+              <span className="text-[13px] font-medium text-slate-700">
                 {item.fatorJuros && item.fatorJuros !== 1 ? item.fatorJuros.toFixed(6) : "—"}
               </span>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[12px] font-bold text-gray-800 mb-1">Acumulado juros(%)</span>
-              <span className="text-[13px] text-gray-600">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Acumulado juros(%)</span>
+              <span className="text-[13px] font-medium text-slate-700">
                 {item.percentualJurosAcumulado ? formatPercent(item.percentualJurosAcumulado) : "—"}
               </span>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[12px] font-bold text-gray-800 mb-1">Juros (R$)</span>
-              <span className="text-[13px] text-gray-600">{formatBRL(item.juros)}</span>
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Juros (R$)</span>
+              <span className="text-[13px] font-medium text-slate-700">{formatBRL(item.juros)}</span>
             </div>
           </>
         )}
@@ -193,7 +195,7 @@ export default function LancamentoRow(props: LancamentoRowProps) {
   const isActuallyExpanded = props.forceExpand || isExpanded;
 
   return (
-    <div className="flex flex-col bg-white border-b border-gray-200 transition-all hover:bg-gray-50/50">
+    <div className="flex flex-col bg-white border-b border-slate-100 transition-colors duration-200 hover:bg-slate-50">
       {/* ─── LINHA PRINCIPAL (Visível sempre) ─── */}
       <div
         className="flex flex-col md:grid md:grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] md:items-center gap-3 md:gap-4 p-4 md:py-3 md:px-4 cursor-pointer select-none"

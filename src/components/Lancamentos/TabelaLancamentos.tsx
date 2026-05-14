@@ -34,9 +34,9 @@ function TabelaLancamentos({
   };
 
   return (
-    <div className="flex flex-col w-full border border-gray-300 rounded-lg overflow-hidden bg-white">
+    <div className="flex flex-col w-full border border-slate-200 rounded-xl shadow-sm overflow-hidden bg-white">
       {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
-      <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-3 bg-[#e8eff8] border-b border-gray-300 text-[13px] font-bold text-gray-800">
+      <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-3 bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
         <div className="text-center"></div> {/* Espaço para ícone de expansão */}
         <div>Data inicial</div>
         <div>Data final</div>
@@ -76,7 +76,7 @@ function TabelaLancamentos({
       {lancamentos.length > 0 && currentPage === totalPages && (
         <>
           {/* Footer Desktop */}
-          <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-4 bg-[#f8f9fa] border-t border-gray-300 text-sm font-bold text-gray-800">
+          <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-4 bg-blue-50/30 border-t border-slate-200 text-sm font-bold text-blue-900">
             <div className="col-span-3 pl-12 text-[15px]">Total</div>
             <div>{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</div>
             <div className="col-span-3"></div>
@@ -85,14 +85,14 @@ function TabelaLancamentos({
           </div>
 
           {/* Footer Mobile */}
-          <div className="md:hidden mt-4 flex flex-col items-center justify-between bg-[#f8f9fa] border-t border-gray-300 p-4">
+          <div className="md:hidden mt-4 flex flex-col items-center justify-between bg-blue-50/30 border-t border-slate-200 p-4">
             <div className="w-full flex justify-between items-center mb-2">
-              <span className="text-sm font-bold text-gray-800">Total Valor</span>
-              <span className="text-sm font-bold text-gray-800">{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</span>
+              <span className="text-sm font-medium text-slate-600">Total Valor</span>
+              <span className="text-sm font-bold text-blue-900">{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</span>
             </div>
             <div className="w-full flex justify-between items-center">
-              <span className="text-sm font-bold text-gray-800">Total Devido Geral</span>
-              <span className="text-base font-bold text-gray-800">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</span>
+              <span className="text-sm font-medium text-slate-600">Total Devido Geral</span>
+              <span className="text-base font-bold text-blue-900">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</span>
             </div>
           </div>
         </>
