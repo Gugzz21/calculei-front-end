@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
-import type { LancamentoItem } from "../../App";
 import { usePagination } from "../../hooks/usePagination";
-
+import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
+import type { LancamentoItem } from "../../types";
 import Paginacao from "./Paginacao";
 import TabelaLancamentos from "./TabelaLancamentos";
 import BotoesExport from "./BotoesExport";
@@ -12,16 +12,15 @@ import { baixarImagem } from "./exportImagem";
 import { exportarParaExcel } from "./exportExcel";
 import toast from "react-hot-toast";
 
-interface LancamentosProps {  
-  lancamentos: LancamentoItem[];
-  loading?: boolean;
-  onRemover: (id: number) => void;
-  onEditar: (id: number) => void;
-  onLimparTodos: () => void;
-  onConfirmarDuplicacao: (idOriginal: number, datas: string[]) => void;
-}
+function Lancamentos() {
+  const {
+    lancamentos,
+    loading,
+    handleRemoverLancamento,
+    handleEditar,
+    handleConfirmarDuplicacao
+  } = useCalculadoraContext();
 
-function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimparTodos, onConfirmarDuplicacao }: LancamentosProps) {
   const tableRef = useRef<HTMLDivElement>(null);
 
   // ── Paginação ──────────────────────────────────────────────────────────────
@@ -67,7 +66,6 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
 
   const handleBaixarImagem = async () => {
     setIsExporting(true);
-    // Aguarda o DOM renderizar o elemento oculto
     setTimeout(async () => {
       if (!exportRef.current) {
         setIsExporting(false);
@@ -90,7 +88,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
   };
 
   const handleRemover = (id: number, isLastInPage: boolean) => {
-    onRemover(id);
+    handleRemoverLancamento(id);
     handleItemRemoved(isLastInPage);
   };
 
@@ -103,7 +101,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
         onClose={() => setDuplicandoItem(null)}
         lancamentoBase={duplicandoItem}
         onConfirmar={(datas) => {
-          if (duplicandoItem) onConfirmarDuplicacao(duplicandoItem.id, datas);
+          if (duplicandoItem) handleConfirmarDuplicacao(duplicandoItem.id, datas);
           setDuplicandoItem(null);
         }}
       />
@@ -141,7 +139,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
               console.error(e);
             }
           }}
-          />
+        />
 
         {/* Conteúdo */}
         {lancamentos.length === 0 && !loading ? (
@@ -152,13 +150,11 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
           <div ref={tableRef} className="flex flex-col gap-4">
             <TabelaLancamentos
               currentItems={currentItems}
-              lancamentos={lancamentos}
               startIndex={startIndex}
               currentPage={currentPage}
               totalPages={totalPages}
               onRemover={handleRemover}
-              onEditar={onEditar}
-              onLimparTodos={onLimparTodos}
+              onEditar={handleEditar}
               onDuplicar={setDuplicandoItem}
             />
 
@@ -221,14 +217,12 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
             <h2 className="text-[24px] text-[#1F2022] font-bold mb-6">Relatório de Lançamentos</h2>
             <TabelaLancamentos
               currentItems={lancamentos}
-              lancamentos={lancamentos}
               startIndex={0}
               currentPage={1}
               totalPages={1}
-              onRemover={() => {}}
-              onEditar={() => {}}
-              onLimparTodos={() => {}}
-              onDuplicar={() => {}}
+              onRemover={() => { }}
+              onEditar={() => { }}
+              onDuplicar={() => { }}
               forceExpand={true}
             />
           </div>

@@ -6,44 +6,32 @@ import Descricao from "./Descricao";
 import Juros from "./Juros";
 import Calcular from "./Calcular";
 import Limpar from "./Limpar";
-import type { FormState, JurosState } from "../../App";
+import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 
-interface CentralCardProps {
-  form: FormState;
-  juros: JurosState;
-  today: string;
-  loading: boolean;
-  erro: string | null;
-  isFormValid: boolean;
-  editandoId: number | null;
-  onFormChange: (field: keyof FormState, value: string) => void;
-  onJurosChange: (field: keyof JurosState, value: string | boolean | any[]) => void;
-  onCalcular: () => void;
-  onLimpar: () => void;
-  onCancelarEdicao: () => void;
-}
+function CentralCard() {
+  const {
+    form,
+    juros,
+    today,
+    loading,
+    erro,
+    isFormValid,
+    editandoId,
+    handleFormChange,
+    handleJurosChange,
+    handleCalcular,
+    handleLimpar,
+    handleCancelarEdicao
+  } = useCalculadoraContext();
 
-function CentralCard({
-  form,
-  juros,
-  today,
-  loading,
-  erro,
-  isFormValid,
-  editandoId,
-  onFormChange,
-  onJurosChange,
-  onCalcular,
-  onLimpar,
-  onCancelarEdicao,
-}: CentralCardProps) {
-  const selicSelecionada = form.indiceCorrecao === "selic";
+  const jurosEmbutidos = ["selic", "tjrj119602009ipcaeselic"].includes(form.indiceCorrecao);
 
+  // Lógica de multa diária (poderia ser movida para um utilitário se crescer)
   let totalDias = 0;
   if (form.dataInicial && form.dataCalculo) {
-    const dInicial = new Date(form.dataInicial).getTime();
-    const dCalculo = new Date(form.dataCalculo).getTime();
-    totalDias = (dCalculo - dInicial) > 0 ? (dCalculo - dInicial) / (1000 * 60 * 60 * 24) : 0;
+    const dInicial = new Date(form.dataInicial + "T00:00:00").getTime();
+    const dCalculo = new Date(form.dataCalculo + "T00:00:00").getTime();
+    totalDias = (dCalculo - dInicial) > 0 ? Math.floor((dCalculo - dInicial) / (1000 * 60 * 60 * 24)) : 0;
   }
   const valorNumerico = form.valor ? parseInt(form.valor, 10) / 100 : 0;
   const multaTotal = valorNumerico * 0.01 * totalDias;
@@ -61,7 +49,7 @@ function CentralCard({
             Editando lançamento — altere os campos e clique em Salvar alteração
           </div>
           <button
-            onClick={onCancelarEdicao}
+            onClick={handleCancelarEdicao}
             className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 text-xs font-semibold underline shrink-0"
           >
             Cancelar
@@ -81,19 +69,19 @@ function CentralCard({
         <div className="w-full sm:flex-[10] md:flex-[13] min-w-0">
           <TipoCalculo
             value={form.tipoCalculo}
-            onChange={(v) => onFormChange("tipoCalculo", v)}
+            onChange={(v) => handleFormChange("tipoCalculo", v)}
           />
         </div>
         <div className="w-full sm:flex-[7] md:flex-[8] min-w-0">
           <IndiceCorrecao
             value={form.indiceCorrecao}
-            onChange={(v) => onFormChange("indiceCorrecao", v)}
+            onChange={(v) => handleFormChange("indiceCorrecao", v)}
           />
         </div>
         <div className="w-full sm:flex-[8] md:flex-[10] min-w-0">
           <Descricao
             value={form.descricao}
-            onChange={(v) => onFormChange("descricao", v)}
+            onChange={(v) => handleFormChange("descricao", v)}
           />
         </div>
       </div>
@@ -105,9 +93,9 @@ function CentralCard({
         <div className="flex flex-col gap-2 w-full sm:w-auto">
           <InputValor
             value={form.valor}
-            onChange={(v) => onFormChange("valor", v)}
+            onChange={(v) => handleFormChange("valor", v)}
           />
-          {!selicSelecionada && (
+          {!jurosEmbutidos && (
             <label
               htmlFor="aplicar-juros"
               className={`flex items-center gap-2 select-none group w-fit mt-1 ${isFormValid ? "cursor-pointer" : "cursor-not-allowed opacity-50"
@@ -119,13 +107,13 @@ function CentralCard({
                   type="checkbox"
                   id="aplicar-juros"
                   checked={juros.enabled}
-                  onChange={(e) => onJurosChange("enabled", e.target.checked)}
+                  onChange={(e) => handleJurosChange("enabled", e.target.checked)}
                   disabled={!isFormValid}
                   className="peer sr-only"
                 />
                 <div
                   className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${juros.enabled
-                      ? "bg-blue-600 border-blue-600"
+                      ? "bg-[#007aff] border-[#007aff]"
                       : "bg-white border-gray-400 group-hover:border-blue-400"
                     }`}
                 >
@@ -149,7 +137,7 @@ function CentralCard({
           <Data
             title="Data inicial"
             value={form.dataInicial}
-            onChange={(v) => onFormChange("dataInicial", v)}
+            onChange={(v) => handleFormChange("dataInicial", v)}
             max={today}
           />
         </div>
@@ -159,7 +147,7 @@ function CentralCard({
           <Data
             title="Data do cálculo"
             value={form.dataCalculo}
-            onChange={(v) => onFormChange("dataCalculo", v)}
+            onChange={(v) => handleFormChange("dataCalculo", v)}
             max={today}
             min={form.dataInicial || undefined}
           />
@@ -179,23 +167,16 @@ function CentralCard({
       </div>
 
       {/* ── Painel de juros ─────────────────────────────────────────── */}
-      {juros.enabled && !selicSelecionada && (
-        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 sm:p-4">
-          <Juros
-            juros={juros}
-            selicSelecionada={selicSelecionada}
-            onJurosChange={onJurosChange}
-            today={today}
-            dataInicialForm={form.dataInicial}
-            dataCalculoForm={form.dataCalculo}
-          />
+      {juros.enabled && !jurosEmbutidos && (
+        <div className="border border-gray-300 dark:border-[#21262d] rounded-lg p-3 sm:p-4 bg-slate-50/30 dark:bg-[#010409]/30">
+          <Juros />
         </div>
       )}
 
       {/* ── Mensagem de erro ────────────────────────────────────────── */}
       {erro && (
-        <div className="text-red-600 text-sm font-semibold bg-red-50 border border-red-200 rounded-md px-4 py-2">
-          ⚠ {erro}
+        <div className="text-red-600 text-sm font-semibold bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/20 rounded-md px-4 py-2">
+          ⚠️ {erro}
         </div>
       )}
 
@@ -203,18 +184,18 @@ function CentralCard({
       <div className="flex flex-col gap-2 w-full">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 w-full">
           <Calcular
-            onClick={onCalcular}
+            onClick={handleCalcular}
             loading={loading}
             disabled={
               !isFormValid ||
-              (juros.enabled && !selicSelecionada && juros.aplicados.length === 0)
+              (juros.enabled && !jurosEmbutidos && juros.aplicados.length === 0)
             }
             editMode={editandoId !== null}
           />
-          <Limpar onClick={onLimpar} />
+          <Limpar onClick={handleLimpar} />
         </div>
-        {juros.enabled && !selicSelecionada && juros.aplicados.length === 0 && (
-          <div className="text-amber-600 text-xs sm:text-sm font-medium mt-1 bg-amber-50 border border-amber-200 p-2 rounded-md">
+        {juros.enabled && !jurosEmbutidos && juros.aplicados.length === 0 && (
+          <div className="text-amber-600 text-xs sm:text-sm font-medium mt-1 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/20 p-2 rounded-md">
             ⚠️ Você marcou para aplicar juros. Clique em "Aplicar" logo acima antes de calcular.
           </div>
         )}

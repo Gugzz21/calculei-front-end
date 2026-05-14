@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { LancamentoItem } from "../../App";
+import type { LancamentoItem } from "../../types";
 import type { LancamentoRecuperado } from "./types";
 import { formatBRL, formatPercent } from "../../utils/formatters";
 import { formatDate } from "../../utils/dateUtils";
@@ -31,15 +31,15 @@ const COLUNAS_PDF = [
 
 function adicionarTotalGeral(
   doc: jsPDF,
-  items: { valorPrincipal: number; valorAtualizado: number; dias: number; juros: number; total: number }[]
+  items: any[]
 ) {
   const finalY = (doc as any).lastAutoTable.finalY;
   const tot = {
-    principal: items.reduce((s, l) => s + l.valorPrincipal, 0),
-    atualizado: items.reduce((s, l) => s + l.valorAtualizado, 0),
-    dias: items.reduce((s, l) => s + l.dias, 0),
-    juros: items.reduce((s, l) => s + l.juros, 0),
-    total: items.reduce((s, l) => s + l.total, 0),
+    principal: items.reduce((s, l) => s + (l.valorPrincipal || 0), 0),
+    atualizado: items.reduce((s, l) => s + (l.valorAtualizado || 0), 0),
+    dias: items.reduce((s, l) => s + (l.dias || 0), 0),
+    juros: items.reduce((s, l) => s + (l.juros || 0), 0),
+    total: items.reduce((s, l) => s + (l.total || 0), 0),
   };
   autoTable(doc, {
     body: [[
@@ -96,7 +96,7 @@ function adicionarBlocoToken(doc: jsPDF, link: string) {
   doc.setFontSize(9);
   doc.setTextColor(146, 64, 14);            // amber-800
   doc.setFont("helvetica", "bold");
-  doc.text("⚠  LINK DE RECUPERAÇÃO", margin + 4, y + 7);
+  doc.text("LINK DE RECUPERAÇÃO", margin + 4, y + 7);
 
   // ── Link em destaque ─────────────────────────────────────────────────────
   doc.setFont("courier", "bold");
@@ -226,16 +226,16 @@ export function gerarPDFRecuperado(items: LancamentoRecuperado[], tokenUsado: st
   doc.text(`Token: ${tokenUsado}`, 14, 20);
 
   const linhas = items.map((l) => [
-    l.descricao,
-    `Inicial: ${formatDate(l.dataInicial)}\nCálculo: ${formatDate(l.dataCalculo)}`,
-    formatBRL(l.valorPrincipal),
-    l.indiceCorrecao,
-    formatBRL(l.valorAtualizado),
-    String(l.dias),
-    formatPercent(l.percentualCorrecao),
-    l.indiceJuros ?? "—",
-    formatBRL(l.juros),
-    formatBRL(l.total),
+    l.descricao || "—",
+    `Inicial: ${formatDate(l.dataInicial || "")}\nCálculo: ${formatDate(l.dataCalculo || "")}`,
+    formatBRL(l.valorPrincipal || 0),
+    l.indiceCorrecao || "—",
+    formatBRL(l.valorAtualizado || 0),
+    String(l.dias || 0),
+    formatPercent(l.percentualCorrecao || 0),
+    l.indiceJuros || "—",
+    formatBRL(l.juros || 0),
+    formatBRL(l.total || 0),
   ]);
 
   autoTable(doc, {

@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import type { LancamentoItem } from '../../App';
+import type { LancamentoItem } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
 
 

@@ -92,7 +92,7 @@ const BCB_SERIES: Record<string, number> = {
   ipca:  433,
   ipcae: 10764,
   igpm:  189,
-  tr:    188,   // Série MENSAL da TR (226 é diária e tem limite de 10 anos)
+  tr:    7811,  
   igpdi: 190,
 };
 
@@ -175,13 +175,22 @@ async function fetchMonthlyFromBcb(
   const response = await fetch(url);
   if (!response.ok) return null;
 
-  const registros: Array<{ valor: string }> = await response.json();
+  const registros: Array<{ data: string; valor: string }> = await response.json();
   if (!Array.isArray(registros) || registros.length === 0) return null;
 
-  return registros.reduce(
-    (fator, { valor }) => fator * (1 + parseFloat(valor.replace(",", ".")) / 100),
-    1
-  );
+  // Filtragem para evitar "sobre-correção": 
+  // O BCB retorna o índice do mês cheio no dia 01/MM/AAAA.
+  // Se o cálculo termina em 2024-05-01, não devemos incluir o índice de Maio (01/05/2024).
+  return registros
+    .filter(r => {
+      const [d, m, y] = r.data.split("/");
+      const isoData = `${y}-${m}-${d}`;
+      return isoData < req.dateFim;
+    })
+    .reduce(
+      (fator, { valor }) => fator * (1 + parseFloat(valor.replace(",", ".")) / 100),
+      1
+    );
 }
 
 /**

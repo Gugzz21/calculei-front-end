@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { LancamentoItem } from '../../App';
+import type { LancamentoItem } from '../../types';
 import { calcularDatasParcelas, formatDate } from '../../utils/dateUtils';
 
 interface ModalDuplicarProps {

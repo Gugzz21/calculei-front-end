@@ -1,33 +1,31 @@
-import type { LancamentoItem } from "../../App";
 import { formatBRL } from "../../utils/formatters";
 import LancamentoRow from "./LancamentoRow";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
+import type { LancamentoItem } from "../../types";
 
 interface TabelaLancamentosProps {
   currentItems: LancamentoItem[];
-  lancamentos: LancamentoItem[];   // todos (para totais e tfoot)
   startIndex: number;
   currentPage: number;
   totalPages: number;
   onRemover: (id: number, isLastInPage: boolean) => void;
   onEditar: (id: number) => void;
-  onLimparTodos: () => void;
   onDuplicar: (item: LancamentoItem) => void;
   forceExpand?: boolean;
 }
 
 function TabelaLancamentos({
   currentItems,
-  lancamentos,
   startIndex,
   currentPage,
   totalPages,
   onRemover,
   onEditar,
-  onLimparTodos,
   onDuplicar,
   forceExpand,
 }: TabelaLancamentosProps) {
+  const { lancamentos, handleLimparTodosLancamentos } = useCalculadoraContext();
 
   const handleRemover = (id: number) => {
     onRemover(id, currentItems.length === 1);
@@ -47,7 +45,7 @@ function TabelaLancamentos({
         <div>Total devido</div>
         <div className="flex justify-end pr-1 text-gray-500">
           <button
-            onClick={onLimparTodos}
+            onClick={handleLimparTodosLancamentos}
             className="p-1 hover:text-red-600 transition-colors rounded"
             title="Limpar todos os lançamentos"
           >
@@ -72,7 +70,6 @@ function TabelaLancamentos({
       </div>
 
       {/* ─── RODAPÉ (Total Geral) ─── */}
-      {/* Exibe apenas na última página */}
       {lancamentos.length > 0 && currentPage === totalPages && (
         <>
           {/* Footer Desktop */}

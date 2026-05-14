@@ -1,19 +1,18 @@
 import type { ReactNode } from "react";
 
-// ─── Lançamento ────────────────────────────────────────────────────────────────
-
-export interface LancamentoItem {
-  numero: ReactNode;
-  id: number;
+/**
+ * Interface base para dados de um lançamento.
+ * Usada para unificar o item da lista e o item recuperado do backend.
+ */
+export interface BaseLancamento {
   descricao: string;
   dataInicial: string;
-  valorPrincipal: number;
   dataCalculo: string;
+  valorPrincipal: number;
   indiceCorrecao: string;
   valorAtualizado: number;
   dias: number;
   percentualCorrecao: number;
-  // Juros
   indiceJuros: string;
   dataInicioJuros: string;
   dataFimJuros: string;
@@ -24,10 +23,19 @@ export interface LancamentoItem {
   total: number;
 }
 
-// ─── Formulário principal ─────────────────────────────────────────────────────
+/**
+ * Item de lançamento na lista da aplicação.
+ */
+export interface LancamentoItem extends BaseLancamento {
+  id: number;
+  numero?: ReactNode;
+}
 
+/**
+ * Estado do formulário de entrada.
+ */
 export interface FormState {
-  valor: string; // raw digits string
+  valor: string; // raw digits string para máscara de moeda
   dataInicial: string;
   dataCalculo: string;
   indiceCorrecao: string;
@@ -35,12 +43,13 @@ export interface FormState {
   descricao: string;
 }
 
-// ─── Juros ────────────────────────────────────────────────────────────────────
-
+/**
+ * Período de juros aplicado a um lançamento.
+ */
 export interface JurosAplicado {
   id: number;
   indice: string;
-  taxa: string;
+  taxa: string; // "12,00"
   dataInicio: string;
   dataFim: string;
   dias: number;
@@ -48,39 +57,28 @@ export interface JurosAplicado {
   percentual: number;
 }
 
+/**
+ * Estado da configuração de juros.
+ */
 export interface JurosState {
   enabled: boolean;
   indice: string;
   dataInicio: string;
   dataFim: string;
-  taxa: string; // % a.a. como string para facilitar input decimal PT-BR
+  taxa: string;
   aplicados: JurosAplicado[];
 }
 
-// ─── Recuperação por token ────────────────────────────────────────────────────
-
-/** Estrutura de cada lançamento retornado pelo backend via token */
-export interface LancamentoRecuperado {
+/**
+ * Lançamento recuperado via Token (pode ter campos opcionais dependendo da versão do backend)
+ */
+export interface LancamentoRecuperado extends Partial<BaseLancamento> {
   id?: number;
-  descricao: string;
-  dataInicial: string;
-  dataCalculo: string;
-  valorPrincipal: number;
-  indiceCorrecao: string;
-  valorAtualizado: number;
-  dias: number;
-  percentualCorrecao: number;
-  indiceJuros: string;
-  dataInicioJuros?: string;
-  dataFimJuros?: string;
-  diasJuros?: number;
-  fatorJuros?: number;
-  percentualJurosAcumulado?: number;
-  juros: number;
-  total: number;
 }
 
-/** Envelope retornado pelo backend (dentro do campo json salvo) */
+/**
+ * Envelope de dados recuperados do backend.
+ */
 export interface DadosRecuperados {
   geradoEm?: string;
   totalLancamentos?: number;

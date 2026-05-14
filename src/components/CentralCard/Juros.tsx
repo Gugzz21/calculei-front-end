@@ -1,30 +1,29 @@
 import { useState } from "react";
 import Data from "./Data";
-import type { JurosState } from "../../types";
 import { calcularJuros } from "../../services/api";
 import { JUROS_DESCRICAO } from "../../constants/dominios";
 import { PercentIcon } from "lucide-react";
 import { useIndices } from "../../hooks/useIndices";
+import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 
-interface JurosProps {
-  juros: JurosState;
-  selicSelecionada: boolean;
-  onJurosChange: (field: keyof JurosState, value: string | boolean | any[]) => void;
-  today: string;
-  dataInicialForm: string;
-  dataCalculoForm: string;
-}
+function Juros() {
+  const {
+    juros,
+    form,
+    today,
+    handleJurosChange
+  } = useCalculadoraContext();
 
-function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm, dataCalculoForm }: JurosProps) {
   const { indice, taxa, aplicados = [] } = juros;
-  const dataInicio = juros.dataInicio || dataInicialForm;
-  const dataFim    = juros.dataFim    || dataCalculoForm;
+  const dataInicio = juros.dataInicio || form.dataInicial;
+  const dataFim    = juros.dataFim    || form.dataCalculo;
 
   const [loading, setLoading]       = useState(false);
   const [erroLocal, setErroLocal]   = useState<string | null>(null);
   
   const { jurosIndiceOpcoes } = useIndices();
 
+  const selicSelecionada = form.indiceCorrecao === "selic";
   if (selicSelecionada) return null;
 
   const handleAplicar = async () => {
@@ -44,7 +43,6 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
       await new Promise((resolve) => setTimeout(resolve, 400));
 
       const novosAplicados: any[] = [];
-
 
       const addAplicado = async (idx: string, dInicio: string, dFim: string, taxaAtual: string) => {
         const resp = await calcularJuros(
@@ -67,8 +65,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
       };
 
       await addAplicado(indice, dataInicio, dataFim, taxa);
-
-      onJurosChange("aplicados", [...aplicados, ...novosAplicados]);
+      handleJurosChange("aplicados", [...aplicados, ...novosAplicados]);
     } catch (e: any) {
       setErroLocal(e.message || "Erro ao calcular juros");
     } finally {
@@ -77,7 +74,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
   };
 
   const handleRemover = (id: number) => {
-    onJurosChange("aplicados", aplicados.filter((a) => a.id !== id));
+    handleJurosChange("aplicados", aplicados.filter((a) => a.id !== id));
   };
 
   const mostraTaxa = ["jurossimples6", "jurossimples12", "especificartaxa"].includes(indice);
@@ -91,7 +88,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
           <strong className="text-[13px] text-gray-700 dark:text-gray-300 font-semibold">Índice de juros</strong>
           <select
             value={indice}
-            onChange={(e) => onJurosChange("indice", e.target.value)}
+            onChange={(e) => handleJurosChange("indice", e.target.value)}
             className="bg-white dark:bg-[#010409] border border-gray-300 dark:border-[#21262d] h-[45px] w-full sm:w-[330px] px-3 rounded-md text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer"
           >
             {jurosIndiceOpcoes.map(({ value, label }) => (
@@ -108,7 +105,7 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
               <input
                 type="text"
                 value={taxa}
-                onChange={(e) => onJurosChange("taxa", e.target.value.replace(/[^\d,]/g, ""))}
+                onChange={(e) => handleJurosChange("taxa", e.target.value.replace(/[^\d,]/g, ""))}
                 className="bg-white dark:bg-[#010409] border border-gray-300 dark:border-[#21262d] h-[45px] w-full md:w-[220px] pl-3 pr-16 rounded-md text-sm text-gray-700 dark:text-gray-200 outline-none"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">
@@ -122,9 +119,9 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
           <Data
             title="Data de início dos juros"
             value={dataInicio}
-            onChange={(v) => onJurosChange("dataInicio", v)}
+            onChange={(v) => handleJurosChange("dataInicio", v)}
             max={today}
-            min={dataInicialForm || undefined}
+            min={form.dataInicial || undefined}
           />
         </div>
 
@@ -132,9 +129,9 @@ function Juros({ juros, selicSelecionada, onJurosChange, today, dataInicialForm,
           <Data
             title="Aplicar juros até"
             value={dataFim}
-            onChange={(v) => onJurosChange("dataFim", v)}
+            onChange={(v) => handleJurosChange("dataFim", v)}
             max={today}
-            min={dataInicio || dataInicialForm || undefined}
+            min={dataInicio || form.dataInicial || undefined}
           />
         </div>
 

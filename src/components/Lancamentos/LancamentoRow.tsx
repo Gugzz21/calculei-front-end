@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LancamentoItem } from "../../App";
+import type { LancamentoItem } from "../../types";
 import { formatBRL, formatPercent } from "../../utils/formatters";
 import { formatDate } from "../../utils/dateUtils";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";

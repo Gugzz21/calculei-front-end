@@ -1,4 +1,4 @@
-import type { LancamentoItem } from "../../App";
+import type { LancamentoItem } from "../../types";
 import { gerarUUID } from "../../utils/helpers";
 import { salvarHistorico } from "../../services/api";
 import { toJpeg } from "html-to-image";
