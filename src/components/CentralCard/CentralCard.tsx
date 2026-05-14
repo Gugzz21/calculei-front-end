@@ -49,12 +49,12 @@ function CentralCard({
   const multaTotal = valorNumerico * 0.01 * totalDias;
 
   return (
-    <div className="flex flex-col bg-white/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 border border-slate-200/60">
+    <div className="flex flex-col bg-white/95 dark:bg-slate-700/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-slate-600/60 transition-colors duration-200">
 
       {/* ── Banner modo edição ─────────────────────────────────────── */}
       {editandoId !== null && (
-        <div className="flex items-start sm:items-center justify-between bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5 gap-2">
-          <div className="flex items-center gap-2 text-amber-800 text-xs sm:text-sm font-semibold">
+        <div className="flex items-start sm:items-center justify-between bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700/50 rounded-lg px-3 py-2.5 gap-2">
+          <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-semibold">
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
@@ -62,7 +62,7 @@ function CentralCard({
           </div>
           <button
             onClick={onCancelarEdicao}
-            className="text-amber-600 hover:text-amber-800 text-xs font-semibold underline shrink-0"
+            className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 text-xs font-semibold underline shrink-0"
           >
             Cancelar
           </button>
@@ -70,8 +70,8 @@ function CentralCard({
       )}
 
       {/* ── Título ─────────────────────────────────────────────────── */}
-      <div className="border-b border-slate-100 pb-3">
-        <h1 className="text-slate-800 font-extrabold tracking-tight text-xl sm:text-2xl md:text-3xl">
+      <div className="border-b border-slate-100 dark:border-slate-700/50 pb-3">
+        <h1 className="text-slate-800 dark:text-slate-100 font-extrabold tracking-tight text-xl sm:text-2xl md:text-3xl">
           Atualização Monetária
         </h1>
       </div>
@@ -139,7 +139,7 @@ function CentralCard({
                 </div>
               </div>
               <span className={`text-[13px] font-medium transition-colors duration-150 ${
-                isFormValid ? "text-gray-600 group-hover:text-gray-800" : "text-gray-500"
+                isFormValid ? "text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100" : "text-gray-500 dark:text-gray-600"
               }`}>
                 Aplicar juros?
               </span>
@@ -171,10 +171,10 @@ function CentralCard({
         {/* Cards informativos de multa diária */}
         {form.tipoCalculo === "multadiaria" && (
           <div className="w-full sm:w-auto flex flex-row flex-wrap gap-3 items-center sm:pt-6">
-            <div className="text-sm font-medium text-gray-700 border border-[#E3D21A] bg-[#FFFADF] p-2 h-[60px] w-[148px] rounded-md">
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-200 border border-[#E3D21A] dark:border-[#E3D21A]/50 bg-[#FFFADF] dark:bg-[#FFFADF]/10 p-2 h-[60px] w-[148px] rounded-md">
               Total de dias: <br />{totalDias}
             </div>
-            <div className="text-sm font-medium text-gray-700 border border-[#E3D21A] bg-[#FFFADF] p-2 h-[60px] w-[148px] rounded-md">
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-200 border border-[#E3D21A] dark:border-[#E3D21A]/50 bg-[#FFFADF] dark:bg-[#FFFADF]/10 p-2 h-[60px] w-[148px] rounded-md">
               Multa total: <br /> R$ {multaTotal.toFixed(2).replace(".", ",")}
             </div>
           </div>
@@ -183,7 +183,7 @@ function CentralCard({
 
       {/* ── Painel de juros ─────────────────────────────────────────── */}
       {juros.enabled && !selicSelecionada && (
-        <div className="border border-gray-300 rounded-lg p-3 sm:p-4">
+        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-3 sm:p-4">
           <Juros
             juros={juros}
             selicSelecionada={selicSelecionada}

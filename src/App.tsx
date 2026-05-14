@@ -31,7 +31,7 @@ function App() {
   } = useCalculadora();
 
   return (
-    <div className="flex flex-col bg-slate-100 min-h-screen w-full overflow-x-hidden">
+    <div className="flex flex-col bg-slate-100 dark:bg-slate-900 min-h-screen w-full overflow-x-hidden transition-colors duration-200">
       <Toaster position="top-right" />
       <Header />
       <div className="flex flex-col gap-4 w-full max-w-[1400px] mx-auto px-3 sm:px-4 md:px-8 pt-4 md:pt-8 pb-6">

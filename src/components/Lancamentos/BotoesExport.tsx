@@ -17,8 +17,8 @@ function BotoesExport({
   onExportarCSV,
 }: BotoesExportProps) {
   const baseBtn = "h-[40px] flex items-center justify-center gap-2 px-5 py-2 rounded-md transition-all font-medium shadow-sm";
-  const ativo   = "bg-white border border-[#ADB4C2] text-[#1F2022] hover:bg-slate-50 cursor-pointer";
-  const inativo = "bg-[#f1f3f5] border border-[#d2d6dc] text-[#adb5bd] cursor-not-allowed";
+  const ativo   = "bg-white dark:bg-slate-700 border border-[#ADB4C2] dark:border-slate-500 text-[#1F2022] dark:text-gray-100 hover:bg-slate-50 dark:hover:bg-slate-600 cursor-pointer";
+  const inativo = "bg-[#f1f3f5] dark:bg-slate-800 border border-[#d2d6dc] dark:border-slate-600 text-[#adb5bd] dark:text-gray-500 cursor-not-allowed";
 
   return (
     <div className="flex items-center justify-start">

@@ -107,11 +107,11 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
         }}
       />
 
-      <div className="flex flex-col bg-slate-50 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-400 overflow-hidden">
+      <div className="flex flex-col bg-slate-50 dark:bg-slate-700/95 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-400 dark:border-slate-600/60 overflow-hidden transition-colors duration-200">
 
         {/* Cabeçalho + paginação superior */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h1 className="text-xl sm:text-2xl text-[#1F2022] font-bold shrink-0">Lançamentos</h1>
+          <h1 className="text-xl sm:text-2xl text-[#1F2022] dark:text-slate-100 font-bold shrink-0">Lançamentos</h1>
           <div className="flex justify-start sm:justify-end">
             <Paginacao
               currentPage={currentPage}
@@ -136,7 +136,7 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
 
         {/* Conteúdo */}
         {lancamentos.length === 0 && !loading ? (
-          <p className="text-sm text-gray-400 italic">
+          <p className="text-sm text-gray-400 dark:text-gray-500 italic">
             Nenhum cálculo realizado ainda. Preencha os dados acima e clique em Calcular.
           </p>
         ) : (
@@ -155,28 +155,28 @@ function Lancamentos({ lancamentos, loading = false, onRemover, onEditar, onLimp
 
             {/* Rodapé: info de paginação + seletor + paginação inferior */}
             {lancamentos.length > 0 && (
-              <div className="flex flex-col gap-3 mt-4 border-t border-gray-200 pt-4">
+              <div className="flex flex-col gap-3 mt-4 border-t border-gray-200 dark:border-slate-700 pt-4">
                 {/* Linha de meta-info: total de registros + itens por página */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     Mostrando{" "}
-                    <span className="font-semibold text-gray-700">{startIndex + 1}</span>{" "}
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">{startIndex + 1}</span>{" "}
                     até{" "}
-                    <span className="font-semibold text-gray-700">
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">
                       {Math.min(startIndex + itemsPerPage, lancamentos.length)}
                     </span>{" "}
                     de{" "}
-                    <span className="font-semibold text-gray-700">{lancamentos.length}</span>{" "}
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">{lancamentos.length}</span>{" "}
                     registros
                   </span>
 
                   <div className="flex items-center gap-2">
-                    <label htmlFor="itemsPerPage" className="text-sm text-gray-500 whitespace-nowrap">
+                    <label htmlFor="itemsPerPage" className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       Itens por página:
                     </label>
                     <select
                       id="itemsPerPage"
-                      className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500 text-gray-700"
+                      className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500 text-gray-700 dark:text-gray-200"
                       value={itemsPerPage}
                       onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
                     >
