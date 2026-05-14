@@ -3,6 +3,7 @@ import { calcularLancamento } from '../services/calcular';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
 import type { FormState, JurosState, LancamentoItem } from '../types';
 import { useAutoRecovery } from './useAutoRecovery';
+import toast from 'react-hot-toast';
 
 export function useCalculadora() {
   const today = new Date().toISOString().split('T')[0];
@@ -26,7 +27,9 @@ export function useCalculadora() {
   });
 
   const [lancamentos, setLancamentos] = useState<LancamentoItem[]>([]);
+
   const [lancamentosOrigem, setLancamentosOrigem] = useState<Record<number, { form: FormState; juros: JurosState }>>({});
+
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -36,6 +39,16 @@ export function useCalculadora() {
 
   // ── Auto Recovery via Link ────────────────────────────────────────────────────
   useAutoRecovery(setLancamentos, setLoading, setErro);
+
+  // ── Persistência Local ────────────────────────────────────────────────────────
+
+
+
+
+
+
+
+
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 
@@ -87,6 +100,7 @@ export function useCalculadora() {
           [editandoId]: { form: { ...form }, juros: { ...juros } },
         }));
         setEditandoId(null);
+        toast.success("Lançamento atualizado com sucesso!");
       } else {
         // Modo adição
         setLancamentos(prev => [...prev, resultado]);
@@ -94,6 +108,7 @@ export function useCalculadora() {
           ...prev,
           [resultado.id]: { form: { ...form }, juros: { ...juros } },
         }));
+        toast.success("Lançamento adicionado com sucesso!");
       }
 
       if (juros.enabled && juros.aplicados.length > 0) {
@@ -101,7 +116,9 @@ export function useCalculadora() {
       }
 
     } catch (e: unknown) {
-      setErro(e instanceof Error ? e.message : 'Erro ao calcular. Verifique se o servidor Java está rodando.');
+      const msg = e instanceof Error ? e.message : 'Erro ao calcular. Verifique se o servidor Java está rodando.';
+      setErro(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
       calculandoRef.current = false;
@@ -139,6 +156,7 @@ export function useCalculadora() {
   const handleRemoverLancamento = (id: number) => {
     if (window.confirm("Tem certeza que deseja remover este lançamento?")) {
       setLancamentos(prev => prev.filter(l => l.id !== id));
+      toast.success("Lançamento removido");
     }
   };
 
@@ -147,6 +165,7 @@ export function useCalculadora() {
       setLancamentos([]);
       setLancamentosOrigem({});
       setEditandoId(null);
+      toast.success("Todos os lançamentos foram removidos");
     }
   };
 
@@ -189,9 +208,12 @@ export function useCalculadora() {
 
       setLancamentos(prev => [...prev, ...novosResultados]);
       setLancamentosOrigem(prev => ({ ...prev, ...novoOrigemMap }));
+      toast.success("Parcelas duplicadas com sucesso!");
 
     } catch (e: unknown) {
-      setErro(e instanceof Error ? e.message : 'Erro ao duplicar parcelas.');
+      const msg = e instanceof Error ? e.message : 'Erro ao duplicar parcelas.';
+      setErro(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

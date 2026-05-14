@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Lancamentos from './components/Lancamentos/Lancamentos';
 import { useCalculadora } from './hooks/useCalculadora';
 import type { FormState, JurosState, LancamentoItem } from './types';
+import { Toaster } from 'react-hot-toast';
 
 export type { FormState, JurosState, LancamentoItem };
 
@@ -30,7 +31,8 @@ function App() {
   } = useCalculadora();
 
   return (
-    <div className="flex flex-col bg-gray-200 min-h-screen w-full overflow-x-hidden">
+    <div className="flex flex-col bg-slate-100 dark:bg-[#010409] min-h-screen w-full overflow-x-hidden transition-colors duration-200">
+      <Toaster position="top-right" />
       <Header />
       <div className="flex flex-col gap-4 w-full max-w-[1400px] mx-auto px-3 sm:px-4 md:px-8 pt-4 md:pt-8 pb-6">
         <CentralCard

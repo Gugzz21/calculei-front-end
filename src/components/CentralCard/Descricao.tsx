@@ -15,11 +15,11 @@ function Descricao({ value, onChange }: DescricaoProps) {
 
   return (
     <div className="flex flex-col gap-1">
-      <strong className="text-[14px] text-gray-700 font-semibold">Descrição</strong>
+      <strong className="text-[14px] text-gray-700 dark:text-gray-300 font-semibold">Descrição</strong>
 
       {!isOther ? (
         <select
-          className="bg-white border border-gray-300 h-[45px] w-full px-2.5 rounded-md text-sm text-gray-700 outline-none cursor-pointer"
+          className="bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none cursor-pointer transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500"
           value={value}
           onChange={(e) => {
             if (e.target.value === "outros") {
@@ -35,7 +35,7 @@ function Descricao({ value, onChange }: DescricaoProps) {
           ))}
         </select>
       ) : (
-        <div className="flex items-center bg-white border border-gray-300 h-[45px] w-full px-2.5 rounded-md text-sm text-gray-700 focus-within:border-blue-500 transition-colors">
+        <div className="flex items-center bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[45px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500">
           <input
             type="text"
             className="flex-1 outline-none bg-transparent"

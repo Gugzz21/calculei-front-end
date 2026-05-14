@@ -40,7 +40,7 @@ function Paginacao({
 
       {/* "Ir para" — oculto em telas muito pequenas */}
       <div className="hidden sm:flex items-center gap-2">
-        <span className="text-sm text-gray-500 whitespace-nowrap">Ir para:</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">Ir para:</span>
         <input
           type="number"
           min={1}
@@ -51,7 +51,7 @@ function Paginacao({
           onKeyDown={(e) => {
             if (e.key === "Enter") commit(e.currentTarget.value);
           }}
-          className="w-14 h-8 text-center border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
+          className="w-14 h-8 text-center border border-gray-300 dark:border-[#21262d] rounded text-sm focus:outline-none focus:border-blue-500 bg-white dark:bg-[#010409] text-gray-700 dark:text-gray-200"
         />
       </div>
 
@@ -62,8 +62,8 @@ function Paginacao({
           disabled={currentPage === 1}
           className={`flex items-center justify-center w-8 h-8 rounded border ${
             currentPage === 1
-              ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
-              : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
+              ? "border-gray-200 dark:border-[#21262d] text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-[#010409] cursor-not-allowed"
+              : "border-gray-300 dark:border-[#21262d] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#0d1117] hover:bg-gray-100 dark:hover:bg-[#1e232b]"
           } transition-colors`}
           title="Página Anterior"
         >
@@ -76,8 +76,8 @@ function Paginacao({
             onClick={() => onGoToPage(page)}
             className={`w-8 h-8 rounded border text-sm font-medium ${
               currentPage === page
-                ? "border-blue-500 bg-blue-50 text-blue-600"
-                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                ? "border-blue-500 bg-blue-50 dark:bg-[#007aff]/20 text-blue-600 dark:text-[#007aff]"
+                : "border-gray-300 dark:border-[#21262d] bg-white dark:bg-[#0d1117] text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1e232b]"
             }`}
           >
             {page}
@@ -89,8 +89,8 @@ function Paginacao({
           disabled={currentPage === totalPages}
           className={`flex items-center justify-center w-8 h-8 rounded border ${
             currentPage === totalPages
-              ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
-              : "border-gray-300 text-gray-700 bg-white hover:bg-gray-100"
+              ? "border-gray-200 dark:border-[#21262d] text-gray-400 dark:text-slate-500 bg-gray-50 dark:bg-[#010409] cursor-not-allowed"
+              : "border-gray-300 dark:border-[#21262d] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#0d1117] hover:bg-gray-100 dark:hover:bg-[#1e232b]"
           } transition-colors`}
           title="Próxima Página"
         >
