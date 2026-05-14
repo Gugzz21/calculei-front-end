@@ -114,6 +114,12 @@ const BCB_DIRECT_INDICES = new Set([
   ...Object.keys(BCB_SERIES),
   ...Object.keys(BCB_DAILY_SERIES),
 ]);
+// ─── Cache ────────────────────────────────────────────────────────────────────
+const API_CACHE = new Map<string, CalcResponse>();
+
+function getCacheKey(type: string, indice: string, req: CalcRequest, extra?: string | number): string {
+  return `${type}:${indice}:${req.valor}:${req.dateInit}:${req.dateFim}${extra ? `:${extra}` : ""}`;
+}
 
 // ─── Funções de Transporte HTTP ───────────────────────────────────────────────
 
@@ -393,9 +399,15 @@ export async function calcularIndice(
   // Índice "sem correção monetária" — comportamento esperado
   if (CORRECAO_ENDPOINTS[indice] === null) return null;
 
+  // 0. Checar Cache
+  const cacheKey = getCacheKey("indice", indice, req);
+  if (API_CACHE.has(cacheKey)) return API_CACHE.get(cacheKey) || null;
+
   // 1. Índices com série BCB → ir direto ao BCB (mais rápido e confiável)
   if (BCB_DIRECT_INDICES.has(indice)) {
-    return fetchFromBcb(indice, req);
+    const res = await fetchFromBcb(indice, req);
+    if (res) API_CACHE.set(cacheKey, res);
+    return res;
   }
 
   // 2. Tentar backend Java (TJ/RJ e outros sem série BCB)
@@ -412,14 +424,18 @@ export async function calcularIndice(
         throw new Error("Java retornou resposta vazia (sem dados no BD)");
       }
 
-      return normalizeBackendResponse(data, req, endpoint);
+      const res = normalizeBackendResponse(data, req, endpoint);
+      API_CACHE.set(cacheKey, res);
+      return res;
     } catch {
       // Java falhou → tentar BCB como último recurso
     }
   }
 
   // 3. Fallback final: BCB
-  return fetchFromBcb(indice, req);
+  const resBcb = await fetchFromBcb(indice, req);
+  if (resBcb) API_CACHE.set(cacheKey, resBcb);
+  return resBcb;
 }
 
 // ─── API Pública — Juros ──────────────────────────────────────────────────────
@@ -438,9 +454,15 @@ export async function calcularJuros(
   req: CalcRequest,
   taxaAnualPercentual?: number
 ): Promise<CalcResponse | null> {
+  // 0. Checar Cache
+  const cacheKey = getCacheKey("juros", indice, req, taxaAnualPercentual);
+  if (API_CACHE.has(cacheKey)) return API_CACHE.get(cacheKey) || null;
+
   // 1. Índices com série BCB → ir direto ao BCB
   if (BCB_DIRECT_INDICES.has(indice)) {
-    return fetchFromBcb(indice, req);
+    const res = await fetchFromBcb(indice, req);
+    if (res) API_CACHE.set(cacheKey, res);
+    return res;
   }
 
   // 2. Para taxa especificada pelo usuário, o endpoint é dinâmico
@@ -461,7 +483,9 @@ export async function calcularJuros(
         throw new Error("Java retornou resposta vazia (sem dados no BD)");
       }
 
-      return normalizeBackendResponse(data, req, endpoint);
+      const res = normalizeBackendResponse(data, req, endpoint);
+      API_CACHE.set(cacheKey, res);
+      return res;
     } catch {
       // Java falhou ou sem dados → tentar BCB
     }
@@ -469,7 +493,10 @@ export async function calcularJuros(
 
   // 4. Fallback: BCB (cobre selic, cdi caso não estejam em BCB_DIRECT_INDICES)
   const bcbData = await fetchFromBcb(indice, req);
-  if (bcbData) return bcbData;
+  if (bcbData) {
+    API_CACHE.set(cacheKey, bcbData);
+    return bcbData;
+  }
 
   // 5. Cálculo local (apenas para taxas sem endpoint e sem série BCB)
   if (taxaAnualPercentual !== undefined && !isNaN(taxaAnualPercentual)) {
@@ -478,13 +505,15 @@ export async function calcularJuros(
     const taxaMensal  = taxaAnualPercentual / 100 / 12;
     const jurosSimples = req.valor * taxaMensal * meses;
 
-    return {
+    const resLocal = {
       dataInicio:          req.dateInit,
       dataFim:             req.dateFim,
       dias,
       valorAcumulado:      req.valor + jurosSimples,
       percentualAcumulado: taxaMensal * meses * 100,
     };
+    API_CACHE.set(cacheKey, resLocal);
+    return resLocal;
   }
 
   return null;

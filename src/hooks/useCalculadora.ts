@@ -178,8 +178,7 @@ export function useCalculadora() {
 
     try {
       // Tamanho do lote de requisições paralelas
-      // Evita sobrecarregar o backend com 100 chamadas simultâneas
-      const LOTE = 5;
+      const LOTE = 15;
 
       const novosResultados: LancamentoItem[] = [];
       const novoOrigemMap: Record<number, { form: FormState; juros: JurosState }> = {};
