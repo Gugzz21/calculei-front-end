@@ -1,11 +1,12 @@
 import { useState, useRef } from "react";
+import { saveAs } from "file-saver";
 import { usePagination } from "../../hooks/usePagination";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 import type { LancamentoItem } from "../../types";
 import Paginacao from "./Paginacao";
 import TabelaLancamentos from "./TabelaLancamentos";
 import BotoesExport from "./BotoesExport";
-import ModalToken from "./ModalToken";
+import ModalRelatorio from "./ModalRelatorio";
 import ModalDuplicar from "./ModalDuplicar";
 import { exportarParaPDF } from "./exportPDF";
 import { baixarImagem } from "./exportImagem";
@@ -18,7 +19,8 @@ function Lancamentos() {
     loading,
     handleRemoverLancamento,
     handleEditar,
-    handleConfirmarDuplicacao
+    handleConfirmarDuplicacao,
+    ufirValue
   } = useCalculadoraContext();
 
   const tableRef = useRef<HTMLDivElement>(null);
@@ -41,7 +43,11 @@ function Lancamentos() {
   const currentItems = lancamentos.slice(startIndex, startIndex + itemsPerPage);
 
   // ── Modais ─────────────────────────────────────────────────────────────────
-  const [modalToken, setModalToken] = useState<string | null>(null);
+  const [modalExport, setModalExport] = useState<{
+    type: "pdf" | "imagem" | "excel";
+    token: string;
+    data?: any;
+  } | null>(null);
   const [duplicandoItem, setDuplicandoItem] = useState<LancamentoItem | null>(null);
   const [salvandoPDF, setSalvandoPDF] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -51,7 +57,8 @@ function Lancamentos() {
   const handleGerarPDF = async () => {
     setSalvandoPDF(true);
     try {
-      await exportarParaPDF(lancamentos);
+      const { token, doc } = await exportarParaPDF(lancamentos, ufirValue);
+      setModalExport({ type: "pdf", token, data: doc });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Erro desconhecido.";
       if (msg.includes("histórico")) {
@@ -72,8 +79,10 @@ function Lancamentos() {
         return;
       }
       try {
-        const token = await baixarImagem(lancamentos, exportRef.current);
-        if (token) setModalToken(token);
+        const result = await baixarImagem(lancamentos, exportRef.current);
+        if (result) {
+          setModalExport({ type: "imagem", token: result.token, data: result.dataUrl });
+        }
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "Erro desconhecido.";
         if (msg.includes("histórico")) {
@@ -95,7 +104,27 @@ function Lancamentos() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <>
-      {modalToken && <ModalToken token={modalToken} onClose={() => setModalToken(null)} />}
+      {modalExport && (
+        <ModalRelatorio
+          type={modalExport.type}
+          token={modalExport.token}
+          onClose={() => setModalExport(null)}
+          onDownload={() => {
+            if (!modalExport.data) return;
+            if (modalExport.type === "pdf") {
+              modalExport.data.save("relatorio-lancamentos.pdf");
+            } else if (modalExport.type === "excel") {
+              saveAs(modalExport.data.blob, modalExport.data.filename);
+            } else if (modalExport.type === "imagem") {
+              const link = document.createElement("a");
+              link.download = "tabela-lancamentos.jpg";
+              link.href = modalExport.data;
+              link.click();
+            }
+            setModalExport(null);
+          }}
+        />
+      )}
       <ModalDuplicar
         isOpen={!!duplicandoItem}
         onClose={() => setDuplicandoItem(null)}
@@ -132,8 +161,8 @@ function Lancamentos() {
           onBaixarImagem={handleBaixarImagem}
           onExportarExcel={async () => {
             try {
-              await exportarParaExcel(lancamentos);
-              toast.success("Excel exportado com sucesso!");
+              const { token, blob, filename } = await exportarParaExcel(lancamentos, ufirValue);
+              setModalExport({ type: "excel", token, data: { blob, filename } });
             } catch (e) {
               toast.error("Erro ao gerar o Excel.");
               console.error(e);

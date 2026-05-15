@@ -31,7 +31,8 @@ const COLUNAS_PDF = [
 
 function adicionarTotalGeral(
   doc: jsPDF,
-  items: any[]
+  items: any[],
+  ufirValue: number = 0
 ) {
   const finalY = (doc as any).lastAutoTable.finalY;
   const tot = {
@@ -56,6 +57,28 @@ function adicionarTotalGeral(
     },
     columnStyles: COL_STYLES,
   });
+
+  if (ufirValue > 0) {
+    const totalUfir = tot.total / ufirValue;
+    const finalY2 = (doc as any).lastAutoTable.finalY;
+    autoTable(doc, {
+      body: [[
+        `TOTAL EM UFIR (Valor UFIR: ${ufirValue.toFixed(4)})`,
+        totalUfir.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+      ]],
+      startY: finalY2,
+      margin: { left: 14, right: 14 },
+      styles: {
+        fontSize: 8, fontStyle: "bold",
+        fillColor: [239, 246, 255], textColor: [7, 51, 101],
+        lineWidth: 0.1, lineColor: [180, 180, 180],
+      },
+      columnStyles: {
+        0: { cellWidth: 236, halign: "right" },
+        1: { cellWidth: 26, halign: "right" },
+      }
+    });
+  }
 }
 
 /**
@@ -136,7 +159,10 @@ function adicionarPaginacao(doc: jsPDF) {
  * O token de recuperação é gerado, salvo no backend e inserido no próprio PDF.
  * Retorna void (não mais exibe popup).
  */
-export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<void> {
+export async function exportarParaPDF(
+  lancamentos: LancamentoItem[],
+  ufirValue: number = 0
+): Promise<{ token: string; doc: jsPDF }> {
   const token = gerarUUID();
   const link = `${window.location.origin}/?token=${token}`;
 
@@ -170,7 +196,7 @@ export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<vo
     alternateRowStyles: { fillColor: [255, 255, 255] },
   });
 
-  if (lancamentos.length > 1) adicionarTotalGeral(doc, lancamentos);
+  if (lancamentos.length > 0) adicionarTotalGeral(doc, lancamentos, ufirValue);
 
   // ── Bloco do link no PDF ──────────────────────────────────────────────────
   adicionarBlocoToken(doc, link);
@@ -178,7 +204,7 @@ export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<vo
   // ── Paginação (depois do bloco para não sobrescrever) ─────────────────────
   adicionarPaginacao(doc);
 
-  doc.save("relatorio-lancamentos.pdf");
+  // doc.save("relatorio-lancamentos.pdf");
 
   // ── Salvar no backend (após download para não bloquear) ───────────────────
   await salvarHistorico({
@@ -208,6 +234,8 @@ export async function exportarParaPDF(lancamentos: LancamentoItem[]): Promise<vo
       })),
     },
   });
+
+  return { token, doc };
 }
 
 // ─── PDF de recuperação ───────────────────────────────────────────────────────

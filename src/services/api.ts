@@ -8,7 +8,7 @@
 // =============================================================================
 
 const BACKEND_BASE_URL = "/api";
-const BCB_BASE_URL     = "https://api.bcb.gov.br/dados/serie";
+const BCB_BASE_URL = "https://api.bcb.gov.br/dados/serie";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -24,22 +24,22 @@ export interface CalcRequest {
 
 /** Payload esperado pelo Spring Boot em todos os endpoints POST */
 interface BackendPayload {
-  amount:    number;
+  amount: number;
   startDate: string;
-  endDate:   string;
+  endDate: string;
 }
 
 /** Resposta normalizada entregue a todos os consumidores do frontend */
 export interface CalcResponse {
-  dataInicio:           string;
-  dataFim:              string;
-  dias:                 number;
-  valorAcumulado?:      number;
-  valorFinal?:          number;
-  valueFinal?:          number;
+  dataInicio: string;
+  dataFim: string;
+  dias: number;
+  valorAcumulado?: number;
+  valorFinal?: number;
+  valueFinal?: number;
   percentualAcumulado?: number;
-  fatorAcumulado?:      number;
-  accumulatedFactor?:   number;
+  fatorAcumulado?: number;
+  accumulatedFactor?: number;
 }
 
 // ─── Mapa de Endpoints ────────────────────────────────────────────────────────
@@ -53,33 +53,33 @@ export interface CalcResponse {
 
 const CORRECAO_ENDPOINTS: Record<string, string | null> = {
   // ✅ Endpoints Java com dados
-  ipcae:                   "/ipcae/calculate/between-dates",
-  tr:                      "/tr/calculate/between-dates",
+  ipcae: "/ipcae/calculate/between-dates",
+  tr: "/tr/calculate/between-dates",
   // ⚠️ Endpoints Java sem dados → fallback para BCB
-  ipca:                    "/ipca/calculate/between-dates",
-  igpm:                    "/igpm/calculate/between-dates",
-  igpdi:                   "/igpdi/calculate/between-dates",
-  cdi:                     "/cdi/calculate/between-dates",
-  selic:                   "/selic-mensal/calculate/between-dates",
+  ipca: "/ipca/calculate/between-dates",
+  igpm: "/igpm/calculate/between-dates",
+  igpdi: "/igpdi/calculate/between-dates",
+  cdi: "/cdi/calculate/between-dates",
+  selic: "/selic/mensal/calculate/between-dates",
   tjrj119602009ipcaeselic: "/tj11960/calculate/between-dates",
-  tjrj6899:                "/tj6899/calculate/between-dates",
+  tjrj6899: "/tj6899/calculate/between-dates",
   // Sem correção monetária — retorna null intencionalmente
-  semcorrecaomonetaria:    null,
+  semcorrecaomonetaria: null,
 };
 
 const JUROS_ENDPOINTS: Record<string, string | null> = {
   // ✅ Endpoints Java com dados
-  jurossimples6:   "/simple-interest/6",
-  jurossimples12:  "/simple-interest/12",
-  codigocivil:     "/simple-interest/period",
-  codigo:          "/simple-interest/period",
+  jurossimples6: "/simple-interest/6",
+  jurossimples12: "/simple-interest/12",
+  codigocivil: "/simple-interest/period",
+  codigo: "/simple-interest/period",
   // ⚠️ Endpoints Java sem dados → fallback para BCB
-  selic:           "/selic-mensal/calculate/between-dates",
-  cdi:             "/cdi/calculate/between-dates",
-  taxalegal:       "/taxalegal/calculate/between-dates",
-  poupancanova:    "/poupanca/nova/calculate/between-dates",
-  poupancaantiga:  "/poupanca/antiga/calculate/between-dates",
-  poupanca:        "/poupanca/nova/calculate/between-dates",
+  selic: "/selic/diario/calculate/between-dates",
+  cdi: "/cdi/calculate/between-dates",
+  taxalegal: "/taxalegal/calculate/between-dates",
+  poupancanova: "/poupanca/nova/calculate/between-dates",
+  poupancaantiga: "/poupanca/antiga/calculate/between-dates",
+  poupanca: "/poupanca/nova/calculate/between-dates",
   // Resolvido dinamicamente pela taxa informada pelo usuário
   especificartaxa: null,
 };
@@ -89,10 +89,10 @@ const JUROS_ENDPOINTS: Record<string, string | null> = {
  * Fonte: https://www.bcb.gov.br/estatisticas/tabelasespeciais
  */
 const BCB_SERIES: Record<string, number> = {
-  ipca:  433,
+  ipca: 433,
   ipcae: 10764,
-  igpm:  189,
-  tr:    7811,  
+  igpm: 189,
+  tr: 7811,
   igpdi: 190,
 };
 
@@ -103,7 +103,7 @@ const BCB_SERIES: Record<string, number> = {
  */
 const BCB_DAILY_SERIES: Record<string, number> = {
   selic: 11,
-  cdi:   12,
+  cdi: 12,
 };
 
 /**
@@ -133,14 +133,14 @@ const BACKEND_TIMEOUT_MS = 3_000;
  */
 async function postToBackend(endpoint: string, payload: BackendPayload): Promise<unknown> {
   const controller = new AbortController();
-  const timeoutId  = setTimeout(() => controller.abort(), BACKEND_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), BACKEND_TIMEOUT_MS);
 
   try {
     const response = await fetch(`${BACKEND_BASE_URL}${endpoint}`, {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload),
-      signal:  controller.signal,
+      body: JSON.stringify(payload),
+      signal: controller.signal,
     });
 
     if (!response.ok) {
@@ -171,7 +171,7 @@ async function fetchMonthlyFromBcb(
   serieId: number,
   req: CalcRequest
 ): Promise<number | null> {
-  const url      = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(req.dateInit)}&dataFinal=${toBcbDate(req.dateFim)}`;
+  const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(req.dateInit)}&dataFinal=${toBcbDate(req.dateFim)}`;
   const response = await fetch(url);
   if (!response.ok) return null;
 
@@ -204,8 +204,8 @@ async function fetchDailyFromBcb(
   const MAX_YEARS_PER_WINDOW = 9; // usa 9 para ter margem de segurança
 
   let currentDate = new Date(req.dateInit);
-  const endDate   = new Date(req.dateFim);
-  let fatorTotal  = 1;
+  const endDate = new Date(req.dateFim);
+  let fatorTotal = 1;
   let encontrouDados = false;
 
   while (currentDate < endDate) {
@@ -215,9 +215,9 @@ async function fetchDailyFromBcb(
     if (windowEnd > endDate) windowEnd.setTime(endDate.getTime());
 
     const inicio = currentDate.toISOString().split("T")[0];
-    const fim    = windowEnd.toISOString().split("T")[0];
+    const fim = windowEnd.toISOString().split("T")[0];
 
-    const url      = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(inicio)}&dataFinal=${toBcbDate(fim)}`;
+    const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(inicio)}&dataFinal=${toBcbDate(fim)}`;
     const response = await fetch(url);
 
     if (response.ok) {
@@ -256,18 +256,18 @@ async function fetchFromBcb(indice: string, req: CalcRequest): Promise<CalcRespo
     if (fatorAcumulado === null || fatorAcumulado <= 0) return null;
 
     const valorFinal = req.valor * fatorAcumulado;
-    const dias       = calcularDias(req.dateInit, req.dateFim);
+    const dias = calcularDias(req.dateInit, req.dateFim);
 
     return {
-      dataInicio:          req.dateInit,
-      dataFim:             req.dateFim,
+      dataInicio: req.dateInit,
+      dataFim: req.dateFim,
       dias,
-      valorAcumulado:      valorFinal,
+      valorAcumulado: valorFinal,
       valorFinal,
-      valueFinal:          valorFinal,
+      valueFinal: valorFinal,
       percentualAcumulado: (fatorAcumulado - 1) * 100,
       fatorAcumulado,
-      accumulatedFactor:   fatorAcumulado,
+      accumulatedFactor: fatorAcumulado,
     };
   } catch {
     console.warn(`[BCB] Falha ao buscar dados para o índice "${indice}"`);
@@ -302,22 +302,22 @@ function normalizeBackendResponse(
   // Esses endpoints retornam apenas { amount, startDate, endDate }.
   // "amount" é o total acumulado (principal + juros) já calculado pelo Java.
   if (endpoint.includes("/simple-interest/")) {
-    const totalAcumulado    = (data.amount ?? req.valor) as number;
+    const totalAcumulado = (data.amount ?? req.valor) as number;
     const percentualAcumulado = req.valor > 0
       ? ((totalAcumulado / req.valor) - 1) * 100
       : 0;
-    const fatorAcumulado    = req.valor > 0 ? totalAcumulado / req.valor : 1;
+    const fatorAcumulado = req.valor > 0 ? totalAcumulado / req.valor : 1;
 
     return {
-      dataInicio:          req.dateInit,
-      dataFim:             req.dateFim,
-      dias:                calcularDias(req.dateInit, req.dateFim), // Java não retorna dias
-      valorAcumulado:      totalAcumulado,
-      valorFinal:          totalAcumulado,
-      valueFinal:          totalAcumulado,
+      dataInicio: req.dateInit,
+      dataFim: req.dateFim,
+      dias: calcularDias(req.dateInit, req.dateFim), // Java não retorna dias
+      valorAcumulado: totalAcumulado,
+      valorFinal: totalAcumulado,
+      valueFinal: totalAcumulado,
       percentualAcumulado,
       fatorAcumulado,
-      accumulatedFactor:   fatorAcumulado,
+      accumulatedFactor: fatorAcumulado,
     };
   }
 
@@ -329,7 +329,7 @@ function normalizeBackendResponse(
   // O campo com o valor final varia por endpoint
   const valorFinal = (
     data.valorAcumulado ?? data.valorFinal ?? data.valueFinal
-    ?? data.finalValue  ?? data.amount
+    ?? data.finalValue ?? data.amount
     ?? req.valor
   ) as number;
 
@@ -350,12 +350,12 @@ function normalizeBackendResponse(
   }
 
   return {
-    dataInicio:      req.dateInit,
-    dataFim:         req.dateFim,
+    dataInicio: req.dateInit,
+    dataFim: req.dateFim,
     dias,
-    valorAcumulado:  valorFinal,
+    valorAcumulado: valorFinal,
     valorFinal,
-    valueFinal:      valorFinal,
+    valueFinal: valorFinal,
     fatorAcumulado,
     percentualAcumulado,
   };
@@ -424,9 +424,9 @@ export async function calcularIndice(
   if (endpoint) {
     try {
       const data = await postToBackend(endpoint, {
-        amount:    req.valor,
+        amount: req.valor,
         startDate: req.dateInit,
-        endDate:   req.dateFim,
+        endDate: req.dateFim,
       }) as Record<string, unknown>;
 
       if (!isBackendResponseValida(data, req)) {
@@ -483,9 +483,9 @@ export async function calcularJuros(
   if (endpoint) {
     try {
       const data = await postToBackend(endpoint, {
-        amount:    req.valor,
+        amount: req.valor,
         startDate: req.dateInit,
-        endDate:   req.dateFim,
+        endDate: req.dateFim,
       }) as Record<string, unknown>;
 
       if (!isBackendResponseValida(data, req)) {
@@ -509,16 +509,16 @@ export async function calcularJuros(
 
   // 5. Cálculo local (apenas para taxas sem endpoint e sem série BCB)
   if (taxaAnualPercentual !== undefined && !isNaN(taxaAnualPercentual)) {
-    const dias        = calcularDias(req.dateInit, req.dateFim);
-    const meses       = dias / 30;
-    const taxaMensal  = taxaAnualPercentual / 100 / 12;
+    const dias = calcularDias(req.dateInit, req.dateFim);
+    const meses = dias / 30;
+    const taxaMensal = taxaAnualPercentual / 100 / 12;
     const jurosSimples = req.valor * taxaMensal * meses;
 
     const resLocal = {
-      dataInicio:          req.dateInit,
-      dataFim:             req.dateFim,
+      dataInicio: req.dateInit,
+      dataFim: req.dateFim,
       dias,
-      valorAcumulado:      req.valor + jurosSimples,
+      valorAcumulado: req.valor + jurosSimples,
       percentualAcumulado: taxaMensal * meses * 100,
     };
     API_CACHE.set(cacheKey, resLocal);
@@ -555,9 +555,9 @@ export interface HistoricoPayload {
  */
 export async function salvarHistorico(payload: HistoricoPayload): Promise<void> {
   const response = await fetch(`${BACKEND_BASE_URL}/history/save`, {
-    method:  "POST",
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify(payload),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
@@ -571,9 +571,9 @@ export async function salvarHistorico(payload: HistoricoPayload): Promise<void> 
  * Endpoint: GET /history/findbytoken?token=<token>
  */
 export async function buscarPorToken(token: string): Promise<object> {
-  const url      = `${BACKEND_BASE_URL}/history/findbytoken?token=${encodeURIComponent(token)}`;
+  const url = `${BACKEND_BASE_URL}/history/findbytoken?token=${encodeURIComponent(token)}`;
   const response = await fetch(url, {
-    method:  "GET",
+    method: "GET",
     headers: { "Content-Type": "application/json" },
   });
 
@@ -584,4 +584,20 @@ export async function buscarPorToken(token: string): Promise<object> {
   }
 
   return response.json();
+}
+
+/**
+ * Busca o valor unitário da UFIR no backend.
+ */
+export async function buscarUfirValue(): Promise<number> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/ufir/value`);
+    if (!response.ok) return 0;
+    const data = await response.json();
+    // O backend pode retornar { value: 4.56 } ou apenas o número
+    return typeof data === "number" ? data : (data.value || 0);
+  } catch (error) {
+    console.error("Erro ao buscar valor da UFIR:", error);
+    return 0;
+  }
 }

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useRef } from 'react';
 import type { FormState, JurosState, LancamentoItem } from '../types';
 import { CalculoService } from '../services/CalculoService';
 import { ReplicacaoService } from '../services/ReplicacaoService';
+import { buscarUfirValue } from '../services/api';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
 import toast from 'react-hot-toast';
 
@@ -14,6 +15,7 @@ interface CalculadoraContextData {
   loading: boolean;
   erro: string | null;
   isFormValid: boolean;
+  ufirValue: number;
   
   handleFormChange: (field: keyof FormState, value: string) => void;
   handleJurosChange: (field: keyof JurosState, value: string | boolean | any[]) => void;
@@ -55,8 +57,14 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [ufirValue, setUfirValue] = useState<number>(0);
 
   const calculandoRef = useRef(false);
+
+  // Buscar UFIR ao carregar
+  React.useEffect(() => {
+    buscarUfirValue().then(setUfirValue);
+  }, []);
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 
@@ -178,7 +186,7 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   return (
     <CalculadoraContext.Provider value={{
-      today, form, juros, lancamentos, editandoId, loading, erro, isFormValid,
+      today, form, juros, lancamentos, editandoId, loading, erro, isFormValid, ufirValue,
       handleFormChange, handleJurosChange, handleCalcular, handleLimpar,
       handleEditar, handleCancelarEdicao, handleRemoverLancamento,
       handleLimparTodosLancamentos, handleConfirmarDuplicacao

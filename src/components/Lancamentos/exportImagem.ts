@@ -7,15 +7,15 @@ import { toJpeg } from "html-to-image";
  * Gera e baixa uma imagem JPEG da tabela de lançamentos usando html-to-image.
  * Também salva os dados no backend e retorna o token gerado.
  */
-export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLElement | null): Promise<string> {
+export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLElement | null): Promise<{ token: string, dataUrl: string } | null> {
   if (lancamentos.length === 0) {
     alert("Nenhum lançamento para exportar.");
-    return "";
+    return null;
   }
 
   if (!element) {
     alert("Erro: Elemento da tabela não encontrado.");
-    return "";
+    return null;
   }
 
   // ── Gera token ────────────────────────────────────────────────
@@ -29,12 +29,13 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
     downloadLink.download = "tabela-lancamentos.jpg";
     downloadLink.href = dataUrl;
     document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    // downloadLink.click();
+    // document.body.removeChild(downloadLink);
+    return { token, dataUrl };
   } catch (error) {
     console.error("Erro ao gerar imagem:", error);
     alert("Erro ao gerar imagem.");
-    return "";
+    return null;
   }
 
   // ── Salvar no backend ───────────────────────────────────────────────────────
@@ -66,5 +67,5 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
     },
   });
 
-  return link;
+  // return link;
 }

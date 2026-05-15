@@ -2,10 +2,17 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import type { LancamentoItem } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
+import { gerarUUID } from "../../utils/helpers";
+import { salvarHistorico } from "../../services/api";
 
 
-export async function exportarParaExcel(lancamentos: LancamentoItem[]) {
-  if (!lancamentos || lancamentos.length === 0) return;
+export async function exportarParaExcel(
+  lancamentos: LancamentoItem[],
+  ufirValue: number = 0
+): Promise<{ token: string; blob: Blob; filename: string }> {
+  if (!lancamentos || lancamentos.length === 0) throw new Error("Sem lançamentos para exportar.");
+
+  const token = gerarUUID();
 
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Calculei App';
@@ -165,6 +172,29 @@ export async function exportarParaExcel(lancamentos: LancamentoItem[]) {
     }
   });
 
+  // Adicionar linha de UFIR se houver valor
+  if (ufirValue > 0) {
+    const totalUfir = totalGeral / ufirValue;
+    const ufirRow = worksheet.addRow({
+      descricao: `TOTAL EM UFIR (Valor UFIR: ${ufirValue.toFixed(4)})`,
+      total: totalUfir,
+    });
+    ufirRow.height = 25;
+    ufirRow.eachCell((cell, colNumber) => {
+      cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FF073365' } };
+      cell.alignment = { vertical: 'middle', horizontal: colNumber === 1 ? 'right' : 'center' };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE6F0FF' },
+      };
+      if (colNumber === 11) {
+        cell.numFmt = '#,##0.0000';
+      }
+    });
+    worksheet.mergeCells(`A${ufirRow.number}:J${ufirRow.number}`);
+  }
+
   // Mesclar células da linha de resumo
   worksheet.mergeCells(`A${summaryRow.number}:C${summaryRow.number}`);
 
@@ -172,5 +202,18 @@ export async function exportarParaExcel(lancamentos: LancamentoItem[]) {
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const filename = `calculei_export_${new Date().toISOString().split("T")[0]}.xlsx`;
-  saveAs(blob, filename);
+  // saveAs(blob, filename);
+
+  // Salvar no backend
+  await salvarHistorico({
+    data: new Date().toISOString().split("T")[0],
+    token,
+    json: {
+      geradoEm: new Date().toISOString(),
+      totalLancamentos: lancamentos.length,
+      lancamentos: lancamentos,
+    },
+  });
+
+  return { token, blob, filename };
 }
