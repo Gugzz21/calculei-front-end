@@ -89,8 +89,8 @@ export class CalculoService {
     let dataFim = "";
 
     if (deveAplicar) {
-      for (const aplicado of juros.aplicados) {
-        if (aplicado.dataFim <= aplicado.dataInicio) continue;
+      const promessas = juros.aplicados.map(async (aplicado) => {
+        if (aplicado.dataFim <= aplicado.dataInicio) return null;
 
         const resp = await calcularJuros(
           aplicado.indice,
@@ -98,7 +98,14 @@ export class CalculoService {
           parseFloat(aplicado.taxa.replace(",", "."))
         );
 
-        if (!resp) continue;
+        return { aplicado, resp };
+      });
+
+      const resultados = await Promise.all(promessas);
+
+      for (const res of resultados) {
+        if (!res || !res.resp) continue;
+        const { aplicado, resp } = res;
 
         valorJurosTotal += getValorAtualizado(resp) - valorBase;
         diasTotais += resp.dias ?? 0;

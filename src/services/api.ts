@@ -203,37 +203,44 @@ async function fetchDailyFromBcb(
 ): Promise<number | null> {
   const MAX_YEARS_PER_WINDOW = 9; // usa 9 para ter margem de segurança
 
+  const windows: Array<{ inicio: string; fim: string }> = [];
   let currentDate = new Date(req.dateInit);
   const endDate = new Date(req.dateFim);
-  let fatorTotal = 1;
-  let encontrouDados = false;
 
   while (currentDate < endDate) {
-    // Define o fim da janela atual (até 9 anos à frente ou a data final)
     const windowEnd = new Date(currentDate);
     windowEnd.setFullYear(windowEnd.getFullYear() + MAX_YEARS_PER_WINDOW);
     if (windowEnd > endDate) windowEnd.setTime(endDate.getTime());
 
-    const inicio = currentDate.toISOString().split("T")[0];
-    const fim = windowEnd.toISOString().split("T")[0];
+    windows.push({
+      inicio: currentDate.toISOString().split("T")[0],
+      fim: windowEnd.toISOString().split("T")[0],
+    });
 
-    const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(inicio)}&dataFinal=${toBcbDate(fim)}`;
-    const response = await fetch(url);
-
-    if (response.ok) {
-      const registros: Array<{ valor: string }> = await response.json();
-      if (Array.isArray(registros) && registros.length > 0) {
-        encontrouDados = true;
-        fatorTotal *= registros.reduce(
-          (f, { valor }) => f * (1 + parseFloat(valor.replace(",", ".")) / 100),
-          1
-        );
-      }
-    }
-
-    // Avança para o dia seguinte ao fim desta janela
     windowEnd.setDate(windowEnd.getDate() + 1);
     currentDate = windowEnd;
+  }
+
+  const promessas = windows.map(async (w) => {
+    const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(w.inicio)}&dataFinal=${toBcbDate(w.fim)}`;
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const registros: Array<{ valor: string }> = await response.json();
+    return Array.isArray(registros) && registros.length > 0 ? registros : null;
+  });
+
+  const resultados = await Promise.all(promessas);
+  let fatorTotal = 1;
+  let encontrouDados = false;
+
+  for (const registros of resultados) {
+    if (registros) {
+      encontrouDados = true;
+      fatorTotal *= registros.reduce(
+        (f, { valor }) => f * (1 + parseFloat(valor.replace(",", ".")) / 100),
+        1
+      );
+    }
   }
 
   return encontrouDados ? fatorTotal : null;

@@ -40,7 +40,6 @@ function Juros() {
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 400));
 
       const novosAplicados: any[] = [];
 
