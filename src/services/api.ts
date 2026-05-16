@@ -67,6 +67,10 @@ const CORRECAO_ENDPOINTS: Record<string, string | null> = {
   semcorrecaomonetaria: null,
 };
 
+const UFIR_ENDPOINTS: Record<string, string | null> = {
+  ufir: "/ufir/last-value",
+};
+
 const JUROS_ENDPOINTS: Record<string, string | null> = {
   // ✅ Endpoints Java com dados
   jurossimples6: "/simple-interest/6",
