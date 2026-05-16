@@ -162,7 +162,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
             <div className="flex flex-col">
               <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Fator de juros</span>
               <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">
-                {item.fatorJuros && item.fatorJuros !== 1 ? item.fatorJuros.toFixed(6) : "—"}
+                {item.fatorJuros && item.fatorJuros !== 1 ? item.fatorJuros.toFixed(8) : "—"}
               </span>
             </div>
 

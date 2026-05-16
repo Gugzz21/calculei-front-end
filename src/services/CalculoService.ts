@@ -9,7 +9,7 @@ const INDICES_COM_JUROS_EMBUTIDOS = new Set(["selic", "tjrj119602009ipcaeselic"]
  * da infraestrutura de UI e hooks.
  */
 export class CalculoService {
-  
+
   /**
    * Executa o cálculo completo de um lançamento.
    */
@@ -116,6 +116,7 @@ export class CalculoService {
         dataFim = aplicado.dataFim;
       }
     }
+    percentualAcumulado = (fatorAcumulado - 1) * 100;
 
     return {
       juros: valorJurosTotal,
