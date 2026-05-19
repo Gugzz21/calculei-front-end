@@ -5,7 +5,7 @@ import type { LancamentoRecuperado } from "./types";
 import { formatBRL, formatPercent } from "../../utils/formatters";
 import { formatDate } from "../../utils/dateUtils";
 import { gerarUUID } from "../../utils/helpers";
-import { salvarHistorico } from "../../services/api";
+import { buscarUfirValue, salvarHistorico } from "../../services/api";
 
 // ─── Estilos compartilhados ───────────────────────────────────────────────────
 
@@ -61,9 +61,10 @@ function adicionarTotalGeral(
   if (ufirValue > 0) {
     const totalUfir = tot.total / ufirValue;
     const finalY2 = (doc as any).lastAutoTable.finalY;
+    const ufirFormatado = ufirValue.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
     autoTable(doc, {
       body: [[
-        `TOTAL EM UFIR (Valor UFIR: ${ufirValue.toFixed(4)})`,
+        `Total em ufir (Valor unitário: R$ ${ufirFormatado})`,
         totalUfir.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
       ]],
       startY: finalY2,
@@ -163,6 +164,15 @@ export async function exportarParaPDF(
   lancamentos: LancamentoItem[],
   ufirValue: number = 0
 ): Promise<{ token: string; doc: jsPDF }> {
+  let resolvedUfir = ufirValue;
+  if (resolvedUfir <= 0) {
+    try {
+      resolvedUfir = await buscarUfirValue();
+    } catch (err) {
+      console.error("Erro ao obter UFIR no exportPDF:", err);
+    }
+  }
+
   const token = gerarUUID();
   const link = `${window.location.origin}/?token=${token}`;
 
@@ -196,7 +206,7 @@ export async function exportarParaPDF(
     alternateRowStyles: { fillColor: [255, 255, 255] },
   });
 
-  if (lancamentos.length > 0) adicionarTotalGeral(doc, lancamentos, ufirValue);
+  if (lancamentos.length > 0) adicionarTotalGeral(doc, lancamentos, resolvedUfir);
 
   // ── Bloco do link no PDF ──────────────────────────────────────────────────
   adicionarBlocoToken(doc, link);

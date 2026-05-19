@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
 import type { LancamentoItem } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
 import { gerarUUID } from "../../utils/helpers";
@@ -7,8 +6,7 @@ import { salvarHistorico } from "../../services/api";
 
 
 export async function exportarParaExcel(
-  lancamentos: LancamentoItem[],
-  ufirValue: number = 0
+  lancamentos: LancamentoItem[]
 ): Promise<{ token: string; blob: Blob; filename: string }> {
   if (!lancamentos || lancamentos.length === 0) throw new Error("Sem lançamentos para exportar.");
 
@@ -171,29 +169,6 @@ export async function exportarParaExcel(
       cell.numFmt = currencyFormat;
     }
   });
-
-  // Adicionar linha de UFIR se houver valor
-  if (ufirValue > 0) {
-    const totalUfir = totalGeral / ufirValue;
-    const ufirRow = worksheet.addRow({
-      descricao: `TOTAL EM UFIR (Valor UFIR: ${ufirValue.toFixed(4)})`,
-      total: totalUfir,
-    });
-    ufirRow.height = 25;
-    ufirRow.eachCell((cell, colNumber) => {
-      cell.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FF073365' } };
-      cell.alignment = { vertical: 'middle', horizontal: colNumber === 1 ? 'right' : 'center' };
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE6F0FF' },
-      };
-      if (colNumber === 11) {
-        cell.numFmt = '#,##0.0000';
-      }
-    });
-    worksheet.mergeCells(`A${ufirRow.number}:J${ufirRow.number}`);
-  }
 
   // Mesclar células da linha de resumo
   worksheet.mergeCells(`A${summaryRow.number}:C${summaryRow.number}`);

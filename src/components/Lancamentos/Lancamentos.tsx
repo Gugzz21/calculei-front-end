@@ -161,7 +161,7 @@ function Lancamentos() {
           onBaixarImagem={handleBaixarImagem}
           onExportarExcel={async () => {
             try {
-              const { token, blob, filename } = await exportarParaExcel(lancamentos, ufirValue);
+              const { token, blob, filename } = await exportarParaExcel(lancamentos);
               setModalExport({ type: "excel", token, data: { blob, filename } });
             } catch (e) {
               toast.error("Erro ao gerar o Excel.");

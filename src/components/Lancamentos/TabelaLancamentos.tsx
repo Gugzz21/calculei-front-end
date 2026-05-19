@@ -25,7 +25,7 @@ function TabelaLancamentos({
   onDuplicar,
   forceExpand,
 }: TabelaLancamentosProps) {
-  const { lancamentos, handleLimparTodosLancamentos, ufirValue } = useCalculadoraContext();
+  const { lancamentos, handleLimparTodosLancamentos } = useCalculadoraContext();
 
   const handleRemover = (id: number) => {
     onRemover(id, currentItems.length === 1);
@@ -80,19 +80,6 @@ function TabelaLancamentos({
             <div className="text-[15px]">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</div>
             <div></div>
           </div>
-
-          {/* Linha UFIR Desktop */}
-          {ufirValue > 0 && (
-            <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-3 bg-blue-100/20 dark:bg-[#007aff]/5 border-t border-slate-200 dark:border-[#21262d] text-sm font-bold text-blue-800 dark:text-[#79b8ff]">
-              <div className="col-span-3 pl-12">Total em UFIR (Valor: {ufirValue.toFixed(4)})</div>
-              <div className="col-span-4"></div>
-              <div className="text-[15px]">
-                {(lancamentos.reduce((s, l) => s + l.total, 0) / ufirValue).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
-              </div>
-              <div></div>
-            </div>
-          )}
-
           {/* Footer Mobile */}
           <div className="md:hidden mt-4 flex flex-col items-center justify-between bg-blue-50/30 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] p-4">
             <div className="w-full flex justify-between items-center mb-2">
@@ -103,14 +90,6 @@ function TabelaLancamentos({
               <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Devido Geral</span>
               <span className="text-base font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</span>
             </div>
-            {ufirValue > 0 && (
-              <div className="w-full flex justify-between items-center mt-2 pt-2 border-t border-blue-200/50 dark:border-blue-900/30">
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total em UFIR</span>
-                <span className="text-sm font-bold text-blue-800 dark:text-[#79b8ff]">
-                  {(lancamentos.reduce((s, l) => s + l.total, 0) / ufirValue).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
-                </span>
-              </div>
-            )}
           </div>
         </>
       )}

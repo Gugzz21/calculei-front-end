@@ -20,7 +20,6 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
 
   // ── Gera token ────────────────────────────────────────────────
   const token = gerarUUID();
-  const link = `${window.location.origin}/?token=${token}`;
 
   // ── Download da imagem com html-to-image ─────────────────────────────
   try {
@@ -29,43 +28,40 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
     downloadLink.download = "tabela-lancamentos.jpg";
     downloadLink.href = dataUrl;
     document.body.appendChild(downloadLink);
-    // downloadLink.click();
-    // document.body.removeChild(downloadLink);
+
+    // ── Salvar no backend ───────────────────────────────────────────────────────
+    await salvarHistorico({
+      data: new Date().toISOString().split("T")[0],
+      token,
+      json: {
+        geradoEm: new Date().toISOString(),
+        totalLancamentos: lancamentos.length,
+        lancamentos: lancamentos.map((l) => ({
+          id: l.id,
+          descricao: l.descricao,
+          dataInicial: l.dataInicial,
+          dataCalculo: l.dataCalculo,
+          valorPrincipal: l.valorPrincipal,
+          indiceCorrecao: l.indiceCorrecao,
+          valorAtualizado: l.valorAtualizado,
+          dias: l.dias,
+          percentualCorrecao: l.percentualCorrecao,
+          indiceJuros: l.indiceJuros,
+          dataInicioJuros: l.dataInicioJuros,
+          dataFimJuros: l.dataFimJuros,
+          diasJuros: l.diasJuros,
+          fatorJuros: l.fatorJuros,
+          percentualJurosAcumulado: l.percentualJurosAcumulado,
+          juros: l.juros,
+          total: l.total,
+        })),
+      },
+    });
+
     return { token, dataUrl };
   } catch (error) {
     console.error("Erro ao gerar imagem:", error);
     alert("Erro ao gerar imagem.");
     return null;
   }
-
-  // ── Salvar no backend ───────────────────────────────────────────────────────
-  await salvarHistorico({
-    data: new Date().toISOString().split("T")[0],
-    token,
-    json: {
-      geradoEm: new Date().toISOString(),
-      totalLancamentos: lancamentos.length,
-      lancamentos: lancamentos.map((l) => ({
-        id: l.id,
-        descricao: l.descricao,
-        dataInicial: l.dataInicial,
-        dataCalculo: l.dataCalculo,
-        valorPrincipal: l.valorPrincipal,
-        indiceCorrecao: l.indiceCorrecao,
-        valorAtualizado: l.valorAtualizado,
-        dias: l.dias,
-        percentualCorrecao: l.percentualCorrecao,
-        indiceJuros: l.indiceJuros,
-        dataInicioJuros: l.dataInicioJuros,
-        dataFimJuros: l.dataFimJuros,
-        diasJuros: l.diasJuros,
-        fatorJuros: l.fatorJuros,
-        percentualJurosAcumulado: l.percentualJurosAcumulado,
-        juros: l.juros,
-        total: l.total,
-      })),
-    },
-  });
-
-  // return link;
 }

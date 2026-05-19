@@ -602,11 +602,17 @@ export async function buscarPorToken(token: string): Promise<object> {
  */
 export async function buscarUfirValue(): Promise<number> {
   try {
-    const response = await fetch(`${BACKEND_BASE_URL}/ufir/value`);
+    const endpoint = UFIR_ENDPOINTS.ufir || "/ufir/last-value";
+    const response = await fetch(`${BACKEND_BASE_URL}${endpoint}`);
     if (!response.ok) return 0;
-    const data = await response.json();
-    // O backend pode retornar { value: 4.56 } ou apenas o número
-    return typeof data === "number" ? data : (data.value || 0);
+    const text = await response.text();
+    try {
+      const data = JSON.parse(text);
+      return typeof data === "number" ? data : (data.value || 0);
+    } catch {
+      const num = parseFloat(text);
+      return isNaN(num) ? 0 : num;
+    }
   } catch (error) {
     console.error("Erro ao buscar valor da UFIR:", error);
     return 0;
