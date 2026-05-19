@@ -10,8 +10,8 @@ function Descricao({ value, onChange }: DescricaoProps) {
   const [forceOther, setForceOther] = useState(false);
 
   // Consider it "custom" if it's not in the predefined list, or if it is exactly "outros", or if user forced it
-  const isPredefined = DESCRICAO_OPCOES.some(opt => opt.value === value) && value !== "outros";
-  const isOther = forceOther || !isPredefined;
+  const isPredefined = (DESCRICAO_OPCOES.some(opt => opt.value === value) || value === "") && value !== "outros";
+  const isOther = forceOther || (!isPredefined && value !== "");
 
   return (
     <div className="flex flex-col gap-1">
@@ -30,6 +30,7 @@ function Descricao({ value, onChange }: DescricaoProps) {
             }
           }}
         >
+          <option value="" disabled>Selecione</option>
           {DESCRICAO_OPCOES.map(({ value: v, label }) => (
             <option key={v} value={v}>{label}</option>
           ))}
@@ -50,7 +51,7 @@ function Descricao({ value, onChange }: DescricaoProps) {
             title="Voltar à lista de opções"
             onClick={() => {
               setForceOther(false);
-              onChange(DESCRICAO_OPCOES[0].value);
+              onChange("");
             }}
           >
             ✕

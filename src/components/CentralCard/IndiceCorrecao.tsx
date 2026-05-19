@@ -15,6 +15,7 @@ function IndiceCorrecao({ value, onChange }: IndiceCorrecaoProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
+        <option value="" disabled>Selecione</option>
         {indiceCorrecaoOpcoes.map(({ value: v, label }) => (
           <option key={v} value={v}>{label}</option>
         ))}

@@ -3,7 +3,7 @@ import type { LancamentoItem } from "../../types";
 import { formatBRL, formatPercent } from "../../utils/formatters";
 import { formatDate } from "../../utils/dateUtils";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
@@ -57,7 +57,7 @@ function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplica
           className="text-gray-500 hover:text-red-500 transition-colors"
           title="Remover"
         >
-          <DeleteOutlinedIcon fontSize="small" />
+          <DeleteIcon fontSize="small" />
         </button>
       </div>
     </div>
@@ -83,7 +83,7 @@ function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar
             <ContentCopyIcon fontSize="small" />
           </button>
           <button onClick={(e) => { e.stopPropagation(); onRemover(item.id); }} className="p-1 text-gray-500 hover:text-red-500 transition-colors">
-            <DeleteOutlinedIcon fontSize="small" />
+            <DeleteIcon fontSize="small" />
           </button>
         </div>
       </div>

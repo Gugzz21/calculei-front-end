@@ -16,6 +16,7 @@ function TipoCalculo({ value, onChange }: TipoCalculoProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
+        <option value="" disabled>Selecione</option>
         {TIPO_CALCULO_OPCOES.map(({ value: v, label }) => (
           <option key={v} value={v}>{label}</option>
         ))}

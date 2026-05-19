@@ -38,9 +38,9 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
     valor: '',
     dataInicial: '',
     dataCalculo: today,
-    indiceCorrecao: 'ipcae',
-    tipoCalculo: 'dfazendanaotributario',
-    descricao: 'ressarci',
+    indiceCorrecao: '',
+    tipoCalculo: '',
+    descricao: '',
   });
 
   const [juros, setJuros] = useState<JurosState>({
@@ -127,9 +127,9 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
       valor: '',
       dataInicial: '',
       dataCalculo: today,
-      indiceCorrecao: 'ipcae',
-      tipoCalculo: 'dfazendanaotributario',
-      descricao: 'ressarci',
+      indiceCorrecao: '',
+      tipoCalculo: '',
+      descricao: '',
     });
     setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00', aplicados: [] });
     setEditandoId(null);
@@ -182,7 +182,7 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
-  const isFormValid = !!form.valor && !!form.dataInicial && !!form.dataCalculo;
+  const isFormValid = !!form.valor && !!form.dataInicial && !!form.dataCalculo && !!form.tipoCalculo && !!form.indiceCorrecao && !!form.descricao;
 
   return (
     <CalculadoraContext.Provider value={{

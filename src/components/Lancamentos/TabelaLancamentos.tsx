@@ -1,9 +1,8 @@
 import { formatBRL } from "../../utils/formatters";
 import LancamentoRow from "./LancamentoRow";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 import type { LancamentoItem } from "../../types";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 interface TabelaLancamentosProps {
   currentItems: LancamentoItem[];
   startIndex: number;
@@ -49,7 +48,7 @@ function TabelaLancamentos({
             className="p-1 hover:text-red-600 transition-colors rounded"
             title="Limpar todos os lançamentos"
           >
-            <DeleteOutlinedIcon fontSize="small" />
+            <DeleteIcon fontSize="small" className="text-white hover:text-red-500" />
           </button>
         </div>
       </div>
@@ -57,11 +56,11 @@ function TabelaLancamentos({
       {/* ─── CORPO DA TABELA (Lista de Rows) ─── */}
       <div className="flex flex-col md:block">
         {currentItems.map((item, index) => (
-          <LancamentoRow 
-            key={item.id} 
-            item={item} 
-            index={startIndex + index} 
-            onRemover={handleRemover} 
+          <LancamentoRow
+            key={item.id}
+            item={item}
+            index={startIndex + index}
+            onRemover={handleRemover}
             onEditar={onEditar}
             onDuplicar={onDuplicar}
             forceExpand={forceExpand}
