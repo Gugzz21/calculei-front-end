@@ -4,8 +4,19 @@ import type { ReactNode } from "react";
  * Interface base para dados de um lançamento.
  * Usada para unificar o item da lista e o item recuperado do backend.
  */
+export interface DetalheJuros {
+  indice: string;
+  taxa: string;
+  dataInicio: string;
+  dataFim: string;
+  dias: number;
+  percentual: number;
+  valor: number;
+}
+
 export interface BaseLancamento {
   descricao: string;
+  descricaoComplementar?: string;
   dataInicial: string;
   dataCalculo: string;
   valorPrincipal: number;
@@ -21,6 +32,7 @@ export interface BaseLancamento {
   percentualJurosAcumulado?: number;
   juros: number;
   total: number;
+  itensJuros?: DetalheJuros[];
 }
 
 /**
@@ -41,6 +53,7 @@ export interface FormState {
   indiceCorrecao: string;
   tipoCalculo: string;
   descricao: string;
+  descricaoComplementar: string;
 }
 
 /**

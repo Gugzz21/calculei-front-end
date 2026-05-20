@@ -52,18 +52,16 @@ export interface CalcResponse {
 //   ⚠️ 500  → endpoint existe mas falta dados no BD → BCB é o fallback
 
 const CORRECAO_ENDPOINTS: Record<string, string | null> = {
-  // ✅ Endpoints Java com dados
-  ipcae: "/ipcae/calculate/between-dates",
-  tr: "/tr/calculate/between-dates",
-  // ⚠️ Endpoints Java sem dados → fallback para BCB
+  // ✅ Endpoints Java
   ipca: "/ipca/calculate/between-dates",
+  ipcae: "/ipcae/calculate/between-dates",
   igpm: "/igpm/calculate/between-dates",
   igpdi: "/igpdi/calculate/between-dates",
-  cdi: "/cdi/calculate/between-dates",
-  selic: "/selic/mensal/calculate/between-dates",
+  tr: "/tr/calculate/between-dates",
   tjrj119602009ipcaeselic: "/tj11960/calculate/between-dates",
   tjrj6899: "/tj6899/calculate/between-dates",
-  // Sem correção monetária — retorna null intencionalmente
+  selic: "/selic/diario/calculate/between-dates",
+  cdi: "/cdi/calculate/between-dates",
   semcorrecaomonetaria: null,
 };
 
@@ -72,18 +70,17 @@ const UFIR_ENDPOINTS: Record<string, string | null> = {
 };
 
 const JUROS_ENDPOINTS: Record<string, string | null> = {
-  // ✅ Endpoints Java com dados
+  // ✅ Endpoints Java
   jurossimples6: "/simple-interest/6",
   jurossimples12: "/simple-interest/12",
   codigocivil: "/simple-interest/period",
   codigo: "/simple-interest/period",
-  // ⚠️ Endpoints Java sem dados → fallback para BCB
   selic: "/selic/diario/calculate/between-dates",
   cdi: "/cdi/calculate/between-dates",
   taxalegal: "/taxalegal/calculate/between-dates",
   poupancanova: "/poupanca/nova/calculate/between-dates",
   poupancaantiga: "/poupanca/antiga/calculate/between-dates",
-  poupanca: "/poupanca/nova/calculate/between-dates",
+  poupanca: "/poupanca/antiga-nova/calculate/between-dates",
   // Resolvido dinamicamente pela taxa informada pelo usuário
   especificartaxa: null,
 };
@@ -110,14 +107,7 @@ const BCB_DAILY_SERIES: Record<string, number> = {
   cdi: 12,
 };
 
-/**
- * Índices que vão DIRETAMENTE ao BCB, sem passar pelo Java.
- * Inclui todas as séries mensais e diárias cobertas pelo BCB.
- */
-const BCB_DIRECT_INDICES = new Set([
-  ...Object.keys(BCB_SERIES),
-  ...Object.keys(BCB_DAILY_SERIES),
-]);
+
 // ─── Cache ────────────────────────────────────────────────────────────────────
 const API_CACHE = new Map<string, CalcResponse>();
 
@@ -128,7 +118,7 @@ function getCacheKey(type: string, indice: string, req: CalcRequest, extra?: str
 // ─── Funções de Transporte HTTP ───────────────────────────────────────────────
 
 /** Tempo máximo (ms) que aguardamos o Java antes de tentar o BCB */
-const BACKEND_TIMEOUT_MS = 3_000;
+const BACKEND_TIMEOUT_MS = 1_000;
 
 /**
  * Realiza um POST para um endpoint do backend Java.
@@ -423,12 +413,6 @@ export async function calcularIndice(
   const cacheKey = getCacheKey("indice", indice, req);
   if (API_CACHE.has(cacheKey)) return API_CACHE.get(cacheKey) || null;
 
-  // 1. Índices com série BCB → ir direto ao BCB (mais rápido e confiável)
-  if (BCB_DIRECT_INDICES.has(indice)) {
-    const res = await fetchFromBcb(indice, req);
-    if (res) API_CACHE.set(cacheKey, res);
-    return res;
-  }
 
   // 2. Tentar backend Java (TJ/RJ e outros sem série BCB)
   const endpoint = CORRECAO_ENDPOINTS[indice];
@@ -458,6 +442,20 @@ export async function calcularIndice(
   return resBcb;
 }
 
+/**
+ * Pré-busca silenciosa do índice de correção.
+ * Dispara a requisição em background e guarda no cache.
+ * Quando o usuário clicar em "Calcular", o resultado já estará pronto.
+ */
+export function prefetchIndice(indice: string, req: CalcRequest): void {
+  if (!indice || !req.dateInit || !req.dateFim || !req.valor) return;
+  if (CORRECAO_ENDPOINTS[indice] === null) return; // sem correção — não precisa buscar
+  const cacheKey = getCacheKey("indice", indice, req);
+  if (API_CACHE.has(cacheKey)) return; // já está em cache
+  // Dispara sem await — resultado vai para o cache quando chegar
+  calcularIndice(indice, req).catch(() => { /* silencioso */ });
+}
+
 // ─── API Pública — Juros ──────────────────────────────────────────────────────
 
 /**
@@ -478,12 +476,6 @@ export async function calcularJuros(
   const cacheKey = getCacheKey("juros", indice, req, taxaAnualPercentual);
   if (API_CACHE.has(cacheKey)) return API_CACHE.get(cacheKey) || null;
 
-  // 1. Índices com série BCB → ir direto ao BCB
-  if (BCB_DIRECT_INDICES.has(indice)) {
-    const res = await fetchFromBcb(indice, req);
-    if (res) API_CACHE.set(cacheKey, res);
-    return res;
-  }
 
   // 2. Para taxa especificada pelo usuário, o endpoint é dinâmico
   const endpoint = indice === "especificartaxa" && taxaAnualPercentual !== undefined

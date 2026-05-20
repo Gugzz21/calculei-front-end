@@ -139,7 +139,7 @@ function Juros() {
             type="button"
             onClick={handleAplicar}
             disabled={loading}
-            className="flex items-center justify-center h-[45px] px-6 gap-2 bg-white dark:bg-[#0d1117] border border-gray-300 dark:border-[#21262d] rounded-md text-sm text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-[#1e232b] transition-colors disabled:opacity-50"
+            className="flex items-center justify-center h-[45px] px-6 gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700/60 rounded-md text-sm text-blue-700 dark:text-blue-300 font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50"
           >
             <PercentIcon size={18} />
             {loading ? "Aplicando..." : "Aplicar"}

@@ -82,6 +82,8 @@ function CentralCard() {
           <Descricao
             value={form.descricao}
             onChange={(v) => handleFormChange("descricao", v)}
+            complementar={form.descricaoComplementar}
+            onComplementarChange={(v) => handleFormChange("descricaoComplementar", v)}
           />
         </div>
       </div>

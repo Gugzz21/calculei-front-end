@@ -3,6 +3,12 @@ import LancamentoRow from "./LancamentoRow";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 import type { LancamentoItem } from "../../types";
 import DeleteIcon from "@mui/icons-material/Delete";
+
+// ─── Constante de grid compartilhada com LancamentoRow ───────────────────────
+// expand | Data inicial | Data final | Valor principal | Índice | Fator de correção | Valor corrigido | Juros | Total devido | ações
+export const TABLE_GRID_COLS =
+  "md:grid-cols-[2rem_6rem_6rem_8rem_minmax(8rem,1fr)_8rem_8rem_7rem_8rem_5rem]";
+
 interface TabelaLancamentosProps {
   currentItems: LancamentoItem[];
   startIndex: number;
@@ -32,28 +38,30 @@ function TabelaLancamentos({
 
   return (
     <div className="flex flex-col w-full border border-slate-200 dark:border-[#21262d] rounded-xl shadow-sm overflow-hidden bg-white dark:bg-[#0d1117] transition-colors duration-200">
+
       {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
-      <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-3 bg-slate-50/80 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-200 dark:border-[#21262d] text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider">
-        <div className="text-center"></div> {/* Espaço para ícone de expansão */}
+      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-100 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-200 dark:border-[#21262d] text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider`}>
+        <div /> {/* Ícone expand */}
         <div>Data inicial</div>
         <div>Data final</div>
-        <div>Valor</div>
+        <div>Valor principal</div>
         <div>Índice</div>
-        <div>Correção</div>
+        <div>Fator de correção</div>
+        <div>Valor corrigido</div>
         <div>Juros</div>
         <div>Total devido</div>
-        <div className="flex justify-end pr-1 text-gray-500">
+        <div className="flex justify-end pr-1">
           <button
             onClick={handleLimparTodosLancamentos}
-            className="p-1 hover:text-red-600 transition-colors rounded"
+            className="p-1 text-slate-300 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded"
             title="Limpar todos os lançamentos"
           >
-            <DeleteIcon fontSize="small" className="text-white hover:text-red-500" />
+            <DeleteIcon fontSize="small" />
           </button>
         </div>
       </div>
 
-      {/* ─── CORPO DA TABELA (Lista de Rows) ─── */}
+      {/* ─── CORPO ─── */}
       <div className="flex flex-col md:block">
         {currentItems.map((item, index) => (
           <LancamentoRow
@@ -72,20 +80,23 @@ function TabelaLancamentos({
       {lancamentos.length > 0 && currentPage === totalPages && (
         <>
           {/* Footer Desktop */}
-          <div className="hidden md:grid grid-cols-[2.5rem_6rem_6rem_8rem_minmax(10rem,1fr)_7rem_4rem_8rem_6rem] items-center gap-4 px-4 py-4 bg-blue-50/30 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] text-sm font-bold text-blue-900 dark:text-[#4da3ff]">
-            <div className="col-span-3 pl-12 text-[15px]">Total</div>
+          <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-4 bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] text-sm font-bold text-blue-900 dark:text-[#4da3ff]`}>
+            <div className="col-span-3 pl-8 text-[15px]">Total</div>
             <div>{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</div>
-            <div className="col-span-3"></div>
+            <div className="col-span-2" />
+            <div>{formatBRL(lancamentos.reduce((s, l) => s + l.valorAtualizado, 0))}</div>
+            <div>{formatBRL(lancamentos.reduce((s, l) => s + l.juros, 0))}</div>
             <div className="text-[15px]">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</div>
-            <div></div>
+            <div />
           </div>
+
           {/* Footer Mobile */}
-          <div className="md:hidden mt-4 flex flex-col items-center justify-between bg-blue-50/30 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] p-4">
-            <div className="w-full flex justify-between items-center mb-2">
+          <div className="md:hidden flex flex-col bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] p-4 gap-2">
+            <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Valor</span>
               <span className="text-sm font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</span>
             </div>
-            <div className="w-full flex justify-between items-center">
+            <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Devido Geral</span>
               <span className="text-base font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</span>
             </div>

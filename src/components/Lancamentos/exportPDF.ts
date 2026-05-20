@@ -241,6 +241,7 @@ export async function exportarParaPDF(
         percentualJurosAcumulado: l.percentualJurosAcumulado,
         juros: l.juros,
         total: l.total,
+        itensJuros: l.itensJuros,
       })),
     },
   });

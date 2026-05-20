@@ -32,6 +32,7 @@ export class CalculoService {
     return {
       id: Date.now(),
       descricao: DESCRICAO_LABEL[form.descricao] ?? form.descricao,
+      descricaoComplementar: form.descricaoComplementar || undefined,
       dataInicial: form.dataInicial,
       valorPrincipal: valorBase,
       dataCalculo: form.dataCalculo,
@@ -87,6 +88,7 @@ export class CalculoService {
     let label = "—";
     let dataIni = "";
     let dataFim = "";
+    const itensJuros: any[] = [];
 
     if (deveAplicar) {
       const promessas = juros.aplicados.map(async (aplicado) => {
@@ -107,13 +109,24 @@ export class CalculoService {
         if (!res || !res.resp) continue;
         const { aplicado, resp } = res;
 
-        valorJurosTotal += getValorAtualizado(resp) - valorBase;
+        const valorPeriodo = getValorAtualizado(resp) - valorBase;
+        valorJurosTotal += valorPeriodo;
         diasTotais += resp.dias ?? 0;
         fatorAcumulado *= (resp.fatorAcumulado ?? (1 + (resp.percentualAcumulado ?? 0) / 100));
         percentualAcumulado += resp.percentualAcumulado ?? resp.accumulatedFactor ?? 0;
         label = JUROS_LABEL[aplicado.indice] ?? aplicado.indice;
         dataIni = aplicado.dataInicio;
         dataFim = aplicado.dataFim;
+
+        itensJuros.push({
+          indice: JUROS_LABEL[aplicado.indice] ?? aplicado.indice,
+          taxa: aplicado.taxa,
+          dataInicio: aplicado.dataInicio,
+          dataFim: aplicado.dataFim,
+          dias: resp.dias ?? 0,
+          percentual: resp.percentualAcumulado ?? resp.accumulatedFactor ?? 0,
+          valor: valorPeriodo,
+        });
       }
     }
     percentualAcumulado = (fatorAcumulado - 1) * 100;
@@ -126,6 +139,7 @@ export class CalculoService {
       indiceJuros: label,
       dataInicioJuros: dataIni,
       dataFimJuros: dataFim,
+      itensJuros,
     };
   }
 

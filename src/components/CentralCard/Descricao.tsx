@@ -4,9 +4,11 @@ import { DESCRICAO_OPCOES } from "../../constants/dominios";
 interface DescricaoProps {
   value: string;
   onChange: (value: string) => void;
+  complementar: string;
+  onComplementarChange: (value: string) => void;
 }
 
-function Descricao({ value, onChange }: DescricaoProps) {
+function Descricao({ value, onChange, complementar, onComplementarChange }: DescricaoProps) {
   const [forceOther, setForceOther] = useState(false);
 
   // Consider it "custom" if it's not in the predefined list, or if it is exactly "outros", or if user forced it
@@ -58,6 +60,15 @@ function Descricao({ value, onChange }: DescricaoProps) {
           </button>
         </div>
       )}
+
+      {/* Campo complementar: nº processo, contratada, observações */}
+      <input
+        type="text"
+        className="bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[36px] w-full px-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-slate-400 dark:hover:border-slate-500 placeholder:text-gray-400 dark:placeholder:text-gray-600"
+        placeholder="Nº processo, contratada, observações..."
+        value={complementar}
+        onChange={(e) => onComplementarChange(e.target.value)}
+      />
     </div>
   );
 }

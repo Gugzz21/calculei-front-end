@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useRef } from 'react';
 import type { FormState, JurosState, LancamentoItem } from '../types';
 import { CalculoService } from '../services/CalculoService';
 import { ReplicacaoService } from '../services/ReplicacaoService';
-import { buscarUfirValue } from '../services/api';
+import { buscarUfirValue, prefetchIndice } from '../services/api';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
 import toast from 'react-hot-toast';
 
@@ -41,6 +41,7 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
     indiceCorrecao: '',
     tipoCalculo: '',
     descricao: '',
+    descricaoComplementar: '',
   });
 
   const [juros, setJuros] = useState<JurosState>({
@@ -65,6 +66,21 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
   React.useEffect(() => {
     buscarUfirValue().then(setUfirValue);
   }, []);
+
+  // Pré-busca do índice em background quando o usuário preenche os campos
+  // para que o cáculo final seja instantâneo
+  React.useEffect(() => {
+    if (form.indiceCorrecao && form.dataInicial && form.dataCalculo && form.valor) {
+      const valor = form.valor ? parseInt(form.valor, 10) / 100 : 0;
+      if (valor > 0) {
+        prefetchIndice(form.indiceCorrecao, {
+          valor,
+          dateInit: form.dataInicial,
+          dateFim: form.dataCalculo,
+        });
+      }
+    }
+  }, [form.indiceCorrecao, form.dataInicial, form.dataCalculo, form.valor]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 
@@ -130,6 +146,7 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
       indiceCorrecao: '',
       tipoCalculo: '',
       descricao: '',
+      descricaoComplementar: '',
     });
     setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00', aplicados: [] });
     setEditandoId(null);
@@ -151,18 +168,15 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const handleRemoverLancamento = (id: number) => {
-    if (window.confirm("Remover este lançamento?")) {
-      setLancamentos(prev => prev.filter(l => l.id !== id));
-      toast.success("Removido");
-    }
+    setLancamentos(prev => prev.filter(l => l.id !== id));
+    toast.success("Lançamento removido");
   };
 
   const handleLimparTodosLancamentos = () => {
-    if (window.confirm("Remover todos os lançamentos?")) {
-      setLancamentos([]);
-      setLancamentosOrigem({});
-      setEditandoId(null);
-    }
+    setLancamentos([]);
+    setLancamentosOrigem({});
+    setEditandoId(null);
+    toast.success("Lançamentos removidos");
   };
 
   const handleConfirmarDuplicacao = async (idBase: number, novasDatas: string[]) => {

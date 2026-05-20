@@ -66,26 +66,24 @@ export default function ModalRelatorio({ type, token, onClose, onDownload }: Mod
                         </div>
                     </div>
 
-                    {/* Seção Menção (apenas para Imagem) */}
-                    {type === "imagem" && (
-                        <div className="flex flex-col gap-3">
-                            <p className="text-gray-700 dark:text-gray-300 text-sm font-medium">
-                                Para mencionar o Calculei, utilize o texto abaixo.
-                            </p>
-                            <div className="flex gap-2">
-                                <div className="flex-1 bg-gray-50 dark:bg-[#010409] border border-gray-200 dark:border-[#30363d] rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 italic">
-                                    {textoMencao}
-                                </div>
-                                <button
-                                    onClick={() => copiar(textoMencao, setCopiadoTexto)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#21262d] border border-gray-300 dark:border-[#30363d] rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors"
-                                >
-                                    {copiadoTexto ? <Check size={16} /> : <Copy size={16} />}
-                                    <span>{copiadoTexto ? "Copiar" : "Copiar"}</span>
-                                </button>
+                    {/* Seção Menção (para todos os tipos) */}
+                    <div className="flex flex-col gap-3">
+                        <p className="text-gray-700 dark:text-gray-300 text-sm font-medium">
+                            Para mencionar o Calculei, utilize o texto abaixo.
+                        </p>
+                        <div className="flex gap-2">
+                            <div className="flex-1 bg-gray-50 dark:bg-[#010409] border border-gray-200 dark:border-[#30363d] rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 italic">
+                                {textoMencao}
                             </div>
+                            <button
+                                onClick={() => copiar(textoMencao, setCopiadoTexto)}
+                                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#21262d] border border-gray-300 dark:border-[#30363d] rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#30363d] transition-colors"
+                            >
+                                {copiadoTexto ? <Check size={16} /> : <Copy size={16} />}
+                                <span>{copiadoTexto ? "Copiado!" : "Copiar"}</span>
+                            </button>
                         </div>
-                    )}
+                    </div>
 
                     {/* Botões de Ação */}
                     <div className="flex justify-end items-center gap-3 mt-4">
