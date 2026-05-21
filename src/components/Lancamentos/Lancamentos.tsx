@@ -97,8 +97,11 @@ function Lancamentos() {
   };
 
   const handleRemover = (id: number, isLastInPage: boolean) => {
-    handleRemoverLancamento(id);
-    handleItemRemoved(isLastInPage);
+    if (window.confirm("Tem certeza que deseja remover este lançamento?")) {
+      handleRemoverLancamento(id);
+      handleItemRemoved(isLastInPage);
+      toast.success("Lançamento removido com sucesso!");
+    }
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────

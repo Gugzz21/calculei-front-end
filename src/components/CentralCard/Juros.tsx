@@ -73,7 +73,9 @@ function Juros() {
   };
 
   const handleRemover = (id: number) => {
-    handleJurosChange("aplicados", aplicados.filter((a) => a.id !== id));
+    if (window.confirm("Tem certeza que deseja remover esta taxa de juros aplicada?")) {
+      handleJurosChange("aplicados", aplicados.filter((a) => a.id !== id));
+    }
   };
 
   const mostraTaxa = ["jurossimples6", "jurossimples12", "especificartaxa"].includes(indice);

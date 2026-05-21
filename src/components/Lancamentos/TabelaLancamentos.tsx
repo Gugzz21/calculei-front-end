@@ -52,7 +52,11 @@ function TabelaLancamentos({
         <div>Total devido</div>
         <div className="flex justify-end pr-1">
           <button
-            onClick={handleLimparTodosLancamentos}
+            onClick={() => {
+              if (window.confirm("Tem certeza que deseja apagar TODOS os lançamentos? Esta ação não pode ser desfeita.")) {
+                handleLimparTodosLancamentos();
+              }
+            }}
             className="p-1 text-slate-300 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded"
             title="Limpar todos os lançamentos"
           >
