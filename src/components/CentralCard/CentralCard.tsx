@@ -24,7 +24,7 @@ function CentralCard() {
     handleCancelarEdicao
   } = useCalculadoraContext();
 
-  const jurosEmbutidos = ["selic", "tjrj119602009ipcaeselic"].includes(form.indiceCorrecao);
+  const jurosEmbutidos = ["selic", "tjrj11960"].includes(form.indiceCorrecao);
 
   // Lógica de multa diária (poderia ser movida para um utilitário se crescer)
   let totalDias = 0;

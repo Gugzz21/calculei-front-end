@@ -2,7 +2,7 @@ import { calcularIndice, calcularJuros, getValorAtualizado } from "./api";
 import type { FormState, JurosState, LancamentoItem } from "../types";
 import { INDICE_LABEL, DESCRICAO_LABEL, JUROS_LABEL } from "../constants/dominios";
 
-const INDICES_COM_JUROS_EMBUTIDOS = new Set(["selic", "tjrj119602009ipcaeselic"]);
+const INDICES_COM_JUROS_EMBUTIDOS = new Set(["selic", "tjrj11960"]);
 
 /**
  * CalculoService isola a lógica de negócio de orquestração de cálculos

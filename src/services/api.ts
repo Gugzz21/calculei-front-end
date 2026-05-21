@@ -58,7 +58,7 @@ const CORRECAO_ENDPOINTS: Record<string, string | null> = {
   igpm: "/igpm/calculate/between-dates",
   igpdi: "/igpdi/calculate/between-dates",
   tr: "/tr/calculate/between-dates",
-  tjrj119602009ipcaeselic: "/tj11960/calculate/between-dates",
+  tjrj11960: "/tj11960/calculate/between-dates",
   tjrj6899: "/tj6899/calculate/between-dates",
   selic: "/selic/diario/calculate/between-dates",
   cdi: "/cdi/calculate/between-dates",
@@ -110,6 +110,17 @@ const BCB_DAILY_SERIES: Record<string, number> = {
   cdi: 12,
 };
 
+
+// ─── Tabela UFIR-RJ (Fallback local) ──────────────────────────────────────────
+const UFIR_RJ_HISTORICO: Record<string, number> = {
+  "2026": 4.9604, "2025": 4.7508, "2024": 4.5373, "2023": 4.3329,
+  "2022": 4.0915, "2021": 3.7053, "2020": 3.5550, "2019": 3.4211,
+  "2018": 3.2939, "2017": 3.1999, "2016": 3.0023, "2015": 2.7119,
+  "2014": 2.5473, "2013": 2.4066, "2012": 2.2752, "2011": 2.1352,
+  "2010": 2.0183, "2009": 1.9372, "2008": 1.8258, "2007": 1.7495,
+  "2006": 1.6992, "2005": 1.6049, "2004": 1.4924, "2003": 1.3584,
+  "2002": 1.2130, "2001": 1.1283, "2000": 1.0641,
+};
 
 // ─── Cache ────────────────────────────────────────────────────────────────────
 const API_CACHE = new Map<string, CalcResponse>();
@@ -279,6 +290,39 @@ async function fetchFromBcb(indice: string, req: CalcRequest): Promise<CalcRespo
   }
 }
 
+/**
+ * Fallback local para índices do Tribunal de Justiça do Rio de Janeiro.
+ * Utiliza a tabela histórica da UFIR-RJ para corrigir os valores quando o backend Java falhar.
+ */
+function fetchFromTjRjLocal(req: CalcRequest): CalcResponse | null {
+  const anoInit = req.dateInit.split("-")[0];
+  const anoFim = req.dateFim.split("-")[0];
+
+  const ufirInit = UFIR_RJ_HISTORICO[anoInit];
+  const ufirFim = UFIR_RJ_HISTORICO[anoFim];
+
+  if (!ufirInit || !ufirFim) {
+    console.warn(`[TJ-RJ] Sem dados locais de UFIR para os anos ${anoInit} ou ${anoFim}`);
+    return null;
+  }
+
+  const fatorAcumulado = ufirFim / ufirInit;
+  const valorFinal = req.valor * fatorAcumulado;
+  const dias = calcularDias(req.dateInit, req.dateFim);
+
+  return {
+    dataInicio: req.dateInit,
+    dataFim: req.dateFim,
+    dias,
+    valorAcumulado: valorFinal,
+    valorFinal,
+    valueFinal: valorFinal,
+    percentualAcumulado: (fatorAcumulado - 1) * 100,
+    fatorAcumulado,
+    accumulatedFactor: fatorAcumulado,
+  };
+}
+
 // ─── Normalização de Resposta ─────────────────────────────────────────────────
 
 /**
@@ -435,14 +479,22 @@ export async function calcularIndice(
       API_CACHE.set(cacheKey, res);
       return res;
     } catch {
-      // Java falhou → tentar BCB como último recurso
+      // Java falhou → será tratado no fallback abaixo
+      console.warn(`[API] Fallback ativado para o índice: ${indice}`);
     }
   }
 
-  // 3. Fallback final: BCB
-  const resBcb = await fetchFromBcb(indice, req);
-  if (resBcb) API_CACHE.set(cacheKey, resBcb);
-  return resBcb;
+  // 3. Fallback final: TJRJ Local ou BCB
+  let resFallback: CalcResponse | null = null;
+  
+  if (indice.startsWith("tj")) {
+    resFallback = fetchFromTjRjLocal(req);
+  } else {
+    resFallback = await fetchFromBcb(indice, req);
+  }
+
+  if (resFallback) API_CACHE.set(cacheKey, resFallback);
+  return resFallback;
 }
 
 /**

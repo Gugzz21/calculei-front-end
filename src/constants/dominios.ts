@@ -15,7 +15,7 @@ export const TIPO_CALCULO_OPCOES = [
 /** Mapeamento tipo de cálculo → índice de correção pré-selecionado */
 export const TIPO_CALCULO_INDICE_MAP: Record<string, string> = {
   dfazendatributario: "selic",
-  dfazendanaotributario: "tjrj119602009ipcaeselic",
+  dfazendanaotributario: "tjrj11960",
   abatimentos: "semcorrecaomonetaria",
   cdparticular: "tjrj6899",
   cfazenda: "tjrj6899",
@@ -33,7 +33,7 @@ export const INDICE_LABEL: Record<string, string> = {
   cdi: "CDI",
   selic: "SELIC",
   semcorrecaomonetaria: "SEM CORREÇÃO MONETÁRIA",
-  tjrj119602009ipcaeselic: "TJRJ 11.960/2009",
+  tjrj11960: "TJRJ 11.960/2009",
   tjrj6899: "TJ/RJ Lei 6.899/81 (UFIR-RJ)",
 };
 
@@ -49,7 +49,7 @@ export const MONETARY_CORRECTION_JAVA_MAP: Record<string, string> = {
   IGP_DI: "igpdi",
   TR: "tr",
   IGP_M: "igpm",
-  TJ11960: "tjrj119602009ipcaeselic",
+  TJ11960: "tjrj11960",
   TJ6899: "tjrj6899",
 };
 

@@ -187,6 +187,27 @@ function gerarTabelaCorrecao(
     ]);
   }
 
+  // Linha vazia de espaçamento
+  body.push([{ content: "", colSpan: 8, styles: { fillColor: BRANCO, minCellHeight: 8, lineWidth: 0 } }]);
+
+  // Valor Unitário da UFIR
+  const ufirUnitStr = ufirValue > 0 ? ufirValue.toLocaleString("pt-BR", { minimumFractionDigits: 4, maximumFractionDigits: 4 }) : "Não disponível";
+  body.push([
+    { content: "Valor unitário da UFIR utilizado:", colSpan: 7, styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101], lineWidth: 0.1, lineColor: [7, 51, 101] } },
+    { content: ufirUnitStr, styles: { halign: "center", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO, lineWidth: 0.1, lineColor: [7, 51, 101] } },
+  ]);
+
+  // TOTAL GERAL EM UFIR
+  const totTotalGeral = lancamentos.reduce((s, l) => s + l.total, 0);
+  const totalGeralUfirStr = ufirValue > 0
+    ? (totTotalGeral / ufirValue).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : "—";
+  
+  body.push([
+    { content: "TOTAL GERAL EM UFIR", colSpan: 7, styles: { halign: "left", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101], lineWidth: 0.1, lineColor: [7, 51, 101] } },
+    { content: totalGeralUfirStr, styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101], lineWidth: 0.1, lineColor: [7, 51, 101] } },
+  ]);
+
   // A4 portrait usable width = 210 - 14*2 = 182mm
   // Soma: 9+30+23+34+22+24+22+18 = 182
   const colWidths: { [key: number]: any } = {
@@ -208,7 +229,7 @@ function gerarTabelaCorrecao(
     tableWidth: pw - margin * 2,
     styles: {
       fontSize: 8,
-      cellPadding: { left: 3, right: 3, top: 2.5, bottom: 2.5 },
+      cellPadding: { left: 4, right: 4, top: 4, bottom: 4 },
       valign: "middle",
       lineWidth: 0.1,
       lineColor: [180, 180, 200],
@@ -343,7 +364,7 @@ function gerarTabelaJuros(
     tableWidth: pw - margin * 2,
     styles: {
       fontSize: 8,
-      cellPadding: { left: 3, right: 3, top: 2.5, bottom: 2.5 },
+      cellPadding: { left: 4, right: 4, top: 4, bottom: 4 },
       valign: "middle",
       lineWidth: 0.1,
       lineColor: [180, 180, 200],
