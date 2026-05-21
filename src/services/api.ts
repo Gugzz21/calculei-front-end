@@ -62,6 +62,8 @@ const CORRECAO_ENDPOINTS: Record<string, string | null> = {
   tjrj6899: "/tj6899/calculate/between-dates",
   selic: "/selic/diario/calculate/between-dates",
   cdi: "/cdi/calculate/between-dates",
+
+  // Não há nenhum tipo de correção. 
   semcorrecaomonetaria: null,
 };
 
@@ -81,6 +83,7 @@ const JUROS_ENDPOINTS: Record<string, string | null> = {
   poupancanova: "/poupanca/nova/calculate/between-dates",
   poupancaantiga: "/poupanca/antiga/calculate/between-dates",
   poupanca: "/poupanca/antiga-nova/calculate/between-dates",
+
   // Resolvido dinamicamente pela taxa informada pelo usuário
   especificartaxa: null,
 };

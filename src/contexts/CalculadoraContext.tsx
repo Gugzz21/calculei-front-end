@@ -4,6 +4,7 @@ import { CalculoService } from '../services/CalculoService';
 import { ReplicacaoService } from '../services/ReplicacaoService';
 import { buscarUfirValue, prefetchIndice } from '../services/api';
 import { TIPO_CALCULO_INDICE_MAP } from '../constants/dominios';
+import { useAutoRecovery } from '../hooks/useAutoRecovery';
 import toast from 'react-hot-toast';
 
 interface CalculadoraContextData {
@@ -61,6 +62,9 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [ufirValue, setUfirValue] = useState<number>(0);
 
   const calculandoRef = useRef(false);
+
+  // ── Recuperação automática por token na URL (?token=...)
+  useAutoRecovery(setLancamentos, setLoading, setErro);
 
   // Buscar UFIR ao carregar
   React.useEffect(() => {
