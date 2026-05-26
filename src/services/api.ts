@@ -10,7 +10,7 @@ import { CORRECAO_ENDPOINTS, JUROS_ENDPOINTS, UFIR_ENDPOINTS } from "../constant
 import { UFIR_RJ_HISTORICO } from "../constants/tabelaUfirRj";
 import { isBackendResponseValida, normalizeBackendResponse, calcularDias } from "../utils/apiNormalizer";
 import { BACKEND_BASE_URL, postToBackend } from "./httpClient";
-import { fetchFromBcb } from "./bcbService";
+
 
 // Re-exportando tipos para os consumidores que importavam daqui
 export type { CalcRequest, CalcResponse, HistoricoPayload } from "../types/api";
@@ -103,17 +103,16 @@ export async function calcularIndice(
     }
   }
 
-  // 3. Fallback final: TJRJ Local ou BCB
-  let resFallback: CalcResponse | null = null;
-  
+  // 3. Fallback final: TJRJ Local como último recurso offline
   if (indice.startsWith("tj")) {
-    resFallback = fetchFromTjRjLocal(req);
-  } else {
-    resFallback = await fetchFromBcb(indice, req);
+    const resFallback = fetchFromTjRjLocal(req);
+    if (resFallback) {
+      API_CACHE.set(cacheKey, resFallback);
+      return resFallback;
+    }
   }
 
-  if (resFallback) API_CACHE.set(cacheKey, resFallback);
-  return resFallback;
+  return null;
 }
 
 /**
@@ -172,16 +171,10 @@ export async function calcularJuros(
       const res = normalizeBackendResponse(data, req, endpoint);
       API_CACHE.set(cacheKey, res);
       return res;
-    } catch {
-      // Java falhou ou sem dados → tentar BCB
+    } catch (err: any) {
+      console.error(`[API] Erro ao calcular juros no Java:`, err);
+      throw err;
     }
-  }
-
-  // 4. Fallback: BCB (cobre selic, cdi caso não estejam em BCB_DIRECT_INDICES)
-  const bcbData = await fetchFromBcb(indice, req);
-  if (bcbData) {
-    API_CACHE.set(cacheKey, bcbData);
-    return bcbData;
   }
 
   // 5. Cálculo local (apenas para taxas sem endpoint e sem série BCB)

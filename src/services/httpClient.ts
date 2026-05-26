@@ -1,9 +1,9 @@
 import type { BackendPayload } from "../types/api";
 
-export const BACKEND_BASE_URL = "/api";
+export const BACKEND_BASE_URL = "http://localhost:8080/api";
 
 /** Tempo máximo (ms) que aguardamos o Java antes de tentar o BCB */
-const BACKEND_TIMEOUT_MS = 1_000;
+const BACKEND_TIMEOUT_MS = 30_000;
 
 /**
  * Realiza um POST para um endpoint do backend Java.

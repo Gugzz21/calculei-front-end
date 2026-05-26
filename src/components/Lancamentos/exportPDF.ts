@@ -137,7 +137,7 @@ function gerarTabelaCorrecao(
 
     // ── Linha de dados
     body.push([
-      { content: `${numero})`, styles: { halign: "center", overflow: "hidden" } },
+      { content: String(numero), styles: { halign: "center" } },
       { content: periodo, styles: { halign: "left" } },
       { content: l.valorPrincipal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
       { content: l.indiceCorrecao, styles: { halign: "left" } },
@@ -158,14 +158,7 @@ function gerarTabelaCorrecao(
       { content: l.total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: CINZA_TOTAL } },
     ]);
 
-    // ── Linha Total em UFIR (sempre exibida; valor só se ufirValue > 0)
-    const totalUfirStr = ufirValue > 0
-      ? (l.total / ufirValue).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-      : "—";
-    body.push([
-      { content: "Total em UFIR", colSpan: 7, styles: { halign: "left", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101] } },
-      { content: totalUfirStr, styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101] } },
-    ]);
+
   });
 
   // Totais gerais (só se mais de 1 lançamento)
@@ -187,8 +180,7 @@ function gerarTabelaCorrecao(
     ]);
   }
 
-  // Linha vazia de espaçamento
-  body.push([{ content: "", colSpan: 8, styles: { fillColor: BRANCO, minCellHeight: 8, lineWidth: 0 } }]);
+
 
   // Valor Unitário da UFIR
   const ufirUnitStr = ufirValue > 0 ? ufirValue.toLocaleString("pt-BR", { minimumFractionDigits: 4, maximumFractionDigits: 4 }) : "Não disponível";
@@ -214,11 +206,11 @@ function gerarTabelaCorrecao(
     0: { cellWidth: 9, halign: "center" },
     1: { cellWidth: 30, halign: "left" },
     2: { cellWidth: 23, halign: "right" },
-    3: { cellWidth: 34, halign: "left" },
+    3: { cellWidth: 26, halign: "left" },
     4: { cellWidth: 22, halign: "right" },
     5: { cellWidth: 24, halign: "right" },
     6: { cellWidth: 22, halign: "right" },
-    7: { cellWidth: 18, halign: "right" },
+    7: { cellWidth: 26, halign: "right" },
   };
 
   autoTable(doc, {
@@ -300,7 +292,7 @@ function gerarTabelaJuros(
         const periodo = `${formatDate(sub.dataInicio)} a ${formatDate(sub.dataFim)}`;
         const fator = sub.taxa ? (sub.taxa.includes("%") ? sub.taxa.replace("%", "").trim() : sub.taxa) : "—";
         body.push([
-          { content: `${numero})`, styles: { halign: "left" } },
+          { content: String(numero), styles: { halign: "center" } },
           { content: periodo, styles: { halign: "left" } },
           { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
           { content: String(sub.dias), styles: { halign: "center" } },
@@ -325,7 +317,7 @@ function gerarTabelaJuros(
         ? `${formatDate(l.dataInicioJuros)} a ${formatDate(l.dataFimJuros)}`
         : "—";
       body.push([
-        { content: `${numero})`, styles: { halign: "left" } },
+        { content: String(numero), styles: { halign: "center" } },
         { content: periodo, styles: { halign: "left" } },
         { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
         { content: String(l.diasJuros ?? "—"), styles: { halign: "center" } },
@@ -348,12 +340,12 @@ function gerarTabelaJuros(
   // Soma: 9+44+36+18+18+22+35 = 182
   const colWidths: { [key: number]: any } = {
     0: { cellWidth: 9, halign: "center" },
-    1: { cellWidth: 44, halign: "left" },
-    2: { cellWidth: 36, halign: "right" },
-    3: { cellWidth: 18, halign: "center" },
-    4: { cellWidth: 18, halign: "center" },
-    5: { cellWidth: 22, halign: "right" },
-    6: { cellWidth: 35, halign: "right" },
+    1: { cellWidth: 38, halign: "left" },
+    2: { cellWidth: 32, halign: "right" },
+    3: { cellWidth: 14, halign: "center" },
+    4: { cellWidth: 20, halign: "center" },
+    5: { cellWidth: 26, halign: "right" },
+    6: { cellWidth: 43, halign: "right" },
   };
 
   autoTable(doc, {

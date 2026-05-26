@@ -20,7 +20,7 @@ export async function fetchMonthlyFromBcb(
   serieId: number,
   req: CalcRequest
 ): Promise<number | null> {
-  const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(req.dateInit)}&dataFinal=${toBcbDate(req.dateFim)}`;
+  const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&datainicial=${toBcbDate(req.dateInit)}&datafinal=${toBcbDate(req.dateFim)}`;
   const response = await fetch(url);
   if (!response.ok) return null;
 
@@ -71,7 +71,7 @@ export async function fetchDailyFromBcb(
   }
 
   const promessas = windows.map(async (w) => {
-    const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(w.inicio)}&dataFinal=${toBcbDate(w.fim)}`;
+    const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&datainicial=${toBcbDate(w.inicio)}&datafinal=${toBcbDate(w.fim)}`;
     const response = await fetch(url);
     if (!response.ok) return null;
     const registros: Array<{ valor: string }> = await response.json();
