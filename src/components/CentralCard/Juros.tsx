@@ -5,8 +5,13 @@ import { JUROS_DESCRICAO } from "../../constants/dominios";
 import { PercentIcon } from "lucide-react";
 import { useIndices } from "../../hooks/useIndices";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
+import InfoButton from "./InfoButton";
 
-function Juros() {
+interface JurosProps {
+  onOpenHelp: () => void;
+}
+
+function Juros({ onOpenHelp }: JurosProps) {
   const {
     juros,
     form,
@@ -16,11 +21,11 @@ function Juros() {
 
   const { indice, taxa, aplicados = [] } = juros;
   const dataInicio = juros.dataInicio || form.dataInicial;
-  const dataFim    = juros.dataFim    || form.dataCalculo;
+  const dataFim = juros.dataFim || form.dataCalculo;
 
-  const [loading, setLoading]       = useState(false);
-  const [erroLocal, setErroLocal]   = useState<string | null>(null);
-  
+  const [loading, setLoading] = useState(false);
+  const [erroLocal, setErroLocal] = useState<string | null>(null);
+
   const { jurosIndiceOpcoes } = useIndices();
 
   const selicSelecionada = form.indiceCorrecao === "selic";
@@ -51,13 +56,13 @@ function Juros() {
         );
         if (resp) {
           novosAplicados.push({
-            id:         Date.now() + Math.random(),
-            indice:     idx,
-            taxa:       taxaAtual,
+            id: Date.now() + Math.random(),
+            indice: idx,
+            taxa: taxaAtual,
             dataInicio: dInicio,
-            dataFim:    dFim,
-            dias:       resp.dias || 0,
-            fator:      resp.fatorAcumulado || 0,
+            dataFim: dFim,
+            dias: resp.dias || 0,
+            fator: resp.fatorAcumulado || 0,
             percentual: resp.percentualAcumulado || 0,
           });
         }
@@ -86,7 +91,10 @@ function Juros() {
 
         {/* Índice de juros */}
         <div className="flex flex-col gap-1 w-full md:w-auto">
-          <strong className="text-[13px] text-gray-700 dark:text-gray-300 font-semibold">Índice de juros</strong>
+          <div className="flex gap-2 items-center">
+            <strong className="text-[13px] text-gray-700 dark:text-gray-300 font-semibold">Índice de juros</strong>
+            <InfoButton onClick={onOpenHelp} />
+          </div>
           <select
             value={indice}
             onChange={(e) => handleJurosChange("indice", e.target.value)}
@@ -180,7 +188,7 @@ function Juros() {
               {aplicados.map((item) => (
                 <tr key={item.id} className="border-t border-[#d2daee] dark:border-[#21262d] text-gray-800 dark:text-gray-200">
                   <td className="py-3 px-4">{new Date(item.dataInicio + "T12:00:00").toLocaleDateString("pt-BR")}</td>
-                  <td className="py-3 px-4">{new Date(item.dataFim   + "T12:00:00").toLocaleDateString("pt-BR")}</td>
+                  <td className="py-3 px-4">{new Date(item.dataFim + "T12:00:00").toLocaleDateString("pt-BR")}</td>
                   <td className="py-3 px-4">{item.dias}</td>
                   <td className="py-3 px-4">{item.taxa ? item.taxa.replace(/,00$/, "") : "—"}</td>
                   <td className="py-3 px-4">{item.percentual.toFixed(2).replace(".", ",")}%</td>

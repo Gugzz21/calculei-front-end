@@ -1,3 +1,4 @@
+import { useState } from "react";
 import TipoCalculo from "./TipoCalculo";
 import Data from "./Data";
 import IndiceCorrecao from "./IndiceCorrecao";
@@ -6,9 +7,12 @@ import Descricao from "./Descricao";
 import Juros from "./Juros";
 import Calcular from "./Calcular";
 import Limpar from "./Limpar";
+import InfoModal from "./InfoModal";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 
 function CentralCard() {
+  const [helpContext, setHelpContext] = useState<'tipoCalculo' | 'indiceCorrecao' | 'jurosIndice' | null>(null);
+
   const {
     form,
     juros,
@@ -70,12 +74,14 @@ function CentralCard() {
           <TipoCalculo
             value={form.tipoCalculo}
             onChange={(v) => handleFormChange("tipoCalculo", v)}
+            onOpenHelp={() => setHelpContext('tipoCalculo')}
           />
         </div>
         <div className="w-full sm:flex-[7] md:flex-[8] min-w-0">
           <IndiceCorrecao
             value={form.indiceCorrecao}
             onChange={(v) => handleFormChange("indiceCorrecao", v)}
+            onOpenHelp={() => setHelpContext('indiceCorrecao')}
           />
         </div>
         <div className="w-full sm:flex-[8] md:flex-[10] min-w-0">
@@ -171,7 +177,7 @@ function CentralCard() {
       {/* ── Painel de juros ─────────────────────────────────────────── */}
       {juros.enabled && !jurosEmbutidos && (
         <div className="border border-gray-300 dark:border-[#21262d] rounded-lg p-3 sm:p-4 bg-slate-50/30 dark:bg-[#010409]/30">
-          <Juros />
+          <Juros onOpenHelp={() => setHelpContext('jurosIndice')} />
         </div>
       )}
 
@@ -202,6 +208,20 @@ function CentralCard() {
           </div>
         )}
       </div>
+
+      {/* ── Modal de Ajuda Centralizado ── */}
+      {helpContext && (
+        <InfoModal
+          isOpen={true}
+          onClose={() => setHelpContext(null)}
+          context={helpContext}
+          selectedValue={
+            helpContext === 'tipoCalculo' ? form.tipoCalculo :
+            helpContext === 'indiceCorrecao' ? form.indiceCorrecao :
+            juros.indice
+          }
+        />
+      )}
     </div>
   );
 }
