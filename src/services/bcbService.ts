@@ -27,14 +27,16 @@ export async function fetchMonthlyFromBcb(
   const registros: Array<{ data: string; valor: string }> = await response.json();
   if (!Array.isArray(registros) || registros.length === 0) return null;
 
-  // Filtragem para evitar "sobre-correção": 
+  // Filtragem por intervalo de datas:
+  // ATENÇÃO: a API do BCB ignora o parâmetro datainicial e retorna todos os
+  // registros históricos desde 1980. Por isso aplicamos o filtro manualmente.
   // O BCB retorna o índice do mês cheio no dia 01/MM/AAAA.
   // Se o cálculo termina em 2024-05-01, não devemos incluir o índice de Maio (01/05/2024).
   return registros
     .filter(r => {
       const [d, m, y] = r.data.split("/");
       const isoData = `${y}-${m}-${d}`;
-      return isoData < req.dateFim;
+      return isoData >= req.dateInit && isoData < req.dateFim;
     })
     .reduce(
       (fator, { valor }) => fator * (1 + parseFloat(valor.replace(",", ".")) / 100),

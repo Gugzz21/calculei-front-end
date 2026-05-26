@@ -20,11 +20,13 @@ export function isBackendResponseValida(
   req: CalcRequest
 ): boolean {
   // Fator acumulado zerado = nenhum dado encontrado no BD
+  // NOTA: accumulatedFactor no backend é um PERCENTUAL (ex: 0 = 0%, não fator 1.0)
   const factor = data.accumulatedFactor ?? data.accumulatedValue ?? data.fatorAcumulado;
   if (factor !== undefined && Number(factor) === 0) return false;
 
   // Valor final igual ao de entrada = nenhuma correção foi aplicada
-  const valorRetornado = data.valueFinal ?? data.finalValue ?? data.valorFinal ?? data.amount;
+  const valorRetornado =
+    data.valueFinal ?? data.finalValue ?? data.valorFinal ?? data.valorAcumulado ?? data.amount;
   if (valorRetornado !== undefined && Number(valorRetornado) === req.valor) return false;
 
   return true;
@@ -35,17 +37,29 @@ export function isBackendResponseValida(
 /**
  * Normaliza a resposta do backend Java para o CalcResponse padrão do frontend.
  *
- * Cada endpoint Java tem um DTO diferente. Os casos conhecidos são:
+ * BUG #3 CORRIGIDO — accumulatedFactor: todos os DTOs do backend Java enviam
+ * o percentual acumulado (ex: 26,5 para 26,5%) no campo `accumulatedFactor`,
+ * NÃO um fator multiplicativo (que seria 1,265). O campo está mal nomeado no
+ * Java. O normalizador anterior tratava este campo como fator multiplicativo,
+ * levando a cálculos errados de juros e exibição de percentuais incorretos.
+ *
+ * A correção unifica o tratamento: `accumulatedFactor` é sempre percentual.
+ * O `fatorAcumulado` real é derivado como `1 + percentual / 100`.
+ *
+ * Mapa de campos por endpoint:
  *
  *   /simple-interest/{n} e /simple-interest/period
  *     → { amount: <principal + juros>, startDate, endDate }
  *     → O `amount` já inclui o principal; NÃO há dias nem fator na resposta.
  *
- *   /ipca/…, /tr/…, /selic-mensal/…, etc.
- *     → { finalValue, accumulatedFactor, businessDays, … }
+ *   /ipca/…, /ipcae/…, /igpm/…, /igpdi/…, /cdi/…, /tj11960/…
+ *     → { valueFinal, accumulatedFactor (= percentual%), businessDays }
  *
- *   /taxalegal/…
- *     → { accumulatedFactor: <percentual%>, … }  (semântica invertida)
+ *   /selic/…, /taxalegal/…, /poupanca/…, /salario/…
+ *     → { finalValue, accumulatedFactor (= percentual%), businessDays }
+ *
+ *   /tr/…, /tj6899/…
+ *     → { finalValue, accumulatedValue (= percentual%), businessDays }
  */
 export function normalizeBackendResponse(
   data: Record<string, unknown>,
@@ -88,21 +102,27 @@ export function normalizeBackendResponse(
     ?? req.valor
   ) as number;
 
-  // O TaxaLegalController usa `accumulatedFactor` como PERCENTUAL (não fator multiplicativo)
-  const ehTaxaLegal = endpoint.includes("/taxalegal/");
+  // BUG #3 FIX: `accumulatedFactor` e `accumulatedValue` nos DTOs Java são
+  // SEMPRE percentuais (ex: 26.5 para 26,5%), não fatores multiplicativos.
+  // O código anterior tratava esses campos como fator multiplicativo (1.265),
+  // o que causava percentuais absurdos (ex: 2650%) em cálculos de juros.
+  // A remoção do case especial para taxalegal unifica o comportamento.
+  let percentualAcumulado = (
+    data.percentualAcumulado       // Campo se o backend futuramente enviar correto
+    ?? data.accumulatedPercentage  // Alias alternativo
+    ?? data.accumulatedFactor      // ← É PERCENTUAL no Java (mal nomeado)
+    ?? data.accumulatedValue       // ← Usado por TR e TJ6899 (também é percentual)
+  ) as number | undefined;
 
-  let percentualAcumulado = ehTaxaLegal
-    ? (data.accumulatedFactor as number | undefined)
-    : (data.percentualAcumulado ?? data.accumulatedPercentage) as number | undefined;
-
-  let fatorAcumulado = ehTaxaLegal
-    ? undefined
-    : (data.fatorAcumulado ?? data.accumulatedFactor) as number | undefined;
-
-  // Fallback: deriva percentual da variação do valor
-  if (percentualAcumulado === undefined && req.valor > 0) {
+  // Fallback: deriva percentual da variação do valor se não veio explícito
+  if ((percentualAcumulado === undefined || percentualAcumulado === 0) && req.valor > 0 && valorFinal !== req.valor) {
     percentualAcumulado = ((valorFinal / req.valor) - 1) * 100;
   }
+
+  // Deriva o fatorAcumulado real (multiplicativo) a partir do percentual
+  const fatorAcumulado = percentualAcumulado !== undefined
+    ? 1 + percentualAcumulado / 100
+    : (req.valor > 0 ? valorFinal / req.valor : 1);
 
   return {
     dataInicio: req.dateInit,
@@ -113,5 +133,6 @@ export function normalizeBackendResponse(
     valueFinal: valorFinal,
     fatorAcumulado,
     percentualAcumulado,
+    accumulatedFactor: fatorAcumulado, // mantido para compatibilidade
   };
 }
