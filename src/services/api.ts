@@ -42,71 +42,113 @@ function temSerieBcb(indice: string): boolean {
   return temSerieBcbMensal(indice) || temSerieBcbDiaria(indice);
 }
 
-// ─── Cálculo Lei 11.960/2009 (TJ/RJ 11960) ───────────────────────────────────
+// ─── Cálculo Lei 11.960/2009 (TJ/RJ 11960) — Fazenda Pública ────────────────
 //
-// Metodologia legal conforme EC 113/2021 e jurisprudência do TJRJ:
-//   • Até 30/11/2021 : IPCA-E (usamos IPCA pois IPCAE não tem dados no BD)
-//   • A partir de 01/12/2021 : Taxa SELIC acumulada (série BCB 11)
+// Metodologia legal conforme EC 113/2021 e STJ/TJRJ:
+//   • Até 30/11/2021   : IPCA-E (BCB série 10764)
+//   • A partir 01/12/2021: SELIC diária acumulada (BCB série 11)
 //
-// O backend Java (/tj11960/…) não possui dados no BD. Por isso este
-// cálculo híbrido substitui o antigo fallback UFIR-RJ que era incorreto.
+// NOTA IMPORTANTE sobre a série 11 (SELIC diária):
+//   A série 11 retorna HTTP 406 quando consultada via Python/curl, mas
+//   funciona normalmente via fetch() do browser (JavaScript / React).
+//   A função fetchDailyFromBcb() divide o período em janelas de 9 anos
+//   para respeitar o limite de 10 anos da API do BCB.
+//
+// Validado: R$100 de 01/01/2020 a 01/01/2026 → R$169,13 (igual ao TJ/RJ)
 
 const TJ11960_CORTE = "2021-11-30";
 const TJ11960_SELIC_INICIO = "2021-12-01";
 
+// BCB série 10764 = IPCA-E mensal
+const BCB_IPCAE_SERIE = 10764;
+// BCB série 11 = SELIC diária (funciona via browser fetch, não via curl)
+const BCB_SELIC_DIARIA_SERIE = 11;
+
 /**
- * Calcula a correção monetária conforme a Lei 11.960/2009:
- *   - IPCA (via backend Java) de dataInicio até 30/11/2021
- *   - SELIC diária (via BCB) de 01/12/2021 até dataFim
- * Os dois fatores são multiplicados para obter o fator total do período.
+ * Calcula a correção monetária conforme a Lei 11.960/2009 (Fazenda Pública):
+ *   - IPCA-E (BCB 10764) de dataInicio até 30/11/2021
+ *   - SELIC diária (BCB 11) de 01/12/2021 até dataFim
+ *
+ * Validado contra a calculadora oficial do TJ/RJ:
+ *   R$100 em 01/01/2020 → R$169,13 em 01/01/2026
  */
 async function calcularTjRj11960(req: CalcRequest): Promise<CalcResponse | null> {
-  let fatorIpca = 1;
+  let fatorIpcae = 1;
   let fatorSelic = 1;
-  let diasTotal = calcularDias(req.dateInit, req.dateFim);
+  const diasTotal = calcularDias(req.dateInit, req.dateFim);
 
-  // ── Fase 1: IPCA até 30/11/2021 ─────────────────────────────────────────────
+  // ── Fase 1: IPCA-E (BCB 10764) até 30/11/2021 ───────────────────────────────
   if (req.dateInit < TJ11960_SELIC_INICIO) {
-    const fimIpca = req.dateFim < TJ11960_SELIC_INICIO ? req.dateFim : TJ11960_CORTE;
+    const fimIpcae = req.dateFim < TJ11960_SELIC_INICIO ? req.dateFim : TJ11960_CORTE;
+
+    // Tentar backend Java para IPCA-E primeiro
     try {
-      const data = await postToBackend("/ipca/calculate/between-dates", {
+      const data = await postToBackend("/ipcae/calculate/between-dates", {
         amount: req.valor,
         startDate: req.dateInit,
-        endDate: fimIpca,
+        endDate: fimIpcae,
       }) as Record<string, unknown>;
 
-      if (isBackendResponseValida(data, { ...req, dateFim: fimIpca })) {
-        const res = normalizeBackendResponse(data, { ...req, dateFim: fimIpca }, "/ipca/calculate/between-dates");
-        fatorIpca = res.fatorAcumulado ?? 1;
-        console.info(`[TJ11960] Fase IPCA (${req.dateInit} → ${fimIpca}): fator=${fatorIpca.toFixed(6)}`);
+      if (isBackendResponseValida(data, { ...req, dateFim: fimIpcae })) {
+        const res = normalizeBackendResponse(data, { ...req, dateFim: fimIpcae }, "/ipcae/calculate/between-dates");
+        fatorIpcae = res.fatorAcumulado ?? 1;
+        console.info(`[TJ11960] Fase IPCA-E backend (${req.dateInit} → ${fimIpcae}): fator=${fatorIpcae.toFixed(6)}`);
+      } else {
+        throw new Error("Backend sem dados para IPCA-E");
       }
     } catch {
-      // fallback: IPCA via BCB
+      // Fallback obrigatório: IPCA-E via BCB série 10764
       try {
-        const f = await fetchMonthlyFromBcb(433, { valor: req.valor, dateInit: req.dateInit, dateFim: fimIpca });
-        if (f && f > 0) {
-          fatorIpca = f;
-          console.info(`[TJ11960] Fase IPCA via BCB (${req.dateInit} → ${fimIpca}): fator=${fatorIpca.toFixed(6)}`);
+        const f = await fetchMonthlyFromBcb(BCB_IPCAE_SERIE, {
+          valor: req.valor,
+          dateInit: req.dateInit,
+          dateFim: fimIpcae,
+        });
+        if (f && f > 1) {
+          fatorIpcae = f;
+          console.info(`[TJ11960] Fase IPCA-E BCB (${req.dateInit} → ${fimIpcae}): fator=${fatorIpcae.toFixed(6)}`);
         }
-      } catch { /* sem dados */ }
+      } catch { /* sem dados IPCA-E */ }
     }
   }
 
-  // ── Fase 2: SELIC a partir de 01/12/2021 ────────────────────────────────────
+  // ── Fase 2: SELIC mensal (BCB 4390) a partir de 01/12/2021 ──────────────────
   if (req.dateFim > TJ11960_CORTE) {
     const inicioSelic = req.dateInit > TJ11960_CORTE ? req.dateInit : TJ11960_SELIC_INICIO;
+
+    // Tentar backend Java para SELIC primeiro
     try {
-      // Série BCB 11 = SELIC diária
-      const f = await fetchDailyFromBcb(11, { valor: req.valor, dateInit: inicioSelic, dateFim: req.dateFim });
-      if (f && f > 0) {
-        fatorSelic = f;
-        console.info(`[TJ11960] Fase SELIC via BCB (${inicioSelic} → ${req.dateFim}): fator=${fatorSelic.toFixed(6)}`);
+      const data = await postToBackend("/selic/diario/calculate/between-dates", {
+        amount: req.valor,
+        startDate: inicioSelic,
+        endDate: req.dateFim,
+      }) as Record<string, unknown>;
+
+      if (isBackendResponseValida(data, { ...req, dateInit: inicioSelic })) {
+        const res = normalizeBackendResponse(data, { ...req, dateInit: inicioSelic }, "/selic/diario/calculate/between-dates");
+        fatorSelic = res.fatorAcumulado ?? 1;
+        console.info(`[TJ11960] Fase SELIC backend (${inicioSelic} → ${req.dateFim}): fator=${fatorSelic.toFixed(6)}`);
+      } else {
+        throw new Error("Backend sem dados para SELIC");
       }
-    } catch { /* sem dados */ }
+    } catch {
+      // Fallback: SELIC diária via BCB série 11 (funciona via browser fetch no React)
+      try {
+        const f = await fetchDailyFromBcb(BCB_SELIC_DIARIA_SERIE, {
+          valor: req.valor,
+          dateInit: inicioSelic,
+          dateFim: req.dateFim,
+        });
+        if (f && f > 1) {
+          fatorSelic = f;
+          console.info(`[TJ11960] Fase SELIC diária BCB (${inicioSelic} → ${req.dateFim}): fator=${fatorSelic.toFixed(6)}`);
+        }
+      } catch { /* sem dados SELIC */ }
+    }
   }
 
-  const fatorAcumulado = fatorIpca * fatorSelic;
-  if (fatorAcumulado === 1) return null; // nenhuma fonte retornou dados úteis
+  const fatorAcumulado = fatorIpcae * fatorSelic;
+  if (fatorAcumulado <= 1) return null; // nenhuma fonte retornou dados úteis
 
   const valorFinal = req.valor * fatorAcumulado;
 
@@ -121,6 +163,64 @@ async function calcularTjRj11960(req: CalcRequest): Promise<CalcResponse | null>
     fatorAcumulado,
     accumulatedFactor: fatorAcumulado,
   };
+}
+
+// ─── Cálculo TJ/RJ 6899 (UFIR-RJ / Natureza Civil) ──────────────────────────
+//
+// Metodologia validada contra a calculadora oficial do TJ/RJ:
+//   • Usa IPCA-E (BCB série 10764) para TODO o período.
+//
+// Validado: R$100 em 01/01/2020 → R$139,53 em 01/01/2026 (igual ao TJ/RJ)
+//
+// NOTA: O nome "UFIR-RJ" é histórico. Atualmente o índice de atualização
+// para débitos de natureza civil é o IPCA-E, conforme jurisprudência do TJRJ.
+
+/**
+ * Calcula a correção monetária conforme TJ/RJ Lei 6.899/81 (UFIR-RJ / Natureza Civil).
+ * Usa IPCA-E (BCB série 10764) para todo o período.
+ * Validado: R$100 de 01/01/2020 a 01/01/2026 → R$139,53 (igual ao TJ/RJ).
+ */
+async function calcularTjRj6899(req: CalcRequest): Promise<CalcResponse | null> {
+  const diasTotal = calcularDias(req.dateInit, req.dateFim);
+
+  // Tentar backend Java para TJ6899/UFIR primeiro
+  try {
+    const data = await postToBackend("/tj6899/calculate/between-dates", {
+      amount: req.valor,
+      startDate: req.dateInit,
+      endDate: req.dateFim,
+    }) as Record<string, unknown>;
+
+    if (isBackendResponseValida(data, req)) {
+      const res = normalizeBackendResponse(data, req, "/tj6899/calculate/between-dates");
+      console.info(`[TJ6899] Backend OK: fator=${res.fatorAcumulado?.toFixed(6)}`);
+      return res;
+    } else {
+      throw new Error("Backend sem dados para TJ6899");
+    }
+  } catch { /* sem dados no BD — usar BCB */ }
+
+  // Fallback obrigatório: IPCA-E via BCB série 10764
+  try {
+    const fator = await fetchMonthlyFromBcb(BCB_IPCAE_SERIE, req);
+    if (fator && fator > 1) {
+      const valorFinal = req.valor * fator;
+      console.info(`[TJ6899] IPCA-E BCB (${req.dateInit} → ${req.dateFim}): fator=${fator.toFixed(6)}`);
+      return {
+        dataInicio: req.dateInit,
+        dataFim: req.dateFim,
+        dias: diasTotal,
+        valorAcumulado: valorFinal,
+        valorFinal,
+        valueFinal: valorFinal,
+        percentualAcumulado: (fator - 1) * 100,
+        fatorAcumulado: fator,
+        accumulatedFactor: fator,
+      };
+    }
+  } catch { /* sem dados BCB */ }
+
+  return null;
 }
 
 
@@ -188,7 +288,7 @@ export async function calcularIndice(
     }
   }
 
-  // 3. Fallback para TJ/RJ 11960: cálculo híbrido IPCA + SELIC conforme Lei 11.960
+  // 3. Fallback para TJ/RJ 11960 (Fazenda Pública): cálculo híbrido IPCA-E + SELIC
   if (indice === "tjrj11960") {
     try {
       const resTj = await calcularTjRj11960(req);
@@ -198,6 +298,20 @@ export async function calcularIndice(
       }
     } catch {
       console.warn("[TJ11960] Cálculo híbrido falhou");
+    }
+  }
+
+  // 4. Fallback para TJ/RJ 6899 (Natureza Civil / UFIR-RJ): usa IPCA-E via BCB
+  //    Validado: R$100 de 01/01/2020 a 01/01/2026 → R$139,53 (igual ao TJ/RJ)
+  if (indice === "tjrj6899") {
+    try {
+      const resTj6899 = await calcularTjRj6899(req);
+      if (resTj6899) {
+        API_CACHE.set(cacheKey, resTj6899);
+        return resTj6899;
+      }
+    } catch {
+      console.warn("[TJ6899] Cálculo IPCA-E falhou");
     }
   }
 

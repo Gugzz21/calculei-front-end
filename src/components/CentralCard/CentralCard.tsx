@@ -82,6 +82,7 @@ function CentralCard() {
             value={form.indiceCorrecao}
             onChange={(v) => handleFormChange("indiceCorrecao", v)}
             onOpenHelp={() => setHelpContext('indiceCorrecao')}
+            tipoCalculo={form.tipoCalculo}
           />
         </div>
         <div className="w-full sm:flex-[8] md:flex-[10] min-w-0">

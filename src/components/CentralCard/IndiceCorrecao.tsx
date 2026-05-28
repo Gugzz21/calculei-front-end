@@ -5,10 +5,11 @@ interface IndiceCorrecaoProps {
   value: string;
   onChange: (value: string) => void;
   onOpenHelp: () => void;
+  tipoCalculo?: string;
 }
 
-function IndiceCorrecao({ value, onChange, onOpenHelp }: IndiceCorrecaoProps) {
-  const { indiceCorrecaoOpcoes } = useIndices();
+function IndiceCorrecao({ value, onChange, onOpenHelp, tipoCalculo }: IndiceCorrecaoProps) {
+  const { indiceCorrecaoOpcoes } = useIndices(tipoCalculo);
   return (
     <div className="flex flex-col gap-1">
       <div className="flex gap-2 items-center"><strong className="text-[14px] text-gray-700 dark:text-gray-300 font-semibold">Índice de correção monetária </strong><InfoButton onClick={onOpenHelp} /> </div>

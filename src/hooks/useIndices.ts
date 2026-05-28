@@ -16,6 +16,7 @@ import {
   JUROS_LABEL,
   MONETARY_CORRECTION_JAVA_MAP,
   INTEREST_CORRECTION_JAVA_MAP,
+  TIPO_CALCULO_INDICE_EXCLUIDOS,
 } from "../constants/dominios";
 
 export interface IndiceOpcao {
@@ -49,10 +50,11 @@ function mapJavaEnumsToOpcoes(
 /**
  * Hook que retorna as listas de índices de correção monetária e de juros
  * carregadas do backend Java, com fallback para as constantes locais.
+ * Filtra automaticamente os índices excluídos para o tipo de cálculo informado.
  */
-export function useIndices() {
-  const [indiceCorrecaoOpcoes, setIndiceCorrecaoOpcoes] = useState<IndiceOpcao[]>([]);
-  const [jurosIndiceOpcoes,    setJurosIndiceOpcoes]    = useState<IndiceOpcao[]>([]);
+export function useIndices(tipoCalculo?: string) {
+  const [indiceCorrecaoOpcoesBase, setIndiceCorrecaoOpcoesBase] = useState<IndiceOpcao[]>([]);
+  const [jurosIndiceOpcoes,        setJurosIndiceOpcoes]        = useState<IndiceOpcao[]>([]);
 
   useEffect(() => {
     async function carregarIndices() {
@@ -61,11 +63,11 @@ export function useIndices() {
         const res  = await fetch("/api/index-name/monetary-correction");
         const data: string[] = await res.json();
         const opcoes = mapJavaEnumsToOpcoes(data, MONETARY_CORRECTION_JAVA_MAP, INDICE_LABEL);
-        setIndiceCorrecaoOpcoes([...opcoes, SEM_CORRECAO_OPCAO]);
+        setIndiceCorrecaoOpcoesBase([...opcoes, SEM_CORRECAO_OPCAO]);
       } catch {
         // Fallback: todas as entradas do dicionário local
         const fallback = Object.entries(INDICE_LABEL).map(([value, label]) => ({ value, label }));
-        setIndiceCorrecaoOpcoes([...fallback, SEM_CORRECAO_OPCAO]);
+        setIndiceCorrecaoOpcoesBase([...fallback, SEM_CORRECAO_OPCAO]);
       }
 
       // ── Índices de Juros ───────────────────────────────────────────────────
@@ -83,6 +85,12 @@ export function useIndices() {
 
     carregarIndices();
   }, []);
+
+  // Filtra os índices excluídos para o tipo de cálculo atual
+  const excluidos = tipoCalculo ? (TIPO_CALCULO_INDICE_EXCLUIDOS[tipoCalculo] ?? []) : [];
+  const indiceCorrecaoOpcoes = excluidos.length > 0
+    ? indiceCorrecaoOpcoesBase.filter(op => !excluidos.includes(op.value))
+    : indiceCorrecaoOpcoesBase;
 
   return { indiceCorrecaoOpcoes, jurosIndiceOpcoes };
 }

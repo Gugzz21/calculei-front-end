@@ -14,11 +14,19 @@ export const TIPO_CALCULO_OPCOES = [
 
 /** Mapeamento tipo de cálculo → índice de correção pré-selecionado */
 export const TIPO_CALCULO_INDICE_MAP: Record<string, string> = {
-  dfazendatributario: "selic",
+  dfazendatributario:    "selic",
   dfazendanaotributario: "tjrj11960",
-  abatimentos: "semcorrecaomonetaria",
-  cdparticular: "tjrj6899",
-  cfazenda: "tjrj6899",
+  abatimentos:           "semcorrecaomonetaria",
+  cdparticular:          "tjrj6899",   // Natureza Civil → TJ/RJ 6899 (UFIR-RJ)
+  cfazenda:              "tjrj11960",  // Fazenda Pública → TJ/RJ 11960
+};
+
+/**
+ * Índices de correção monetária que NÃO devem aparecer para cada tipo de cálculo.
+ * Ex: TJ/RJ 11960 (Fazenda Pública) não se aplica a Créditos/Débitos entre Particulares.
+ */
+export const TIPO_CALCULO_INDICE_EXCLUIDOS: Record<string, string[]> = {
+  cdparticular: ["tjrj11960"], // Natureza Civil não usa Lei 11.960 (Fazenda Pública)
 };
 
 // ─── Índice de Correção Monetária ─────────────────────────────────────────────
