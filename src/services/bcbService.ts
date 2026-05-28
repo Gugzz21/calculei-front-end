@@ -20,7 +20,7 @@ export async function fetchMonthlyFromBcb(
   serieId: number,
   req: CalcRequest
 ): Promise<number | null> {
-  const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&datainicial=${toBcbDate(req.dateInit)}&datafinal=${toBcbDate(req.dateFim)}`;
+  const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(req.dateInit)}&dataFinal=${toBcbDate(req.dateFim)}`;
   const response = await fetch(url);
   if (!response.ok) return null;
 
@@ -28,10 +28,8 @@ export async function fetchMonthlyFromBcb(
   if (!Array.isArray(registros) || registros.length === 0) return null;
 
   // Filtragem por intervalo de datas:
-  // ATENÇÃO: a API do BCB ignora o parâmetro datainicial e retorna todos os
-  // registros históricos desde 1980. Por isso aplicamos o filtro manualmente.
-  // O BCB retorna o índice do mês cheio no dia 01/MM/AAAA.
-  // Se o cálculo termina em 2024-05-01, não devemos incluir o índice de Maio (01/05/2024).
+  // Embora a API do BCB agora filtre os dados do lado do servidor usando dataInicial e dataFinal,
+  // mantemos o filtro local para garantir a exclusão estrita da data final (ex: req.dateFim não deve ser inclusa).
   return registros
     .filter(r => {
       const [d, m, y] = r.data.split("/");
@@ -73,7 +71,7 @@ export async function fetchDailyFromBcb(
   }
 
   const promessas = windows.map(async (w) => {
-    const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&datainicial=${toBcbDate(w.inicio)}&datafinal=${toBcbDate(w.fim)}`;
+    const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(w.inicio)}&dataFinal=${toBcbDate(w.fim)}`;
     const response = await fetch(url);
     if (!response.ok) return null;
     const registros: Array<{ valor: string }> = await response.json();
