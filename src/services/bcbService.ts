@@ -43,6 +43,46 @@ export async function fetchMonthlyFromBcb(
 }
 
 /**
+ * Busca dados de uma série MENSAL do BCB e acumula o fator de correção via
+ * ACUMULAÇÃO SIMPLES (soma das taxas), conforme metodologia TJ/RJ Lei 11.960.
+ *
+ * Fórmula: fator = 1 + Σ(taxas mensais) / 100
+ *
+ * Diferente de fetchMonthlyFromBcb (que usa produto/juros compostos),
+ * esta função usa soma simples, que é o método exigido pelo TJ/RJ para a
+ * SELIC no período pós-EC 113/2021 (a partir de 01/12/2021).
+ *
+ * Validado: série BCB 4390 de 01/12/2021 a 01/01/2026 → soma=49,82% → fator=1,4982 (igual ao TJ/RJ).
+ */
+export async function fetchMonthlySimpleFromBcb(
+  serieId: number,
+  req: CalcRequest
+): Promise<number | null> {
+  const url = `${BCB_BASE_URL}/bcdata.sgs.${serieId}/dados?formato=json&dataInicial=${toBcbDate(req.dateInit)}&dataFinal=${toBcbDate(req.dateFim)}`;
+  const response = await fetch(url);
+  if (!response.ok) return null;
+
+  const registros: Array<{ data: string; valor: string }> = await response.json();
+  if (!Array.isArray(registros) || registros.length === 0) return null;
+
+  // Acumulação SIMPLES: Σ taxas (% a.m.) ÷ 100 + 1
+  // TJRJ 11.960 exige que o cálculo inclua tanto o mês de início quanto o mês de fim (inclusivo)
+  const initMonth = req.dateInit.substring(0, 7); // YYYY-MM
+  const fimMonth = req.dateFim.substring(0, 7);   // YYYY-MM
+
+  const somaRates = registros
+    .filter(r => {
+      const [d, m, y] = r.data.split("/");
+      const recordMonth = `${y}-${m}`;
+      return recordMonth >= initMonth && recordMonth <= fimMonth;
+    })
+    .reduce((acc, { valor }) => acc + parseFloat(valor.replace(",", ".")), 0);
+
+  if (somaRates === 0) return null;
+  return 1 + somaRates / 100;
+}
+
+/**
  * Busca dados de uma série DIÁRIA do BCB em janelas de 10 anos (limite da API).
  * Acumula os fatores de cada janela para obter o fator total do período.
  */

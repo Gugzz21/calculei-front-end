@@ -16,8 +16,8 @@ import { CORRECAO_ENDPOINTS, JUROS_ENDPOINTS, UFIR_ENDPOINTS, BCB_SERIES, BCB_DA
 import { isBackendResponseValida, normalizeBackendResponse, calcularDias } from "../utils/apiNormalizer";
 import { BACKEND_BASE_URL, postToBackend } from "./httpClient";
 
-// BUG #2 FIX: importar fetchFromBcb, fetchMonthlyFromBcb, fetchDailyFromBcb
-import { fetchFromBcb, fetchMonthlyFromBcb, fetchDailyFromBcb } from "./bcbService";
+// BUG #2 FIX: importar fetchFromBcb, fetchMonthlyFromBcb, fetchDailyFromBcb, fetchMonthlySimpleFromBcb
+import { fetchFromBcb, fetchMonthlyFromBcb, fetchDailyFromBcb, fetchMonthlySimpleFromBcb } from "./bcbService";
 
 // Re-exportando tipos para os consumidores que importavam daqui
 export type { CalcRequest, CalcResponse, HistoricoPayload } from "../types/api";
@@ -46,13 +46,12 @@ function temSerieBcb(indice: string): boolean {
 //
 // Metodologia legal conforme EC 113/2021 e STJ/TJRJ:
 //   • Até 30/11/2021   : IPCA-E (BCB série 10764)
-//   • A partir 01/12/2021: SELIC diária acumulada (BCB série 11)
+//   • A partir 01/12/2021: SELIC mensal acumulada (BCB série 4390) via acumulação SIMPLES
 //
-// NOTA IMPORTANTE sobre a série 11 (SELIC diária):
-//   A série 11 retorna HTTP 406 quando consultada via Python/curl, mas
-//   funciona normalmente via fetch() do browser (JavaScript / React).
-//   A função fetchDailyFromBcb() divide o período em janelas de 9 anos
-//   para respeitar o limite de 10 anos da API do BCB.
+// POR QUE ACUMULAÇÃO SIMPLES (não composta):
+//   O TJ/RJ aplica: fatorSELIC = 1 + Σ(taxas mensais) / 100
+//   Usando juros compostos o resultado seria ~1,62 (errado).
+//   Com acumulação simples: 49 meses × ~1,017%/mês = 49,82% → fator 1,4982 (correto).
 //
 // Validado: R$100 de 01/01/2020 a 01/01/2026 → R$169,13 (igual ao TJ/RJ)
 
@@ -61,78 +60,103 @@ const TJ11960_SELIC_INICIO = "2021-12-01";
 
 // BCB série 10764 = IPCA-E mensal
 const BCB_IPCAE_SERIE = 10764;
-// BCB série 11 = SELIC diária (funciona via browser fetch, não via curl)
+// BCB série 4390 = Taxa Selic acumulada no mês (% a.m.) — metodologia TJ/RJ (acumulação simples)
+// Validado: soma de 01/12/2021 a 01/01/2026 = 49,82% → fator 1,4982 (igual ao TJ/RJ)
+const BCB_SELIC_MENSAL_SERIE = 4390;
+// BCB série 11 = SELIC diária (mantida como fallback secundário)
 const BCB_SELIC_DIARIA_SERIE = 11;
 
 /**
  * Calcula a correção monetária conforme a Lei 11.960/2009 (Fazenda Pública):
  *   - IPCA-E (BCB 10764) de dataInicio até 30/11/2021
- *   - SELIC diária (BCB 11) de 01/12/2021 até dataFim
+ *   - SELIC mensal acumulada (BCB 4390) de 01/12/2021 até dataFim
+ *     Metodologia: acumulação SIMPLES (soma das taxas, não juros compostos)
  *
  * Validado contra a calculadora oficial do TJ/RJ:
  *   R$100 em 01/01/2020 → R$169,13 em 01/01/2026
+ *   IPCA-E fator 1,12887 × SELIC simples fator 1,4982 = 1,6913
  */
 async function calcularTjRj11960(req: CalcRequest): Promise<CalcResponse | null> {
   let fatorIpcae = 1;
   let fatorSelic = 1;
   const diasTotal = calcularDias(req.dateInit, req.dateFim);
 
-  // ── Fase 1: IPCA-E (BCB 10764) até 30/11/2021 ───────────────────────────────
+  // ── Fase 1: IPCA-E até 30/11/2021 ──────────────────────────────────────────
   if (req.dateInit < TJ11960_SELIC_INICIO) {
     const fimIpcae = req.dateFim < TJ11960_SELIC_INICIO ? req.dateFim : TJ11960_CORTE;
 
-    // Tentar backend Java para IPCA-E primeiro
+    // Fonte primária: /tj11960/calculate/between-dates para período EXCLUSIVAMENTE pré-corte.
+    // Esse endpoint usa tbl_tj_l11960_selic (tem dados!) → retorna o MESMO fator IPCA-E
+    // que o TJ/RJ usa. Exemplo: Jan2020→Nov2021 → fator 1,12887383.
     try {
-      const data = await postToBackend("/ipcae/calculate/between-dates", {
+      const data = await postToBackend("/tj11960/calculate/between-dates", {
         amount: req.valor,
         startDate: req.dateInit,
-        endDate: fimIpcae,
+        endDate: fimIpcae,   // sempre < 2021-12-01, logo backend retorna só a fase IPCA-E
       }) as Record<string, unknown>;
 
       if (isBackendResponseValida(data, { ...req, dateFim: fimIpcae })) {
-        const res = normalizeBackendResponse(data, { ...req, dateFim: fimIpcae }, "/ipcae/calculate/between-dates");
+        const res = normalizeBackendResponse(data, { ...req, dateFim: fimIpcae }, "/tj11960/calculate/between-dates");
         fatorIpcae = res.fatorAcumulado ?? 1;
-        console.info(`[TJ11960] Fase IPCA-E backend (${req.dateInit} → ${fimIpcae}): fator=${fatorIpcae.toFixed(6)}`);
+        console.info(`[TJ11960] Fase IPCA-E via tj11960 backend (${req.dateInit} → ${fimIpcae}): fator=${fatorIpcae.toFixed(6)}`);
       } else {
-        throw new Error("Backend sem dados para IPCA-E");
+        throw new Error("Backend tj11960 sem dados IPCA-E");
       }
     } catch {
-      // Fallback obrigatório: IPCA-E via BCB série 10764
+      // Fallback secundário: /ipcae/calculate/between-dates
       try {
-        const f = await fetchMonthlyFromBcb(BCB_IPCAE_SERIE, {
-          valor: req.valor,
-          dateInit: req.dateInit,
-          dateFim: fimIpcae,
-        });
-        if (f && f > 1) {
-          fatorIpcae = f;
-          console.info(`[TJ11960] Fase IPCA-E BCB (${req.dateInit} → ${fimIpcae}): fator=${fatorIpcae.toFixed(6)}`);
+        const data2 = await postToBackend("/ipcae/calculate/between-dates", {
+          amount: req.valor,
+          startDate: req.dateInit,
+          endDate: fimIpcae,
+        }) as Record<string, unknown>;
+
+        if (isBackendResponseValida(data2, { ...req, dateFim: fimIpcae })) {
+          const res2 = normalizeBackendResponse(data2, { ...req, dateFim: fimIpcae }, "/ipcae/calculate/between-dates");
+          fatorIpcae = res2.fatorAcumulado ?? 1;
+          console.info(`[TJ11960] Fase IPCA-E via ipcae backend (${req.dateInit} → ${fimIpcae}): fator=${fatorIpcae.toFixed(6)}`);
+        } else {
+          throw new Error("Backend ipcae sem dados");
         }
-      } catch { /* sem dados IPCA-E */ }
+      } catch {
+        // Último fallback: IPCA-E via BCB série 10764 (pode divergir ligeiramente do TJ/RJ)
+        try {
+          const f = await fetchMonthlyFromBcb(BCB_IPCAE_SERIE, {
+            valor: req.valor,
+            dateInit: req.dateInit,
+            dateFim: fimIpcae,
+          });
+          if (f && f > 1) {
+            fatorIpcae = f;
+            console.warn(`[TJ11960] Fase IPCA-E BCB 10764 (${req.dateInit} → ${fimIpcae}): fator=${fatorIpcae.toFixed(6)} (pode divergir do TJ/RJ)`);
+          }
+        } catch { /* sem dados IPCA-E */ }
+      }
     }
   }
 
-  // ── Fase 2: SELIC mensal (BCB 4390) a partir de 01/12/2021 ──────────────────
+  // ── Fase 2: SELIC mensal simples (BCB 4390) a partir de 01/12/2021 ─────────────────
   if (req.dateFim > TJ11960_CORTE) {
     const inicioSelic = req.dateInit > TJ11960_CORTE ? req.dateInit : TJ11960_SELIC_INICIO;
 
-    // Tentar backend Java para SELIC primeiro
+    // A fase SELIC da Lei 11.960 exige acumulação SIMPLES mensal (soma das taxas).
+    // O backend /selic/diario/calculate/between-dates calcula juros compostos diários (incorreto legalmente).
+    // Portanto, buscamos diretamente via BCB 4390 acumulada simples.
     try {
-      const data = await postToBackend("/selic/diario/calculate/between-dates", {
-        amount: req.valor,
-        startDate: inicioSelic,
-        endDate: req.dateFim,
-      }) as Record<string, unknown>;
-
-      if (isBackendResponseValida(data, { ...req, dateInit: inicioSelic })) {
-        const res = normalizeBackendResponse(data, { ...req, dateInit: inicioSelic }, "/selic/diario/calculate/between-dates");
-        fatorSelic = res.fatorAcumulado ?? 1;
-        console.info(`[TJ11960] Fase SELIC backend (${inicioSelic} → ${req.dateFim}): fator=${fatorSelic.toFixed(6)}`);
+      const f = await fetchMonthlySimpleFromBcb(BCB_SELIC_MENSAL_SERIE, {
+        valor: req.valor,
+        dateInit: inicioSelic,
+        dateFim: req.dateFim,
+      });
+      if (f && f > 1) {
+        fatorSelic = f;
+        console.info(`[TJ11960] Fase SELIC mensal simples BCB 4390 (${inicioSelic} → ${req.dateFim}): fator=${fatorSelic.toFixed(6)}`);
       } else {
-        throw new Error("Backend sem dados para SELIC");
+        throw new Error("BCB 4390 sem dados");
       }
     } catch {
-      // Fallback: SELIC diária via BCB série 11 (funciona via browser fetch no React)
+      // Fallback secundário: SELIC diária BCB série 11 (resultado diferente do TJ/RJ, mas usado em último caso)
+      console.warn("[TJ11960] BCB 4390 indisponível, tentando série 11 diária (fallback secundário)");
       try {
         const f = await fetchDailyFromBcb(BCB_SELIC_DIARIA_SERIE, {
           valor: req.valor,
@@ -141,7 +165,7 @@ async function calcularTjRj11960(req: CalcRequest): Promise<CalcResponse | null>
         });
         if (f && f > 1) {
           fatorSelic = f;
-          console.info(`[TJ11960] Fase SELIC diária BCB (${inicioSelic} → ${req.dateFim}): fator=${fatorSelic.toFixed(6)}`);
+          console.warn(`[TJ11960] Fase SELIC diária BCB 11 (${inicioSelic} → ${req.dateFim}): fator=${fatorSelic.toFixed(6)} (pode divergir do TJ/RJ)`);
         }
       } catch { /* sem dados SELIC */ }
     }

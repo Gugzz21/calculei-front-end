@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -458,16 +457,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
 
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200">
-      <style dangerouslySetInnerHTML={{__html: `
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}} />
-      <div 
+      <div
         ref={cardRef}
         className="bg-white dark:bg-[#010409] border border-gray-200 dark:border-[#21262d] rounded-2xl shadow-2xl w-full max-w-lg md:max-w-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-200"
       >
@@ -475,37 +465,21 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
           <h2 className="text-lg md:text-xl font-extrabold text-gray-800 dark:text-slate-100 tracking-tight">
             {currentConfig.title}
           </h2>
-          <button 
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-            aria-label="Fechar modal"
-          >
-            <X size={18} />
-          </button>
         </div>
 
-        <div className="relative bg-gray-50/50 dark:bg-[#0d1117]/10 border-b border-gray-100 dark:border-[#21262d]">
-          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 dark:from-[#010409]/60 to-transparent pointer-events-none z-10" />
-          <div className="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth px-5 py-0.5">
-            {currentConfig.tabs.map((tab: any) => {
-              const isActive = tab.id === activeTabId;
-              return (
-                <button
-                  type="button"
-                  key={tab.id}
-                  onClick={() => setActiveTabId(tab.id)}
-                  className={`py-3.5 px-3.5 border-b-2 text-xs font-bold tracking-wider whitespace-nowrap transition-all duration-150 relative -bottom-[1px] cursor-pointer ${isActive
-                    ? 'border-blue-600 dark:border-[#007aff] text-blue-600 dark:text-[#007aff]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                    }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 dark:from-[#010409]/60 to-transparent pointer-events-none z-10" />
+        {/* Menu Dropdown de Seleção */}
+        <div className="p-4 bg-gray-50/50 dark:bg-[#0d1117]/10 border-b border-gray-100 dark:border-[#21262d]">
+          <select
+            value={activeTabId}
+            onChange={(e) => setActiveTabId(e.target.value)}
+            className="w-full p-2.5 bg-white dark:bg-[#010409] border border-gray-300 dark:border-[#30363d] rounded-lg text-sm font-medium text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#007aff] transition-shadow cursor-pointer"
+          >
+            {currentConfig.tabs.map((tab: any) => (
+              <option key={tab.id} value={tab.id}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="p-6 overflow-y-auto bg-slate-50/20 dark:bg-[#0d1117]/5 flex-1 min-h-[220px]">

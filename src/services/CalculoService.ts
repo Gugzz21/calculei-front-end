@@ -1,8 +1,8 @@
-import { calcularIndice, calcularJuros, getValorAtualizado } from "./api";
-import type { FormState, JurosState, LancamentoItem } from "../types";
+import { calcularIndice, calcularJuros, getValorAtualizado, type CalcResponse } from "./api";
+import type { FormState, JurosState, LancamentoItem, DetalheJuros } from "../types";
 import { INDICE_LABEL, DESCRICAO_LABEL, JUROS_LABEL } from "../constants/dominios";
 
-const INDICES_COM_JUROS_EMBUTIDOS = new Set(["selic", "tjrj11960"]);
+const INDICES_COM_JUROS_EMBUTIDOS = new Set(["selic"]);
 
 /**
  * CalculoService isola a lógica de negócio de orquestração de cálculos
@@ -66,9 +66,9 @@ export class CalculoService {
   /**
    * Extrai ou calcula o percentual de correção da resposta.
    */
-  private static extrairPercentualCorrecao(resp: any, valorBase: number, valorAtualizado: number): number {
-    let pct = resp?.percentualAcumulado ?? resp?.fatorAcumulado ?? resp?.accumulatedFactor;
-    if (!pct && valorBase > 0) {
+  private static extrairPercentualCorrecao(resp: CalcResponse | null, valorBase: number, valorAtualizado: number): number {
+    let pct = resp?.percentualAcumulado;
+    if ((pct === undefined || pct === null) && valorBase > 0) {
       pct = ((valorAtualizado - valorBase) / valorBase) * 100;
     }
     return pct ?? 0;
@@ -88,7 +88,7 @@ export class CalculoService {
     let label = "—";
     let dataIni = "";
     let dataFim = "";
-    const itensJuros: any[] = [];
+    const itensJuros: DetalheJuros[] = [];
 
     if (deveAplicar) {
       const promessas = juros.aplicados.map(async (aplicado) => {
@@ -113,7 +113,7 @@ export class CalculoService {
         valorJurosTotal += valorPeriodo;
         diasTotais += resp.dias ?? 0;
         fatorAcumulado *= (resp.fatorAcumulado ?? (1 + (resp.percentualAcumulado ?? 0) / 100));
-        percentualAcumulado += resp.percentualAcumulado ?? resp.accumulatedFactor ?? 0;
+        percentualAcumulado += resp.percentualAcumulado ?? 0;
         label = JUROS_LABEL[aplicado.indice] ?? aplicado.indice;
         dataIni = aplicado.dataInicio;
         dataFim = aplicado.dataFim;
@@ -124,7 +124,7 @@ export class CalculoService {
           dataInicio: aplicado.dataInicio,
           dataFim: aplicado.dataFim,
           dias: resp.dias ?? 0,
-          percentual: resp.percentualAcumulado ?? resp.accumulatedFactor ?? 0,
+          percentual: resp.percentualAcumulado ?? 0,
           valor: valorPeriodo,
         });
       }

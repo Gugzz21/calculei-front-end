@@ -102,27 +102,30 @@ export function normalizeBackendResponse(
     ?? req.valor
   ) as number;
 
-  // BUG #3 FIX: `accumulatedFactor` e `accumulatedValue` nos DTOs Java são
-  // SEMPRE percentuais (ex: 26.5 para 26,5%), não fatores multiplicativos.
-  // O código anterior tratava esses campos como fator multiplicativo (1.265),
-  // o que causava percentuais absurdos (ex: 2650%) em cálculos de juros.
-  // A remoção do case especial para taxalegal unifica o comportamento.
-  let percentualAcumulado = (
-    data.percentualAcumulado       // Campo se o backend futuramente enviar correto
-    ?? data.accumulatedPercentage  // Alias alternativo
-    ?? data.accumulatedFactor      // ← É PERCENTUAL no Java (mal nomeado)
-    ?? data.accumulatedValue       // ← Usado por TR e TJ6899 (também é percentual)
-  ) as number | undefined;
+  let fatorAcumulado: number;
+  let percentualAcumulado: number;
 
-  // Fallback: deriva percentual da variação do valor se não veio explícito
-  if ((percentualAcumulado === undefined || percentualAcumulado === 0) && req.valor > 0 && valorFinal !== req.valor) {
-    percentualAcumulado = ((valorFinal / req.valor) - 1) * 100;
+  // Os endpoints /tj6899/ e /tj11960/ retornam o FATOR MULTIPLICATIVO (ex: 1.33637131), não o percentual.
+  if (endpoint.includes("/tj6899/") || endpoint.includes("/tj11960/")) {
+    fatorAcumulado = (data.accumulatedValue ?? data.accumulatedFactor ?? (req.valor > 0 ? valorFinal / req.valor : 1)) as number;
+    percentualAcumulado = (fatorAcumulado - 1) * 100;
+  } else {
+    // Para os demais endpoints (IPCA, IGP-M, TR, CDI, etc.), o backend envia a variação percentual (ex: 26.5 para 26,5%).
+    let percentual = (
+      data.percentualAcumulado
+      ?? data.accumulatedPercentage
+      ?? data.accumulatedFactor
+      // Observação: Para TR, a API envia percentual em accumulatedValue
+      ?? data.accumulatedValue
+    ) as number | undefined;
+
+    if ((percentual === undefined || percentual === null || percentual === 0) && req.valor > 0 && valorFinal !== req.valor) {
+      percentual = ((valorFinal / req.valor) - 1) * 100;
+    }
+
+    percentualAcumulado = percentual ?? 0;
+    fatorAcumulado = 1 + percentualAcumulado / 100;
   }
-
-  // Deriva o fatorAcumulado real (multiplicativo) a partir do percentual
-  const fatorAcumulado = percentualAcumulado !== undefined
-    ? 1 + percentualAcumulado / 100
-    : (req.valor > 0 ? valorFinal / req.valor : 1);
 
   return {
     dataInicio: req.dateInit,
