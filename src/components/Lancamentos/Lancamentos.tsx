@@ -174,12 +174,25 @@ function Lancamentos() {
         />
 
         {/* Conteúdo */}
-        {lancamentos.length === 0 && !loading ? (
+        {loading && lancamentos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 gap-3 bg-white dark:bg-[#161b22] border border-slate-200 dark:border-[#30363d] rounded-lg shadow-sm">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent border-[#073365] dark:border-[#007aff]"></div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 font-semibold animate-pulse">Buscando dados e realizando os cálculos...</p>
+          </div>
+        ) : lancamentos.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-500 italic">
             Nenhum cálculo realizado ainda. Preencha os dados acima e clique em Calcular.
           </p>
         ) : (
-          <div ref={tableRef} className="flex flex-col gap-4">
+          <div ref={tableRef} className="relative flex flex-col gap-4">
+            {loading && (
+              <div className="absolute inset-0 bg-white/70 dark:bg-[#0d1117]/70 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-lg">
+                <div className="flex flex-col items-center gap-2 bg-white dark:bg-[#161b22] px-6 py-4 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800">
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-[#073365] dark:border-[#007aff]"></div>
+                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Atualizando...</span>
+                </div>
+              </div>
+            )}
             <TabelaLancamentos
               currentItems={currentItems}
               startIndex={startIndex}

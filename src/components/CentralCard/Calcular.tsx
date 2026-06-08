@@ -1,4 +1,4 @@
-import { Calculator, Save } from 'lucide-react';
+import { Calculator, Save, Loader2 } from 'lucide-react';
 
 interface CalcularProps {
   onClick: () => void;
@@ -28,7 +28,13 @@ function Calcular({ onClick, loading, disabled, editMode = false }: CalcularProp
               : "bg-[#073365] dark:bg-[#007aff] text-white hover:bg-[#062953] dark:hover:bg-[#0066d6] cursor-pointer"
           }`}
       >
-        {editMode ? <Save className="w-5 h-5" /> : <Calculator className="w-5 h-5" />}
+        {loading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : editMode ? (
+          <Save className="w-5 h-5" />
+        ) : (
+          <Calculator className="w-5 h-5" />
+        )}
         <span>{label}</span>
       </button>
     </div>

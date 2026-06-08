@@ -72,7 +72,7 @@ export async function fetchMonthlySimpleFromBcb(
 
   const somaRates = registros
     .filter(r => {
-      const [d, m, y] = r.data.split("/");
+      const [, m, y] = r.data.split("/");
       const recordMonth = `${y}-${m}`;
       return recordMonth >= initMonth && recordMonth <= fimMonth;
     })

@@ -24,9 +24,10 @@ export type { CalcRequest, CalcResponse, HistoricoPayload } from "../types/api";
 
 // ─── Cache ────────────────────────────────────────────────────────────────────
 const API_CACHE = new Map<string, CalcResponse>();
+const IN_FLIGHT_REQUESTS = new Map<string, Promise<CalcResponse | null>>();
 
 function getCacheKey(type: string, indice: string, req: CalcRequest, extra?: string | number): string {
-  return `${type}:${indice}:${req.valor}:${req.dateInit}:${req.dateFim}${extra ? `:${extra}` : ""}`;
+  return `${type}:${indice}:${req.dateInit}:${req.dateFim}${extra ? `:${extra}` : ""}`;
 }
 
 // ─── Helpers de detecção de série BCB ────────────────────────────────────────
@@ -271,75 +272,113 @@ export async function calcularIndice(
 
   // 0. Checar Cache
   const cacheKey = getCacheKey("indice", indice, req);
-  if (API_CACHE.has(cacheKey)) return API_CACHE.get(cacheKey) || null;
+  if (API_CACHE.has(cacheKey)) {
+    const cached = API_CACHE.get(cacheKey)!;
+    const valorFinal = req.valor * (cached.fatorAcumulado ?? 1);
+    return {
+      ...cached,
+      valorAcumulado: valorFinal,
+      valorFinal,
+      valueFinal: valorFinal,
+    };
+  }
 
-  // 1. Tentar backend Java (fonte primária)
-  const endpoint = CORRECAO_ENDPOINTS[indice];
-  if (endpoint) {
-    try {
-      const data = await postToBackend(endpoint, {
-        amount: req.valor,
-        startDate: req.dateInit,
-        endDate: req.dateFim,
-      }) as Record<string, unknown>;
+  // 0.5 Checar in-flight request
+  if (IN_FLIGHT_REQUESTS.has(cacheKey)) {
+    const promise = IN_FLIGHT_REQUESTS.get(cacheKey)!;
+    const cached = await promise;
+    if (cached) {
+      const valorFinal = req.valor * (cached.fatorAcumulado ?? 1);
+      return {
+        ...cached,
+        valorAcumulado: valorFinal,
+        valorFinal,
+        valueFinal: valorFinal,
+      };
+    }
+    return null;
+  }
 
-      if (!isBackendResponseValida(data, req)) {
-        throw new Error("Java retornou resposta vazia (sem dados no BD)");
+  const promiseExecution = (async (): Promise<CalcResponse | null> => {
+    // 1. Tentar backend Java (fonte primária)
+    const endpoint = CORRECAO_ENDPOINTS[indice];
+    if (endpoint) {
+      try {
+        const data = await postToBackend(endpoint, {
+          amount: req.valor,
+          startDate: req.dateInit,
+          endDate: req.dateFim,
+        }) as Record<string, unknown>;
+
+        if (!isBackendResponseValida(data, req)) {
+          throw new Error("Java retornou resposta vazia (sem dados no BD)");
+        }
+
+        const res = normalizeBackendResponse(data, req, endpoint);
+        return res;
+      } catch {
+        // Java falhou → tentar BCB como fallback
+        console.warn(`[API] Java falhou para "${indice}" → tentando BCB como fallback`);
       }
+    }
 
-      const res = normalizeBackendResponse(data, req, endpoint);
+    // 2. BUG #2 FIX: Fallback BCB
+    if (temSerieBcb(indice)) {
+      try {
+        console.info(`[BCB] Buscando "${indice}" na API do Banco Central...`);
+        const resBcb = await fetchFromBcb(indice, req);
+        if (resBcb) {
+          return resBcb;
+        }
+      } catch {
+        console.warn(`[BCB] Falha ao buscar "${indice}" no Banco Central`);
+      }
+    }
+
+    // 3. Fallback para TJ/RJ 11960 (Fazenda Pública): cálculo híbrido IPCA-E + SELIC
+    if (indice === "tjrj11960") {
+      try {
+        const resTj = await calcularTjRj11960(req);
+        if (resTj) {
+          return resTj;
+        }
+      } catch {
+        console.warn("[TJ11960] Cálculo híbrido falhou");
+      }
+    }
+
+    // 4. Fallback para TJ/RJ 6899 (Natureza Civil / UFIR-RJ): usa IPCA-E via BCB
+    if (indice === "tjrj6899") {
+      try {
+        const resTj6899 = await calcularTjRj6899(req);
+        if (resTj6899) {
+          return resTj6899;
+        }
+      } catch {
+        console.warn("[TJ6899] Cálculo IPCA-E falhou");
+      }
+    }
+
+    return null;
+  })();
+
+  IN_FLIGHT_REQUESTS.set(cacheKey, promiseExecution);
+  try {
+    const res = await promiseExecution;
+    if (res) {
       API_CACHE.set(cacheKey, res);
-      return res;
-    } catch {
-      // Java falhou → tentar BCB como fallback
-      console.warn(`[API] Java falhou para "${indice}" → tentando BCB como fallback`);
+      const valorFinal = req.valor * (res.fatorAcumulado ?? 1);
+      return {
+        ...res,
+        valorAcumulado: valorFinal,
+        valorFinal,
+        valueFinal: valorFinal,
+      };
     }
+    return null;
+  } finally {
+    IN_FLIGHT_REQUESTS.delete(cacheKey);
   }
-
-  // 2. BUG #2 FIX: Fallback BCB — antes este bloco não existia!
-  //    Índices como IPCA, IGPM, TR, IPCAE, IGPDI têm séries no BCB.
-  //    Se o Java não tiver dados ou estiver offline, o BCB é consultado.
-  if (temSerieBcb(indice)) {
-    try {
-      console.info(`[BCB] Buscando "${indice}" na API do Banco Central...`);
-      const resBcb = await fetchFromBcb(indice, req);
-      if (resBcb) {
-        API_CACHE.set(cacheKey, resBcb);
-        return resBcb;
-      }
-    } catch {
-      console.warn(`[BCB] Falha ao buscar "${indice}" no Banco Central`);
-    }
-  }
-
-  // 3. Fallback para TJ/RJ 11960 (Fazenda Pública): cálculo híbrido IPCA-E + SELIC
-  if (indice === "tjrj11960") {
-    try {
-      const resTj = await calcularTjRj11960(req);
-      if (resTj) {
-        API_CACHE.set(cacheKey, resTj);
-        return resTj;
-      }
-    } catch {
-      console.warn("[TJ11960] Cálculo híbrido falhou");
-    }
-  }
-
-  // 4. Fallback para TJ/RJ 6899 (Natureza Civil / UFIR-RJ): usa IPCA-E via BCB
-  //    Validado: R$100 de 01/01/2020 a 01/01/2026 → R$139,53 (igual ao TJ/RJ)
-  if (indice === "tjrj6899") {
-    try {
-      const resTj6899 = await calcularTjRj6899(req);
-      if (resTj6899) {
-        API_CACHE.set(cacheKey, resTj6899);
-        return resTj6899;
-      }
-    } catch {
-      console.warn("[TJ6899] Cálculo IPCA-E falhou");
-    }
-  }
-
-  return null;
 }
 
 /**
@@ -373,70 +412,112 @@ export async function calcularJuros(
 ): Promise<CalcResponse | null> {
   // 0. Checar Cache
   const cacheKey = getCacheKey("juros", indice, req, taxaAnualPercentual);
-  if (API_CACHE.has(cacheKey)) return API_CACHE.get(cacheKey) || null;
-
-  // 1. Para taxa especificada pelo usuário, o endpoint é dinâmico
-  const endpoint = indice === "especificartaxa" && taxaAnualPercentual !== undefined
-    ? `/simple-interest/${taxaAnualPercentual}`
-    : JUROS_ENDPOINTS[indice];
-
-  // 2. Tentar backend Java
-  if (endpoint) {
-    try {
-      const data = await postToBackend(endpoint, {
-        amount: req.valor,
-        startDate: req.dateInit,
-        endDate: req.dateFim,
-      }) as Record<string, unknown>;
-
-      if (!isBackendResponseValida(data, req)) {
-        throw new Error("Java retornou resposta vazia (sem dados no BD)");
-      }
-
-      const res = normalizeBackendResponse(data, req, endpoint);
-      API_CACHE.set(cacheKey, res);
-      return res;
-    } catch (err: unknown) {
-      // Para juros com série BCB, tentar fallback
-      if (temSerieBcb(indice)) {
-        console.warn(`[API] Java falhou para juros "${indice}" → tentando BCB`);
-        try {
-          const resBcb = await fetchFromBcb(indice, req);
-          if (resBcb) {
-            API_CACHE.set(cacheKey, resBcb);
-            return resBcb;
-          }
-        } catch {
-          console.warn(`[BCB] Falha ao buscar juros "${indice}"`);
-        }
-      }
-      // Para outros índices sem fallback BCB, propagar o erro
-      console.error(`[API] Erro ao calcular juros no Java:`, err);
-      throw err;
-    }
-  }
-
-  // 3. Cálculo local (apenas para taxas sem endpoint e sem série BCB)
-  if (taxaAnualPercentual !== undefined && !isNaN(taxaAnualPercentual)) {
-    const dias = calcularDias(req.dateInit, req.dateFim);
-    const meses = dias / 30;
-    const taxaMensal = taxaAnualPercentual / 100 / 12;
-    const jurosSimples = req.valor * taxaMensal * meses;
-    const percentualAcumulado = taxaMensal * meses * 100;
-
-    const resLocal = {
-      dataInicio: req.dateInit,
-      dataFim: req.dateFim,
-      dias,
-      valorAcumulado: req.valor + jurosSimples,
-      percentualAcumulado,
-      fatorAcumulado: 1 + percentualAcumulado / 100,
+  if (API_CACHE.has(cacheKey)) {
+    const cached = API_CACHE.get(cacheKey)!;
+    const valorFinal = req.valor * (cached.fatorAcumulado ?? 1);
+    return {
+      ...cached,
+      valorAcumulado: valorFinal,
+      valorFinal,
+      valueFinal: valorFinal,
     };
-    API_CACHE.set(cacheKey, resLocal);
-    return resLocal;
   }
 
-  return null;
+  // 0.5 Checar in-flight request
+  if (IN_FLIGHT_REQUESTS.has(cacheKey)) {
+    const promise = IN_FLIGHT_REQUESTS.get(cacheKey)!;
+    const cached = await promise;
+    if (cached) {
+      const valorFinal = req.valor * (cached.fatorAcumulado ?? 1);
+      return {
+        ...cached,
+        valorAcumulado: valorFinal,
+        valorFinal,
+        valueFinal: valorFinal,
+      };
+    }
+    return null;
+  }
+
+  const promiseExecution = (async (): Promise<CalcResponse | null> => {
+    // 1. Para taxa especificada pelo usuário, o endpoint é dinâmico
+    const endpoint = indice === "especificartaxa" && taxaAnualPercentual !== undefined
+      ? `/simple-interest/${taxaAnualPercentual}`
+      : JUROS_ENDPOINTS[indice];
+
+    // 2. Tentar backend Java
+    if (endpoint) {
+      try {
+        const data = await postToBackend(endpoint, {
+          amount: req.valor,
+          startDate: req.dateInit,
+          endDate: req.dateFim,
+        }) as Record<string, unknown>;
+
+        if (!isBackendResponseValida(data, req)) {
+          throw new Error("Java retornou resposta vazia (sem dados no BD)");
+        }
+
+        const res = normalizeBackendResponse(data, req, endpoint);
+        return res;
+      } catch (err: unknown) {
+        // Para juros com série BCB, tentar fallback
+        if (temSerieBcb(indice)) {
+          console.warn(`[API] Java falhou para juros "${indice}" → tentando BCB`);
+          try {
+            const resBcb = await fetchFromBcb(indice, req);
+            if (resBcb) {
+              return resBcb;
+            }
+          } catch {
+            console.warn(`[BCB] Falha ao buscar juros "${indice}"`);
+          }
+        }
+        // Para outros índices sem fallback BCB, propagar o erro
+        console.error(`[API] Erro ao calcular juros no Java:`, err);
+        throw err;
+      }
+    }
+
+    // 3. Cálculo local (apenas para taxas sem endpoint e sem série BCB)
+    if (taxaAnualPercentual !== undefined && !isNaN(taxaAnualPercentual)) {
+      const dias = calcularDias(req.dateInit, req.dateFim);
+      const meses = dias / 30;
+      const taxaMensal = taxaAnualPercentual / 100 / 12;
+      const jurosSimples = req.valor * taxaMensal * meses;
+      const percentualAcumulado = taxaMensal * meses * 100;
+
+      const resLocal = {
+        dataInicio: req.dateInit,
+        dataFim: req.dateFim,
+        dias,
+        valorAcumulado: req.valor + jurosSimples,
+        percentualAcumulado,
+        fatorAcumulado: 1 + percentualAcumulado / 100,
+      };
+      return resLocal;
+    }
+
+    return null;
+  })();
+
+  IN_FLIGHT_REQUESTS.set(cacheKey, promiseExecution);
+  try {
+    const res = await promiseExecution;
+    if (res) {
+      API_CACHE.set(cacheKey, res);
+      const valorFinal = req.valor * (res.fatorAcumulado ?? 1);
+      return {
+        ...res,
+        valorAcumulado: valorFinal,
+        valorFinal,
+        valueFinal: valorFinal,
+      };
+    }
+    return null;
+  } finally {
+    IN_FLIGHT_REQUESTS.delete(cacheKey);
+  }
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

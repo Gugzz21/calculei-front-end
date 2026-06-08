@@ -72,19 +72,16 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   // Pré-busca do índice em background quando o usuário preenche os campos
-  // para que o cáculo final seja instantâneo
+  // para que o cálculo final seja instantâneo
   React.useEffect(() => {
-    if (form.indiceCorrecao && form.dataInicial && form.dataCalculo && form.valor) {
-      const valor = form.valor ? parseInt(form.valor, 10) / 100 : 0;
-      if (valor > 0) {
-        prefetchIndice(form.indiceCorrecao, {
-          valor,
-          dateInit: form.dataInicial,
-          dateFim: form.dataCalculo,
-        });
-      }
+    if (form.indiceCorrecao && form.dataInicial && form.dataCalculo) {
+      prefetchIndice(form.indiceCorrecao, {
+        valor: 1, // valor dummy para pré-busca (fator de correção independe do valor principal)
+        dateInit: form.dataInicial,
+        dateFim: form.dataCalculo,
+      });
     }
-  }, [form.indiceCorrecao, form.dataInicial, form.dataCalculo, form.valor]);
+  }, [form.indiceCorrecao, form.dataInicial, form.dataCalculo]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 
