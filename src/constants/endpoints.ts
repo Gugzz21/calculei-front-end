@@ -13,13 +13,18 @@ export const CORRECAO_ENDPOINTS: Record<string, string | null> = {
   ipcae: "/ipcae/calculate/between-dates",
   igpm: "/igpm/calculate/between-dates",
   igpdi: "/igpdi/calculate/between-dates",
-  tr: "/tr/calculate/between-dates",
+  // TR: NÃO usar endpoint Java (/tr/calculate/between-dates) — o Java diverge da
+  // Calculadora do Cidadão (retorna ~9,63% vs 6,37% correto para Jan/2020→Jan/2026).
+  // O Java provavelmente usa uma série ou metodologia diferente da BCB 7811.
+  // SOLUÇÃO: omitir o endpoint Java para TR → o sistema cai no fallback BCB série 7811,
+  // que é exatamente a mesma fonte usada pela Calculadora do Cidadão.
+  tr: null,
   tjrj11960: "/tj11960/calculate/between-dates",
   tjrj6899: "/tj6899/calculate/between-dates",
   selic: "/selic/diario/calculate/between-dates",
   cdi: "/cdi/calculate/between-dates",
 
-  // Não há nenhum tipo de correção. 
+  // Não há nenhum tipo de correção.
   semcorrecaomonetaria: null,
 };
 

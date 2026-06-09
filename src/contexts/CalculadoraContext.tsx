@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, useMemo } from 'react';
 import type { FormState, JurosState, LancamentoItem } from '../types';
 import { CalculoService } from '../services/CalculoService';
 import { ReplicacaoService } from '../services/ReplicacaoService';
@@ -85,7 +85,7 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // ── Handlers ──────────────────────────────────────────────────────────────────
 
-  const handleFormChange = (field: keyof FormState, value: string) => {
+  const handleFormChange = useCallback((field: keyof FormState, value: string) => {
     setForm(prev => {
       const next = { ...prev, [field]: value };
       if (field === 'tipoCalculo') {
@@ -94,9 +94,9 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
       return next;
     });
-  };
+  }, []);
 
-  const handleJurosChange = (field: keyof JurosState, value: string | boolean | any[]) => {
+  const handleJurosChange = useCallback((field: keyof JurosState, value: string | boolean | any[]) => {
     setJuros(prev => {
       const next = { ...prev, [field]: value };
       if (field === 'indice') {
@@ -105,9 +105,9 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
       return next;
     });
-  };
+  }, []);
 
-  const handleCalcular = async () => {
+  const handleCalcular = useCallback(async () => {
     if (calculandoRef.current) return;
     calculandoRef.current = true;
 
@@ -137,9 +137,9 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setLoading(false);
       calculandoRef.current = false;
     }
-  };
+  }, [form, juros, editandoId, today]);
 
-  const handleLimpar = () => {
+  const handleLimpar = useCallback(() => {
     setForm({
       valor: '',
       dataInicial: '',
@@ -152,35 +152,35 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setJuros({ enabled: false, indice: 'taxalegal', dataInicio: '', dataFim: '', taxa: '12,00', aplicados: [] });
     setEditandoId(null);
     setErro(null);
-  };
+  }, [today]);
 
-  const handleEditar = (id: number) => {
+  const handleEditar = useCallback((id: number) => {
     const origem = lancamentosOrigem[id];
     if (!origem) return;
     setForm({ ...origem.form });
     setJuros({ ...origem.juros });
     setEditandoId(id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, [lancamentosOrigem]);
 
-  const handleCancelarEdicao = () => {
+  const handleCancelarEdicao = useCallback(() => {
     setEditandoId(null);
     setErro(null);
-  };
+  }, []);
 
-  const handleRemoverLancamento = (id: number) => {
+  const handleRemoverLancamento = useCallback((id: number) => {
     setLancamentos(prev => prev.filter(l => l.id !== id));
     toast.success("Lançamento removido");
-  };
+  }, []);
 
-  const handleLimparTodosLancamentos = () => {
+  const handleLimparTodosLancamentos = useCallback(() => {
     setLancamentos([]);
     setLancamentosOrigem({});
     setEditandoId(null);
     toast.success("Lançamentos removidos");
-  };
+  }, []);
 
-  const handleConfirmarDuplicacao = async (idBase: number, novasDatas: string[]) => {
+  const handleConfirmarDuplicacao = useCallback(async (idBase: number, novasDatas: string[]) => {
     const origem = lancamentosOrigem[idBase];
     if (!origem) return;
 
@@ -195,17 +195,29 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } finally {
       setLoading(false);
     }
-  };
+  }, [lancamentosOrigem, today]);
 
-  const isFormValid = !!form.valor && !!form.dataInicial && !!form.dataCalculo && !!form.tipoCalculo && !!form.indiceCorrecao && !!form.descricao;
+  const isFormValid = useMemo(
+    () => !!form.valor && !!form.dataInicial && !!form.dataCalculo && !!form.tipoCalculo && !!form.indiceCorrecao && !!form.descricao,
+    [form.valor, form.dataInicial, form.dataCalculo, form.tipoCalculo, form.indiceCorrecao, form.descricao]
+  );
+
+  // Memoizar o value do Provider: sem isso, um novo objeto é criado a cada render
+  // forçando TODOS os consumidores do contexto a re-renderizar desnecessariamente.
+  const contextValue = useMemo(() => ({
+    today, form, juros, lancamentos, editandoId, loading, erro, isFormValid, ufirValue,
+    handleFormChange, handleJurosChange, handleCalcular, handleLimpar,
+    handleEditar, handleCancelarEdicao, handleRemoverLancamento,
+    handleLimparTodosLancamentos, handleConfirmarDuplicacao
+  }), [
+    today, form, juros, lancamentos, editandoId, loading, erro, isFormValid, ufirValue,
+    handleFormChange, handleJurosChange, handleCalcular, handleLimpar,
+    handleEditar, handleCancelarEdicao, handleRemoverLancamento,
+    handleLimparTodosLancamentos, handleConfirmarDuplicacao
+  ]);
 
   return (
-    <CalculadoraContext.Provider value={{
-      today, form, juros, lancamentos, editandoId, loading, erro, isFormValid, ufirValue,
-      handleFormChange, handleJurosChange, handleCalcular, handleLimpar,
-      handleEditar, handleCancelarEdicao, handleRemoverLancamento,
-      handleLimparTodosLancamentos, handleConfirmarDuplicacao
-    }}>
+    <CalculadoraContext.Provider value={contextValue}>
       {children}
     </CalculadoraContext.Provider>
   );

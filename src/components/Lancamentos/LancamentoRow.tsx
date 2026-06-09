@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import type { LancamentoItem } from "../../types";
 import { formatBRL } from "../../utils/formatters";
 import { formatDate } from "../../utils/dateUtils";
@@ -270,7 +270,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 
-export default function LancamentoRow(props: LancamentoRowProps) {
+export default React.memo(function LancamentoRow(props: LancamentoRowProps) {
   const [isExpanded, setIsExpanded] = useState(props.forceExpand || false);
   const isActuallyExpanded = props.forceExpand || isExpanded;
 
@@ -288,12 +288,11 @@ export default function LancamentoRow(props: LancamentoRowProps) {
 
       {/* ─── ÁREA EXPANSÍVEL ─── */}
       <div
-        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-          isActuallyExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        }`}
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isActuallyExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          }`}
       >
         <LancamentoRowExpanded item={props.item} />
       </div>
     </div>
   );
-}
+});

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
 import { saveAs } from "file-saver";
 import { usePagination } from "../../hooks/usePagination";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
@@ -40,7 +40,10 @@ function Lancamentos() {
     handleItemRemoved
   } = usePagination({ totalItems: lancamentos.length });
 
-  const currentItems = lancamentos.slice(startIndex, startIndex + itemsPerPage);
+  const currentItems = useMemo(
+    () => lancamentos.slice(startIndex, startIndex + itemsPerPage),
+    [lancamentos, startIndex, itemsPerPage]
+  );
 
   // ── Modais ─────────────────────────────────────────────────────────────────
   const [modalExport, setModalExport] = useState<{
@@ -54,7 +57,7 @@ function Lancamentos() {
   const exportRef = useRef<HTMLDivElement>(null);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
-  const handleGerarPDF = async () => {
+  const handleGerarPDF = useCallback(async () => {
     setSalvandoPDF(true);
     try {
       const { token, doc } = await exportarParaPDF(lancamentos, ufirValue);
@@ -69,9 +72,9 @@ function Lancamentos() {
     } finally {
       setSalvandoPDF(false);
     }
-  };
+  }, [lancamentos, ufirValue]);
 
-  const handleBaixarImagem = async () => {
+  const handleBaixarImagem = useCallback(async () => {
     setIsExporting(true);
     setTimeout(async () => {
       if (!exportRef.current) {
@@ -94,15 +97,25 @@ function Lancamentos() {
         setIsExporting(false);
       }
     }, 300);
-  };
+  }, [lancamentos]);
 
-  const handleRemover = (id: number, isLastInPage: boolean) => {
+  const handleRemover = useCallback((id: number, isLastInPage: boolean) => {
     if (window.confirm("Tem certeza que deseja remover este lançamento?")) {
       handleRemoverLancamento(id);
       handleItemRemoved(isLastInPage);
       toast.success("Lançamento removido com sucesso!");
     }
-  };
+  }, [handleRemoverLancamento, handleItemRemoved]);
+
+  const handleExportarExcel = useCallback(async () => {
+    try {
+      const { token, blob, filename } = await exportarParaExcel(lancamentos, ufirValue);
+      setModalExport({ type: "excel", token, data: { blob, filename } });
+    } catch (e) {
+      toast.error("Erro ao gerar o Excel.");
+      console.error(e);
+    }
+  }, [lancamentos, ufirValue]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -162,15 +175,7 @@ function Lancamentos() {
           salvandoPDF={salvandoPDF}
           onGerarPDF={handleGerarPDF}
           onBaixarImagem={handleBaixarImagem}
-          onExportarExcel={async () => {
-            try {
-              const { token, blob, filename } = await exportarParaExcel(lancamentos, ufirValue);
-              setModalExport({ type: "excel", token, data: { blob, filename } });
-            } catch (e) {
-              toast.error("Erro ao gerar o Excel.");
-              console.error(e);
-            }
-          }}
+          onExportarExcel={handleExportarExcel}
         />
 
         {/* Conteúdo */}

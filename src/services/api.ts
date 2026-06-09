@@ -268,7 +268,11 @@ export async function calcularIndice(
   req: CalcRequest
 ): Promise<CalcResponse | null> {
   // Índice "sem correção monetária" — comportamento esperado
-  if (CORRECAO_ENDPOINTS[indice] === null) return null;
+  // NOTA: null no mapa significa "pular Java, ir direto ao BCB",
+  //       exceto para o índice 'semcorrecaomonetaria' que genuinamente não tem correção.
+  //       Se o índice não existir no mapa (undefined), também retorna null.
+  if (!(indice in CORRECAO_ENDPOINTS)) return null;
+  if (indice === "semcorrecaomonetaria") return null;
 
   // 0. Checar Cache
   const cacheKey = getCacheKey("indice", indice, req);

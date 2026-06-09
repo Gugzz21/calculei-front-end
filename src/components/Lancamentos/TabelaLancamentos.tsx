@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from "react";
 import { formatBRL } from "../../utils/formatters";
 import LancamentoRow from "./LancamentoRow";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
@@ -32,9 +33,21 @@ function TabelaLancamentos({
 }: TabelaLancamentosProps) {
   const { lancamentos, handleLimparTodosLancamentos } = useCalculadoraContext();
 
-  const handleRemover = (id: number) => {
+  // Memoizar todos os totais em um único reduce em vez de 6 independentes.
+  // Sem useMemo, cada render percorre toda a lista 6 vezes (3 desktop + 3 mobile).
+  const totais = useMemo(() => lancamentos.reduce(
+    (acc, l) => ({
+      valorPrincipal: acc.valorPrincipal + l.valorPrincipal,
+      valorAtualizado: acc.valorAtualizado + l.valorAtualizado,
+      juros: acc.juros + l.juros,
+      total: acc.total + l.total,
+    }),
+    { valorPrincipal: 0, valorAtualizado: 0, juros: 0, total: 0 }
+  ), [lancamentos]);
+
+  const handleRemover = useCallback((id: number) => {
     onRemover(id, currentItems.length === 1);
-  };
+  }, [onRemover, currentItems.length]);
 
   return (
     <div className="flex flex-col w-full border border-slate-200 dark:border-[#21262d] rounded-xl shadow-sm overflow-hidden bg-white dark:bg-[#0d1117] transition-colors duration-200">
@@ -86,11 +99,11 @@ function TabelaLancamentos({
           {/* Footer Desktop */}
           <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-4 bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] text-sm font-bold text-blue-900 dark:text-[#4da3ff]`}>
             <div className="col-span-3 pl-8 text-[15px]">Total</div>
-            <div>{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</div>
+            <div>{formatBRL(totais.valorPrincipal)}</div>
             <div className="col-span-2" />
-            <div>{formatBRL(lancamentos.reduce((s, l) => s + l.valorAtualizado, 0))}</div>
-            <div>{formatBRL(lancamentos.reduce((s, l) => s + l.juros, 0))}</div>
-            <div className="text-[15px]">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</div>
+            <div>{formatBRL(totais.valorAtualizado)}</div>
+            <div>{formatBRL(totais.juros)}</div>
+            <div className="text-[15px]">{formatBRL(totais.total)}</div>
             <div />
           </div>
 
@@ -98,11 +111,11 @@ function TabelaLancamentos({
           <div className="md:hidden flex flex-col bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] p-4 gap-2">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Valor</span>
-              <span className="text-sm font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(lancamentos.reduce((s, l) => s + l.valorPrincipal, 0))}</span>
+              <span className="text-sm font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(totais.valorPrincipal)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Devido Geral</span>
-              <span className="text-base font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(lancamentos.reduce((s, l) => s + l.total, 0))}</span>
+              <span className="text-base font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(totais.total)}</span>
             </div>
           </div>
         </>
