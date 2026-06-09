@@ -55,10 +55,10 @@ function TabelaLancamentos({
   }, [onRemover]);
 
   return (
-    <div className="flex flex-col w-full border border-slate-200 dark:border-[#21262d] rounded-xl shadow-sm overflow-hidden bg-white dark:bg-[#0d1117] transition-colors duration-200">
+    <div className="flex flex-col w-full border border-slate-300 dark:border-[#21262d] rounded-xl shadow-sm overflow-hidden bg-white dark:bg-[#0d1117] transition-colors duration-200">
 
       {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
-      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-100 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-200 dark:border-[#21262d] text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap`}>
+      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-200 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-300 dark:border-[#21262d] text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap`}>
         <div /> {/* Ícone expand */}
         <div>Data inicial</div>
         <div>Data final</div>
@@ -75,7 +75,7 @@ function TabelaLancamentos({
                 handleLimparTodosLancamentos();
               }
             }}
-            className="p-1 text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded"
+            className="p-1 text-slate-600 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded"
             title="Limpar todos os lançamentos"
           >
             <DeleteIcon fontSize="small" />
@@ -102,7 +102,7 @@ function TabelaLancamentos({
       {lancamentos.length > 0 && currentPage === totalPages && (
         <>
           {/* Footer Desktop */}
-          <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-4 bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] text-sm font-bold text-blue-900 dark:text-[#4da3ff]`}>
+          <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-4 bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-300 dark:border-[#21262d] text-sm font-bold text-blue-900 dark:text-[#4da3ff]`}>
             <div className="col-span-3 pl-8 text-[15px]">Total</div>
             <div>{formatBRL(totais.valorPrincipal)}</div>
             <div className="col-span-2" />
@@ -113,13 +113,13 @@ function TabelaLancamentos({
           </div>
 
           {/* Footer Mobile */}
-          <div className="md:hidden flex flex-col bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-200 dark:border-[#21262d] p-4 gap-2">
+          <div className="md:hidden flex flex-col bg-blue-50 dark:bg-[#007aff]/10 border-t border-slate-300 dark:border-[#21262d] p-4 gap-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Valor</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Total Valor</span>
               <span className="text-sm font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(totais.valorPrincipal)}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Devido Geral</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Total Devido Geral</span>
               <span className="text-base font-bold text-blue-900 dark:text-[#4da3ff]">{formatBRL(totais.total)}</span>
             </div>
           </div>

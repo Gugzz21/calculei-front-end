@@ -33,7 +33,7 @@ export default function DarkmodeButton() {
   return (
     <button
       onClick={toggleDarkMode}
-      className="p-2 rounded-full bg-slate-200 dark:bg-[#0d1117] text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-[#1e232b] transition-colors shadow-sm"
+      className="p-2 rounded-full bg-slate-300 dark:bg-[#0d1117] text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-[#1e232b] transition-colors shadow-sm"
       title={isDark ? "Mudar para modo claro" : "Mudar para modo escuro"}
     >
       {isDark ? <Sun size={20} /> : <Moon size={20} />}

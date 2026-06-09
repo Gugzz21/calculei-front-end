@@ -27,7 +27,7 @@ function Header() {
             <button
               id="btn-ajuda"
               onClick={() => setShowAjudaModal(true)}
-              className="flex items-center gap-1.5 border border-slate-300 dark:border-[#21262d] rounded-full px-3 py-1.5 text-[13px] text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 border border-slate-400 dark:border-[#21262d] rounded-full px-3 py-1.5 text-[13px] text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors whitespace-nowrap"
             >
               <HelpCircle className="w-4 h-4 shrink-0" />
               <span className="hidden sm:inline">Ajuda</span>
@@ -110,16 +110,16 @@ function Header() {
                   setShowAjudaModal(false);
                   setShowSobreModal(true);
                 }}
-                className="flex items-center gap-3 w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                className="flex items-center gap-3 w-full px-4 py-3.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700/50 rounded-xl text-left hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors group"
               >
-                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-700 shrink-0">
-                  <Info size={18} className="text-slate-600 dark:text-slate-300" />
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-slate-300 dark:bg-slate-700 shrink-0">
+                  <Info size={18} className="text-slate-700 dark:text-slate-300" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-slate-100">
                     Sobre
                   </p>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     Informações sobre o sistema e versão
                   </p>
                 </div>

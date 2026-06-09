@@ -482,7 +482,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
           </select>
         </div>
 
-        <div className="p-6 overflow-y-auto bg-slate-50/20 dark:bg-[#0d1117]/5 flex-1 min-h-[220px]">
+        <div className="p-6 overflow-y-auto bg-slate-100/20 dark:bg-[#0d1117]/5 flex-1 min-h-[220px]">
           <div className="transition-all duration-150 ease-out">
             {activeTab.content}
           </div>

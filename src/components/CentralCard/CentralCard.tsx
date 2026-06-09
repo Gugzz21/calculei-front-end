@@ -60,7 +60,7 @@ function CentralCard() {
     handleJurosChange("enabled", e.target.checked), [handleJurosChange]);
 
   return (
-    <div id="tour-inclusao" className="flex flex-col bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-[#21262d]/60 transition-colors duration-200">
+    <div id="tour-inclusao" className="flex flex-col bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-300/60 dark:border-[#21262d]/60 transition-colors duration-200">
 
       {/* ── Banner modo edição ─────────────────────────────────────── */}
       {editandoId !== null && (
@@ -198,7 +198,7 @@ function CentralCard() {
 
       {/* ── Painel de juros ─────────────────────────────────────────── */}
         {juros.enabled && !jurosEmbutidos && (
-        <div className="border border-gray-300 dark:border-[#21262d] rounded-lg p-3 sm:p-4 bg-slate-50/30 dark:bg-[#010409]/30">
+        <div className="border border-gray-300 dark:border-[#21262d] rounded-lg p-3 sm:p-4 bg-slate-100/30 dark:bg-[#010409]/30">
           <Juros onOpenHelp={handleOpenJurosIndice} />
         </div>
       )}

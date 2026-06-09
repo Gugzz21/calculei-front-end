@@ -10,7 +10,7 @@ import OnboardingTour from './components/OnboardingTour';
 function App() {
   return (
     <CalculadoraProvider>
-      <div className="flex flex-col bg-slate-100 dark:bg-[#010409] min-h-screen w-full overflow-x-hidden transition-colors duration-200">
+      <div className="flex flex-col bg-slate-200 dark:bg-[#010409] min-h-screen w-full overflow-x-hidden transition-colors duration-200">
         <Toaster position="top-right" />
         <OnboardingTour />
         <Header />
