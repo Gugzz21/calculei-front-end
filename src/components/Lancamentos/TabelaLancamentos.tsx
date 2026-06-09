@@ -70,7 +70,7 @@ function TabelaLancamentos({
                 handleLimparTodosLancamentos();
               }
             }}
-            className="p-1 text-slate-300 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded"
+            className="p-1 text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded"
             title="Limpar todos os lançamentos"
           >
             <DeleteIcon fontSize="small" />

@@ -89,14 +89,14 @@ function CentralCard() {
 
       {/* ── Linha 1: Tipo de cálculo | Índice de correção | Descrição ─ */}
       <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-5 w-full">
-        <div className="w-full sm:flex-[10] md:flex-[13] min-w-0">
+        <div id="tour-tipo-calculo" className="w-full sm:flex-[10] md:flex-[13] min-w-0">
           <TipoCalculo
             value={form.tipoCalculo}
             onChange={handleTipoCalculo}
             onOpenHelp={handleOpenTipoCalculo}
           />
         </div>
-        <div className="w-full sm:flex-[7] md:flex-[8] min-w-0">
+        <div id="tour-indice-juros" className="w-full sm:flex-[7] md:flex-[8] min-w-0">
           <IndiceCorrecao
             value={form.indiceCorrecao}
             onChange={handleIndiceCorrecao}
@@ -118,7 +118,7 @@ function CentralCard() {
       <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-5 items-start w-full">
 
         {/* Valor + checkbox "Aplicar juros?" */}
-        <div className="flex flex-col gap-2 w-full sm:w-auto">
+        <div id="tour-valor-principal" className="flex flex-col gap-2 w-full sm:w-auto">
           <InputValor
             value={form.valor}
             onChange={handleValor}
@@ -161,7 +161,8 @@ function CentralCard() {
         </div>
 
         {/* Data inicial */}
-        <div className="w-full sm:w-auto">
+        <div id="tour-datas" className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="w-full sm:w-auto">
           <Data
             title="Data inicial"
             value={form.dataInicial}
@@ -179,6 +180,7 @@ function CentralCard() {
             max={today}
             min={form.dataInicial || undefined}
           />
+        </div>
         </div>
 
         {/* Cards informativos de multa diária */}
@@ -211,15 +213,17 @@ function CentralCard() {
       {/* ── Botões Calcular / Limpar ────────────────────────────────── */}
       <div className="flex flex-col gap-2 w-full">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 w-full">
-          <Calcular
-            onClick={handleCalcular}
-            loading={loading}
-            disabled={
-              !isFormValid ||
-              (juros.enabled && !jurosEmbutidos && juros.aplicados.length === 0)
-            }
-            editMode={editandoId !== null}
-          />
+          <div id="tour-btn-calcular" className="w-full sm:w-auto">
+            <Calcular
+              onClick={handleCalcular}
+              loading={loading}
+              disabled={
+                !isFormValid ||
+                (juros.enabled && !jurosEmbutidos && juros.aplicados.length === 0)
+              }
+              editMode={editandoId !== null}
+            />
+          </div>
           <Limpar onClick={handleLimpar} />
         </div>
         {juros.enabled && !jurosEmbutidos && juros.aplicados.length === 0 && (

@@ -7,14 +7,14 @@ import { gerarUUID } from "../../utils/helpers";
 import { buscarUfirValue, salvarHistorico } from "../../services/api";
 import { logoGrandeMPRJUrl, logoGateUrl, carregarImagemBase64 } from "../../assets/images";
 
-// ─── Paleta de cores MPRJ ─────────────────────────────────────────────────────
+// ─── Paleta de cores baseada no modelo ────────────────────────────────────────
 
-const AZUL_HEADER: [number, number, number] = [31, 78, 121];   // azul escuro cabeçalho
-const AZUL_GRUPO: [number, number, number] = [189, 210, 235];  // azul claro grupo
+const AZUL_HEADER: [number, number, number] = [31, 78, 121];   // Azul escuro cabeçalho tabela
+const AZUL_GRUPO: [number, number, number] = [189, 210, 235];  // Azul clarinho para "Ressarcimento (1)"
 const BRANCO: [number, number, number] = [255, 255, 255];
-const CINZA_TOTAL: [number, number, number] = [242, 242, 242];
-const AZUL_UFIR: [number, number, number] = [220, 234, 248];
+const CINZA_TOTAL: [number, number, number] = [242, 242, 242]; // Cinza das linhas de Total
 const PRETO: [number, number, number] = [0, 0, 0];
+const VERMELHO_LINK: [number, number, number] = [204, 0, 0];
 
 // ─── Cabeçalho MPRJ ──────────────────────────────────────────────────────────
 
@@ -22,24 +22,30 @@ function desenharCabecalho(
   doc: jsPDF,
   paginaAtual: number,
   logoGrandeB64: string,
-  logoGateB64: string
+  logoGateB64: string,
+  linkRetorno?: string
 ) {
   const pw = doc.internal.pageSize.getWidth();
 
-  // ── Logo grande MPRJ (esquerda) — 402×60px → ≈ 72mm × 10.8mm
-  // Posicionada em x=14, y=4, largura=72, altura=10.8
-  doc.addImage(logoGrandeB64, "PNG", 14, 4, 72, 10.8);
+  // ── Link "Voltar a tela" centralizado no topo
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(...VERMELHO_LINK);
+  if (linkRetorno) {
+    doc.textWithLink("Voltar a tela", pw / 2, 10, { url: linkRetorno, align: "center" });
+  } else {
+    doc.text("Voltar a tela", pw / 2, 10, { align: "center" });
+  }
 
-  // ── Logo Gate MPRJ (direita) — 186×40px → ≈ 35mm × 7.5mm
-  // Posicionada à direita: x = pw - 14 - 35
-  doc.addImage(logoGateB64, "PNG", pw - 49, 4, 35, 7.5);
+  // ── Logo grande MPRJ (esquerda)
+  // Posicionada em x=14, y=14
+  doc.addImage(logoGrandeB64, "PNG", 14, 14, 60, 9);
 
-  // Linha separadora horizontal
-  doc.setDrawColor(200, 200, 200);
-  doc.setLineWidth(0.3);
-  doc.line(14, 18, pw - 14, 18);
+  // ── Logo Gate MPRJ (direita)
+  // Posicionada à direita: x = pw - 14 - largura
+  doc.addImage(logoGateB64, "PNG", pw - 44, 14, 30, 6.5);
 
-  // Data de geração (linha 1 apenas)
+  // Data de geração
   if (paginaAtual === 1) {
     const hoje = new Date();
     const dia = String(hoje.getDate()).padStart(2, "0");
@@ -47,8 +53,8 @@ function desenharCabecalho(
     const ano = hoje.getFullYear();
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-    doc.setTextColor(60, 60, 60);
-    doc.text(`Data de geração: ${dia}/${mes}/${ano}`, pw - 14, 24, { align: "right" });
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Data de geração: ${dia}/${mes}/${ano}`, pw - 14, 25, { align: "right" });
   }
 }
 
@@ -62,26 +68,23 @@ function adicionarRodape(doc: jsPDF, link: string) {
   for (let i = 1; i <= total; i++) {
     doc.setPage(i);
 
-    // Linha separadora
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(0.3);
-    doc.line(14, ph - 14, pw - 14, ph - 14);
-
     // Link de recuperação
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(7.5);
+    doc.setFontSize(8);
     doc.setTextColor(80, 80, 80);
-    doc.text("Para recuperar este cálculo, clique no link: ", 14, ph - 8);
+    const prefixo = "Para recuperar este calculo, clique no link: ";
+    doc.text(prefixo, 14, ph - 10);
 
-    const prefixWidth = doc.getTextWidth("Para recuperar este cálculo, clique no link: ");
-    doc.setTextColor(0, 0, 200);
-    doc.text(link, 14 + prefixWidth, ph - 8);
+    const prefixWidth = doc.getTextWidth(prefixo);
+    doc.setTextColor(100, 100, 100);
+    // Para simplificar a exibição e linkar de forma limpa, deixamos na mesma linha com cor sutil
+    doc.textWithLink(link, 14 + prefixWidth, ph - 10, { url: link });
 
     // Paginação
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-    doc.setTextColor(120, 120, 120);
-    doc.text(`Página ${i} de ${total}`, pw - 14, ph - 8, { align: "right" });
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Página ${i} de ${total}`, pw - 14, ph - 10, { align: "right" });
   }
 }
 
@@ -107,7 +110,7 @@ function gerarTabelaCorrecao(
   const tableStartY = startY + 5;
 
   // Cabeçalho da tabela
-  const head = [["#", "Período de cálculo", "Valor (R$)", "Índice", "Correção (%)", "Valor atualizado (R$)", "Juros (R$)", "Total devido (R$)"]];
+  const head = [["Período de cálculo", "Valor (R$)", "Índice", "Fator de correção", "Valor atualizado (R$)", "Juros (R$)", "Total devido (R$)"]];
 
   // Corpo: para cada lançamento, linha de dados + linha de subtotal + linha Total em UFIR
   const body: any[] = [];
@@ -116,108 +119,86 @@ function gerarTabelaCorrecao(
   // e usar willAddPage para re-desenhar cabeçalho
 
   lancamentos.forEach((l, idx) => {
-    const numero = idx + 1;
+    const numero = String(idx + 1);
     const periodo = `${formatDate(l.dataInicial)} a ${formatDate(l.dataCalculo)}`;
-    const correcaoPct = Number(l.percentualCorrecao).toLocaleString("pt-BR", { minimumFractionDigits: 8, maximumFractionDigits: 8 });
 
-    // ── Linha de grupo (nome do lançamento)
+    // A correção deve mostrar muitas casas decimais conforme o modelo
+    const correcaoPct = Number(l.percentualCorrecao).toLocaleString("pt-BR", { minimumFractionDigits: 8, maximumFractionDigits: 8 });
+    const descricaoGrupo = `${numero} - ${l.descricao}${l.descricaoComplementar ? ` (${l.descricaoComplementar})` : ""}`;
+
+    // ── Linha de grupo (Ressarcimento)
     body.push([
       {
-        content: `${l.descricao}${l.descricaoComplementar ? ` (${l.descricaoComplementar})` : ""}`,
-        colSpan: 8,
+        content: descricaoGrupo,
+        colSpan: 7,
         styles: {
           fillColor: AZUL_GRUPO,
           textColor: PRETO,
           fontStyle: "bold",
           fontSize: 8,
-          cellPadding: { left: 3, right: 3, top: 2, bottom: 2 },
+          halign: "left",
         },
       },
     ]);
 
     // ── Linha de dados
     body.push([
-      { content: String(numero), styles: { halign: "center" } },
-      { content: periodo, styles: { halign: "left" } },
-      { content: l.valorPrincipal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
-      { content: l.indiceCorrecao, styles: { halign: "left" } },
-      { content: correcaoPct, styles: { halign: "right", fontSize: 7 } },
-      { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
-      { content: l.juros > 0 ? l.juros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "right" } },
-      { content: l.total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
+      { content: periodo, styles: { halign: "center" } },
+      { content: l.valorPrincipal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center" } },
+      { content: l.indiceCorrecao, styles: { halign: "center" } },
+      { content: correcaoPct, styles: { halign: "center" } },
+      { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center" } },
+      { content: l.juros > 0 ? l.juros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "center" } },
+      { content: l.total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center", fillColor: CINZA_TOTAL } },
     ]);
-
-    // ── Linha de Total do grupo
-    body.push([
-      { content: "Total", colSpan: 2, styles: { halign: "left", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-      { content: l.valorPrincipal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-      { content: "", styles: { fillColor: CINZA_TOTAL } },
-      { content: "", styles: { fillColor: CINZA_TOTAL } },
-      { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-      { content: l.juros > 0 ? l.juros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "right", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-      { content: l.total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-    ]);
-
-
   });
 
-  // Totais gerais (só se mais de 1 lançamento)
-  if (lancamentos.length > 1) {
-    const totPrincipal = lancamentos.reduce((s, l) => s + l.valorPrincipal, 0);
-    const totAtualizado = lancamentos.reduce((s, l) => s + l.valorAtualizado, 0);
-    const totJuros = lancamentos.reduce((s, l) => s + l.juros, 0);
-    const totTotal = lancamentos.reduce((s, l) => s + l.total, 0);
-    const temJuros = lancamentos.some(l => l.juros > 0);
-
-    body.push([
-      { content: "TOTAL GERAL", colSpan: 2, styles: { halign: "left", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO } },
-      { content: totPrincipal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO } },
-      { content: "", styles: { fillColor: AZUL_HEADER } },
-      { content: "", styles: { fillColor: AZUL_HEADER } },
-      { content: totAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO } },
-      { content: temJuros ? totJuros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO } },
-      { content: totTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO } },
-    ]);
-  }
-
-
-
-  // Valor Unitário da UFIR
-  const ufirUnitStr = ufirValue > 0 ? ufirValue.toLocaleString("pt-BR", { minimumFractionDigits: 4, maximumFractionDigits: 4 }) : "Não disponível";
-  body.push([
-    { content: "Valor unitário da UFIR utilizado:", colSpan: 7, styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101], lineWidth: 0.1, lineColor: [7, 51, 101] } },
-    { content: ufirUnitStr, styles: { halign: "center", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO, lineWidth: 0.1, lineColor: [7, 51, 101] } },
-  ]);
-
-  // TOTAL GERAL EM UFIR
-  const totTotalGeral = lancamentos.reduce((s, l) => s + l.total, 0);
-  const totalGeralUfirStr = ufirValue > 0
-    ? (totTotalGeral / ufirValue).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : "—";
+  // ── Totais Gerais (Apenas no final do cálculo)
+  const totalPrincipal = lancamentos.reduce((acc, l) => acc + l.valorPrincipal, 0);
+  const totalAtualizado = lancamentos.reduce((acc, l) => acc + l.valorAtualizado, 0);
+  const totalJuros = lancamentos.reduce((acc, l) => acc + l.juros, 0);
+  const totalGeral = lancamentos.reduce((acc, l) => acc + l.total, 0);
   
+  const totalEmUfir = ufirValue > 0 ? (totalGeral / ufirValue).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—";
+  const ufirUnitStr = ufirValue > 0 ? ufirValue.toLocaleString("pt-BR", { minimumFractionDigits: 4, maximumFractionDigits: 4 }) : "Não disponível";
+
   body.push([
-    { content: "TOTAL GERAL EM UFIR", colSpan: 7, styles: { halign: "left", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101], lineWidth: 0.1, lineColor: [7, 51, 101] } },
-    { content: totalGeralUfirStr, styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_UFIR, textColor: [7, 51, 101], lineWidth: 0.1, lineColor: [7, 51, 101] } },
+    { content: "Total", styles: { halign: "left", fontStyle: "bold", fillColor: BRANCO } },
+    { content: totalPrincipal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center", fontStyle: "bold", fillColor: BRANCO } },
+    { content: "", styles: { fillColor: BRANCO } },
+    { content: "", styles: { fillColor: BRANCO } },
+    { content: totalAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center", fontStyle: "bold", fillColor: BRANCO } },
+    { content: totalJuros > 0 ? totalJuros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "center", fontStyle: "bold", fillColor: BRANCO } },
+    { content: totalGeral.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center", fontStyle: "bold", fillColor: CINZA_TOTAL } },
   ]);
 
-  // A4 portrait usable width = 210 - 14*2 = 182mm
-  // Soma: 9+30+23+34+22+24+22+18 = 182
+
+  body.push([
+    { content: "Valor unitário da UFIR utilizado:", colSpan: 6, styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_GRUPO } },
+    { content: ufirUnitStr, styles: { halign: "center", fontStyle: "bold", fillColor: AZUL_HEADER, textColor: BRANCO } },
+  ]);
+
+  body.push([
+    { content: "Total geral em UFIR", colSpan: 6, styles: { halign: "right", fontStyle: "bold", fillColor: AZUL_GRUPO } },
+    { content: totalEmUfir, styles: { halign: "center", fontStyle: "bold", fillColor: AZUL_GRUPO } },
+  ]);
+
+  // A4 landscape usable width = 297 - 14*2 = 269mm
   const colWidths: { [key: number]: any } = {
-    0: { cellWidth: 9, halign: "center" },
-    1: { cellWidth: 30, halign: "left" },
-    2: { cellWidth: 23, halign: "right" },
-    3: { cellWidth: 26, halign: "left" },
-    4: { cellWidth: 22, halign: "right" },
-    5: { cellWidth: 24, halign: "right" },
-    6: { cellWidth: 22, halign: "right" },
-    7: { cellWidth: 26, halign: "right" },
+    0: { cellWidth: 42, halign: "center" },
+    1: { cellWidth: 32, halign: "center" },
+    2: { cellWidth: 40, halign: "center" },
+    3: { cellWidth: 40, halign: "center" },
+    4: { cellWidth: 40, halign: "center" },
+    5: { cellWidth: 36, halign: "center" },
+    6: { cellWidth: 39, halign: "center" },
   };
 
   autoTable(doc, {
     head,
     body,
     startY: tableStartY,
-    margin: { left: margin, right: margin },
+    margin: { top: 32, left: margin, right: margin },
     tableWidth: pw - margin * 2,
     styles: {
       fontSize: 8,
@@ -231,13 +212,13 @@ function gerarTabelaCorrecao(
       fillColor: AZUL_HEADER,
       textColor: BRANCO,
       fontStyle: "bold",
-      fontSize: 8,
+      fontSize: 9,
       halign: "center",
     },
     columnStyles: colWidths,
-    alternateRowStyles: { fillColor: BRANCO },
+    // Remover fundo alternado global para respeitar grupos
     didDrawPage: (data) => {
-      desenharCabecalho(doc, data.pageNumber, logoGrandeB64, logoGateB64);
+      desenharCabecalho(doc, data.pageNumber, logoGrandeB64, logoGateB64, window.location.origin);
     },
   });
 
@@ -264,25 +245,25 @@ function gerarTabelaJuros(
 
   const tableStartY = startY + 5;
 
-  const head = [["#", "Período de cálculo", "Valor atualizado (R$)", "Dias", "Fator (%)", "Acumulado (%)", "Juros (R$)"]];
+  const head = [["Período de cálculo", "Valor atualizado (R$)", "Dias", "Fator (%)", "Acumulado (%)", "Juros (R$)"]];
   const body: any[] = [];
 
   lancamentos.forEach((l, idx) => {
-    const numero = idx + 1;
+    const numero = String(idx + 1);
     const temItens = l.itensJuros && l.itensJuros.length > 0;
-    const nomeGrupo = `${l.descricao}${l.descricaoComplementar ? ` (${l.descricaoComplementar})` : ""}`;
+    const nomeGrupo = `${numero} - ${l.descricao}${l.descricaoComplementar ? ` (${l.descricaoComplementar})` : ""}`;
 
     // Linha de grupo
     body.push([
       {
         content: nomeGrupo,
-        colSpan: 7,
+        colSpan: 6,
         styles: {
           fillColor: AZUL_GRUPO,
           textColor: PRETO,
           fontStyle: "bold",
           fontSize: 8,
-          cellPadding: { left: 3, right: 3, top: 2, bottom: 2 },
+          halign: "left"
         },
       },
     ]);
@@ -292,67 +273,58 @@ function gerarTabelaJuros(
         const periodo = `${formatDate(sub.dataInicio)} a ${formatDate(sub.dataFim)}`;
         const fator = sub.taxa ? (sub.taxa.includes("%") ? sub.taxa.replace("%", "").trim() : sub.taxa) : "—";
         body.push([
-          { content: String(numero), styles: { halign: "center" } },
-          { content: periodo, styles: { halign: "left" } },
-          { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
+          { content: periodo, styles: { halign: "center" } },
+          { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center" } },
           { content: String(sub.dias), styles: { halign: "center" } },
           { content: fator, styles: { halign: "center" } },
-          { content: Number(sub.percentual).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
-          { content: Number(sub.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
+          { content: Number(sub.percentual).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center" } },
+          { content: Number(sub.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center", fillColor: CINZA_TOTAL } },
         ]);
       });
-
-      // Total do grupo
-      const totalDias = l.itensJuros!.reduce((s, sub) => s + (sub.dias || 0), 0);
-      body.push([
-        { content: "Total", colSpan: 3, styles: { halign: "left", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-        { content: String(totalDias), styles: { halign: "center", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-        { content: "", styles: { fillColor: CINZA_TOTAL } },
-        { content: "", styles: { fillColor: CINZA_TOTAL } },
-        { content: l.juros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-      ]);
     } else {
       // Sem itens detalhados — usa os campos simples do lançamento
       const periodo = l.dataInicioJuros
         ? `${formatDate(l.dataInicioJuros)} a ${formatDate(l.dataFimJuros)}`
         : "—";
       body.push([
-        { content: String(numero), styles: { halign: "center" } },
-        { content: periodo, styles: { halign: "left" } },
-        { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
+        { content: periodo, styles: { halign: "center" } },
+        { content: l.valorAtualizado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center" } },
         { content: String(l.diasJuros ?? "—"), styles: { halign: "center" } },
         { content: l.fatorJuros != null ? String(l.fatorJuros) : "—", styles: { halign: "center" } },
-        { content: l.percentualJurosAcumulado != null ? Number(l.percentualJurosAcumulado).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "right" } },
-        { content: l.juros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right" } },
-      ]);
-
-      body.push([
-        { content: "Total", colSpan: 3, styles: { halign: "left", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-        { content: String(l.diasJuros ?? "—"), styles: { halign: "center", fontStyle: "bold", fillColor: CINZA_TOTAL } },
-        { content: "", styles: { fillColor: CINZA_TOTAL } },
-        { content: "", styles: { fillColor: CINZA_TOTAL } },
-        { content: l.juros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "right", fontStyle: "bold", fillColor: CINZA_TOTAL } },
+        { content: l.percentualJurosAcumulado != null ? Number(l.percentualJurosAcumulado).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "center" } },
+        { content: l.juros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center", fillColor: CINZA_TOTAL } },
       ]);
     }
   });
 
-  // A4 portrait usable width = 182mm
-  // Soma: 9+44+36+18+18+22+35 = 182
+  // ── Totais Gerais de Juros
+  const totalAtualizadoJuros = lancamentos.reduce((acc, l) => acc + l.valorAtualizado, 0);
+  const totalJurosGeral = lancamentos.reduce((acc, l) => acc + l.juros, 0);
+
+  body.push([
+    { content: "Total", styles: { halign: "left", fontStyle: "bold", fillColor: BRANCO } },
+    { content: totalAtualizadoJuros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), styles: { halign: "center", fontStyle: "bold", fillColor: BRANCO } },
+    { content: "", styles: { fillColor: BRANCO } },
+    { content: "", styles: { fillColor: BRANCO } },
+    { content: "", styles: { fillColor: BRANCO } },
+    { content: totalJurosGeral > 0 ? totalJurosGeral.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—", styles: { halign: "center", fontStyle: "bold", fillColor: CINZA_TOTAL } },
+  ]);
+
+  // A4 landscape usable width = 297 - 14*2 = 269mm
   const colWidths: { [key: number]: any } = {
-    0: { cellWidth: 9, halign: "center" },
-    1: { cellWidth: 38, halign: "left" },
-    2: { cellWidth: 32, halign: "right" },
-    3: { cellWidth: 14, halign: "center" },
-    4: { cellWidth: 20, halign: "center" },
-    5: { cellWidth: 26, halign: "right" },
-    6: { cellWidth: 43, halign: "right" },
+    0: { cellWidth: 64, halign: "center" },
+    1: { cellWidth: 54, halign: "center" },
+    2: { cellWidth: 22, halign: "center" },
+    3: { cellWidth: 32, halign: "center" },
+    4: { cellWidth: 40, halign: "center" },
+    5: { cellWidth: 57, halign: "center" },
   };
 
   autoTable(doc, {
     head,
     body,
     startY: tableStartY,
-    margin: { left: margin, right: margin },
+    margin: { top: 32, left: margin, right: margin },
     tableWidth: pw - margin * 2,
     styles: {
       fontSize: 8,
@@ -366,13 +338,12 @@ function gerarTabelaJuros(
       fillColor: AZUL_HEADER,
       textColor: BRANCO,
       fontStyle: "bold",
-      fontSize: 8,
+      fontSize: 9,
       halign: "center",
     },
     columnStyles: colWidths,
-    alternateRowStyles: { fillColor: BRANCO },
     didDrawPage: (data) => {
-      desenharCabecalho(doc, data.pageNumber, logoGrandeB64, logoGateB64);
+      desenharCabecalho(doc, data.pageNumber, logoGrandeB64, logoGateB64, window.location.origin);
     },
   });
 
@@ -409,13 +380,13 @@ export async function exportarParaPDF(
   const token = gerarUUID();
   const link = `${window.location.origin}/?token=${token}`;
 
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
   // Primeira página: cabeçalho
-  desenharCabecalho(doc, 1, logoGrandeB64, logoGateB64);
+  desenharCabecalho(doc, 1, logoGrandeB64, logoGateB64, link);
 
   // ── Tabela 1
-  let currentY = 30;
+  let currentY = 32;
   currentY = gerarTabelaCorrecao(doc, lancamentos, currentY, resolvedUfir, logoGrandeB64, logoGateB64);
 
   // ── Tabela 2 (somente se houver juros)
@@ -428,8 +399,8 @@ export async function exportarParaPDF(
     const ph = doc.internal.pageSize.getHeight();
     if (currentY + 40 > ph - 20) {
       doc.addPage();
-      desenharCabecalho(doc, (doc.internal as any).getNumberOfPages(), logoGrandeB64, logoGateB64);
-      currentY = 30;
+      desenharCabecalho(doc, (doc.internal as any).getNumberOfPages(), logoGrandeB64, logoGateB64, link);
+      currentY = 32;
     }
 
     gerarTabelaJuros(doc, lancamentosComJuros, currentY, logoGrandeB64, logoGateB64);
@@ -474,7 +445,7 @@ export async function exportarParaPDF(
 // ─── PDF de recuperação ───────────────────────────────────────────────────────
 
 export async function gerarPDFRecuperado(items: LancamentoRecuperado[], tokenUsado: string): Promise<void> {
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
   // ── Carregar logos
   let logoGrandeB64 = "";
@@ -488,10 +459,12 @@ export async function gerarPDFRecuperado(items: LancamentoRecuperado[], tokenUsa
     console.error("Erro ao carregar logos:", err);
   }
 
-  desenharCabecalho(doc, 1, logoGrandeB64, logoGateB64);
+  const link = `${window.location.origin}/?token=${tokenUsado}`;
+
+  desenharCabecalho(doc, 1, logoGrandeB64, logoGateB64, link);
 
   const lancamentos = items as LancamentoItem[];
-  let currentY = 30;
+  let currentY = 32;
 
   currentY = gerarTabelaCorrecao(doc, lancamentos, currentY, 0, logoGrandeB64, logoGateB64);
 
@@ -502,13 +475,12 @@ export async function gerarPDFRecuperado(items: LancamentoRecuperado[], tokenUsa
     const ph = doc.internal.pageSize.getHeight();
     if (currentY + 40 > ph - 20) {
       doc.addPage();
-      desenharCabecalho(doc, (doc.internal as any).getNumberOfPages(), logoGrandeB64, logoGateB64);
-      currentY = 30;
+      desenharCabecalho(doc, (doc.internal as any).getNumberOfPages(), logoGrandeB64, logoGateB64, link);
+      currentY = 32;
     }
     gerarTabelaJuros(doc, lancamentosComJuros, currentY, logoGrandeB64, logoGateB64);
   }
 
-  const link = `${window.location.origin}/?token=${tokenUsado}`;
   adicionarRodape(doc, link);
 
   doc.save(`relatorio-token-${tokenUsado.slice(0, 8)}.pdf`);

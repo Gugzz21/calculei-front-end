@@ -11,7 +11,6 @@ interface DescricaoProps {
 function Descricao({ value, onChange, complementar, onComplementarChange }: DescricaoProps) {
   const [forceOther, setForceOther] = useState(false);
 
-  // Consider it "custom" if it's not in the predefined list, or if it is exactly "outros", or if user forced it
   const isPredefined = (DESCRICAO_OPCOES.some(opt => opt.value === value) || value === "") && value !== "outros";
   const isOther = forceOther || (!isPredefined && value !== "");
 

@@ -153,7 +153,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
 
   return (
     <div className="overflow-hidden">
-      <div className="px-6 md:pl-12 md:pr-4 py-4 md:py-5 bg-slate-50/50 dark:bg-[#0d1117]/50 shadow-inner border-t border-slate-100 dark:border-[#21262d]">
+      <div className="px-6 md:pl-12 md:pr-4 py-4 md:py-5 bg-slate-50/50 dark:bg-[#0d1117]/50 border-t border-slate-200 dark:border-[#21262d]">
 
         {/* ── Descrição ── */}
         <div className="flex flex-col gap-0.5 mb-4">
