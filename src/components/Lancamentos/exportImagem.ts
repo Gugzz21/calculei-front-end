@@ -23,7 +23,10 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
 
   // ── Download da imagem com html-to-image ─────────────────────────────
   try {
-    const dataUrl = await toJpeg(element, { quality: 0.95, backgroundColor: '#ffffff' });
+    const filter = (node: HTMLElement) => {
+      return !node.classList?.contains('exclude-from-print');
+    };
+    const dataUrl = await toJpeg(element, { quality: 0.95, backgroundColor: '#ffffff', filter, pixelRatio: 1 });
     const downloadLink = document.createElement("a");
     downloadLink.download = "tabela-lancamentos.jpg";
     downloadLink.href = dataUrl;
@@ -38,6 +41,7 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
         totalLancamentos: lancamentos.length,
         lancamentos: lancamentos.map((l) => ({
           id: l.id,
+          tipoCalculo: l.tipoCalculo,
           descricao: l.descricao,
           dataInicial: l.dataInicial,
           dataCalculo: l.dataCalculo,

@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useRef, useEffect } from "react";
 import { formatBRL } from "../../utils/formatters";
 import LancamentoRow from "./LancamentoRow";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 // ─── Constante de grid compartilhada com LancamentoRow ───────────────────────
 // expand | Data inicial | Data final | Valor principal | Índice | Fator de correção | Valor corrigido | Juros | Total devido | ações
 export const TABLE_GRID_COLS =
-  "md:grid-cols-[2rem_6rem_6rem_8rem_minmax(8rem,1fr)_8rem_8rem_7rem_8rem_5rem]";
+  "md:grid-cols-[2rem_6rem_6rem_8rem_minmax(8rem,1fr)_10rem_9rem_7rem_8rem_5rem]";
 
 interface TabelaLancamentosProps {
   currentItems: LancamentoItem[];
@@ -45,15 +45,20 @@ function TabelaLancamentos({
     { valorPrincipal: 0, valorAtualizado: 0, juros: 0, total: 0 }
   ), [lancamentos]);
 
+  const itemsLengthRef = useRef(currentItems.length);
+  useEffect(() => {
+    itemsLengthRef.current = currentItems.length;
+  }, [currentItems.length]);
+
   const handleRemover = useCallback((id: number) => {
-    onRemover(id, currentItems.length === 1);
-  }, [onRemover, currentItems.length]);
+    onRemover(id, itemsLengthRef.current === 1);
+  }, [onRemover]);
 
   return (
     <div className="flex flex-col w-full border border-slate-200 dark:border-[#21262d] rounded-xl shadow-sm overflow-hidden bg-white dark:bg-[#0d1117] transition-colors duration-200">
 
       {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
-      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-100 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-200 dark:border-[#21262d] text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider`}>
+      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-100 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-200 dark:border-[#21262d] text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap`}>
         <div /> {/* Ícone expand */}
         <div>Data inicial</div>
         <div>Data final</div>
@@ -63,7 +68,7 @@ function TabelaLancamentos({
         <div>Valor corrigido</div>
         <div>Juros</div>
         <div>Total devido</div>
-        <div className="flex justify-end pr-1">
+        <div className="flex justify-end pr-1 exclude-from-print">
           <button
             onClick={() => {
               if (window.confirm("Tem certeza que deseja apagar TODOS os lançamentos? Esta ação não pode ser desfeita.")) {

@@ -16,7 +16,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
       tabs: [
         {
           id: 'cdparticular',
-          label: 'PARTICULARES',
+          label: 'Entre particulares',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Créditos / Débitos Entre Particulares</p>
@@ -59,7 +59,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'dfazendanaotributario',
-          label: 'FAZ. NÃO TRIBUTÁRIO',
+          label: 'Faz. não tributário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Débitos da Fazenda Pública - Não Tributários</p>
@@ -74,7 +74,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'previdenciario',
-          label: 'PREVIDENCIÁRIO',
+          label: 'Previdenciário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Débitos Previdenciários (INSS)</p>
@@ -89,7 +89,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'precatoriostributario',
-          label: 'PREC. TRIBUTÁRIO',
+          label: 'Prec. tributário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Precatórios - Tributários</p>
@@ -101,7 +101,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'precatoriosnaotributario',
-          label: 'PREC. NÃO TRIBUTÁRIO',
+          label: 'Prec. não tributário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Precatórios - Não Tributários</p>
@@ -114,7 +114,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'multadiaria',
-          label: 'MULTA DIÁRIA',
+          label: 'Multa diária',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Multa Diária (Astreintes)</p>
@@ -129,7 +129,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'abatimentos',
-          label: 'ABATIMENTOS',
+          label: 'Abatimentos',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Abatimentos (Deduções)</p>

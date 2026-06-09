@@ -31,6 +31,7 @@ export class CalculoService {
 
     return {
       id: Date.now(),
+      tipoCalculo: form.tipoCalculo,
       descricao: DESCRICAO_LABEL[form.descricao] ?? form.descricao,
       descricaoComplementar: form.descricaoComplementar || undefined,
       dataInicial: form.dataInicial,

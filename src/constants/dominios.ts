@@ -40,7 +40,7 @@ export const INDICE_LABEL: Record<string, string> = {
   ipca: "IPCA",
   cdi: "CDI",
   selic: "SELIC",
-  semcorrecaomonetaria: "SEM CORREÇÃO MONETÁRIA",
+  semcorrecaomonetaria: "Sem correção monetária",
   tjrj11960: "TJRJ 11.960/2009",
   tjrj6899: "TJ/RJ Lei 6.899/81 (UFIR-RJ)",
 };

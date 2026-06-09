@@ -7,33 +7,18 @@ const STEPS: Step[] = [
   {
     target: 'body',
     placement: 'center',
-    title: 'Bem-vindo à nova versão do Calculei! 🎉',
+    title: 'Bem-vindo ao Calculei!',
     content: 'Fizemos várias melhorias na interface! Agora você tem exportação para Excel, resultados mais claros e os lançamentos estão mais organizados. Vamos fazer um rápido tour para você conhecer as novidades?',
   },
   {
-    target: '#tour-tipo-calculo',
-    title: 'Defina a natureza do débito',
-    content: 'Escolha se é um cálculo comum ou contra a Fazenda Pública. Para iniciar, deixaremos no padrão "Comum".',
+    target: '#tour-inclusao',
+    title: 'Nova área de inclusão de dados',
+    content: 'Nova área reformulada com uma nova ordenação e novo visual dos campos e botões.',
   },
   {
-    target: '#tour-valor-principal',
-    title: 'Qual o valor a ser corrigido?',
-    content: 'Digite o valor histórico original que você deseja atualizar. Ex: R$ 1.000,00',
-  },
-  {
-    target: '#tour-datas',
-    title: 'Defina o período',
-    content: 'Insira a data inicial do débito e a data até a qual deseja calcular a correção.',
-  },
-  {
-    target: '#tour-indice-juros',
-    title: 'Regras simplificadas',
-    content: 'Todo o visual de índices e juros foi simplificado. As opções padrão já vêm configuradas, e se precisar editar, os painéis estão mais fáceis de ler.',
-  },
-  {
-    target: '#tour-btn-calcular',
-    title: 'Mais resultados, nova exportação!',
-    content: 'Clique em Calcular para gerar o lançamento. A tabela de lançamentos logo abaixo agora permite expandir os detalhes e exportar para Excel, além do PDF e imagem!',
+    target: '#tour-tabela',
+    title: 'Nova tabela e funcionalidades',
+    content: 'A nova tabela possui mais espaço e está agrupada diferente, priorizando algumas colunas. Além de termos a nova função Printar e salvar.',
   },
 ];
 
@@ -67,11 +52,45 @@ export default function OnboardingTour() {
       run={run}
       continuous={true}
       onEvent={handleJoyrideCallback}
+      options={{
+        primaryColor: '#003b73',
+        zIndex: 10000,
+        showProgress: true,
+      }}
+      styles={{
+        buttonPrimary: {
+          backgroundColor: '#003b73',
+          borderRadius: 8,
+          fontSize: 14,
+          padding: '8px 16px',
+        },
+        buttonBack: {
+          color: '#64748b',
+          fontSize: 14,
+        },
+        buttonSkip: {
+          color: '#64748b',
+          fontSize: 14,
+        },
+        tooltipTitle: {
+          fontSize: 18,
+          fontWeight: 'bold',
+          color: '#1e293b',
+          textAlign: 'left',
+          marginBottom: 8,
+        },
+        tooltipContent: {
+          fontSize: 14,
+          color: '#475569',
+          textAlign: 'left',
+        },
+      }}
       locale={{
         back: 'Voltar',
         close: 'Fechar',
         last: 'Concluir',
         next: 'Próximo',
+        nextWithProgress: 'Próximo ({current} de {total})',
         skip: 'Pular',
       }}
     />

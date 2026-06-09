@@ -60,7 +60,7 @@ function CentralCard() {
     handleJurosChange("enabled", e.target.checked), [handleJurosChange]);
 
   return (
-    <div className="flex flex-col bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-[#21262d]/60 transition-colors duration-200">
+    <div id="tour-inclusao" className="flex flex-col bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/60 dark:border-[#21262d]/60 transition-colors duration-200">
 
       {/* ── Banner modo edição ─────────────────────────────────────── */}
       {editandoId !== null && (

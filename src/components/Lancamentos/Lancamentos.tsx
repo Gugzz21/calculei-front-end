@@ -53,7 +53,6 @@ function Lancamentos() {
   } | null>(null);
   const [duplicandoItem, setDuplicandoItem] = useState<LancamentoItem | null>(null);
   const [salvandoPDF, setSalvandoPDF] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
@@ -75,28 +74,20 @@ function Lancamentos() {
   }, [lancamentos, ufirValue]);
 
   const handleBaixarImagem = useCallback(async () => {
-    setIsExporting(true);
-    setTimeout(async () => {
-      if (!exportRef.current) {
-        setIsExporting(false);
-        return;
+    if (!exportRef.current) return;
+    try {
+      const result = await baixarImagem(lancamentos, exportRef.current);
+      if (result) {
+        setModalExport({ type: "imagem", token: result.token, data: result.dataUrl });
       }
-      try {
-        const result = await baixarImagem(lancamentos, exportRef.current);
-        if (result) {
-          setModalExport({ type: "imagem", token: result.token, data: result.dataUrl });
-        }
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "Erro desconhecido.";
-        if (msg.includes("histórico")) {
-          alert(`Imagem gerada, mas não foi possível salvar o token:\n${msg}`);
-        } else {
-          alert(`Erro ao gerar imagem: ${msg}`);
-        }
-      } finally {
-        setIsExporting(false);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Erro desconhecido.";
+      if (msg.includes("histórico")) {
+        alert(`Imagem gerada, mas não foi possível salvar o token:\n${msg}`);
+      } else {
+        alert(`Erro ao gerar imagem: ${msg}`);
       }
-    }, 300);
+    }
   }, [lancamentos]);
 
   const handleRemover = useCallback((id: number, isLastInPage: boolean) => {
@@ -151,7 +142,7 @@ function Lancamentos() {
         }}
       />
 
-      <div className="flex flex-col bg-slate-50 dark:bg-[#0d1117]/95 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-400 dark:border-[#21262d]/60 overflow-hidden transition-colors duration-200">
+      <div id="tour-tabela" className="flex flex-col bg-slate-50 dark:bg-[#0d1117]/95 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-400 dark:border-[#21262d]/60 overflow-hidden transition-colors duration-200">
 
         {/* Cabeçalho + paginação superior */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -210,7 +201,7 @@ function Lancamentos() {
 
             {/* Rodapé: info de paginação + seletor + paginação inferior */}
             {lancamentos.length > 0 && (
-              <div className="flex flex-col gap-3 mt-4 border-t border-gray-200 dark:border-[#21262d] pt-4">
+              <div className="flex flex-col gap-3 mt-4 border-t border-gray-200 dark:border-[#21262d] pt-4 exclude-from-print">
                 {/* Linha de meta-info: total de registros + itens por página */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -261,23 +252,21 @@ function Lancamentos() {
       </div>
 
       {/* ── Componente Oculto para Exportação de Imagem ── */}
-      {isExporting && (
-        <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
-          <div ref={exportRef} className="w-[1200px] bg-white p-8">
-            <h2 className="text-[24px] text-[#1F2022] font-bold mb-6">Relatório de Lançamentos</h2>
-            <TabelaLancamentos
-              currentItems={lancamentos}
-              startIndex={0}
-              currentPage={1}
-              totalPages={1}
-              onRemover={() => { }}
-              onEditar={() => { }}
-              onDuplicar={() => { }}
-              forceExpand={true}
-            />
-          </div>
+      <div style={{ position: "absolute", left: "-9999px", top: "-9999px", opacity: 0, pointerEvents: 'none' }}>
+        <div ref={exportRef} className="w-[1200px] bg-white p-8">
+          <h2 className="text-[24px] text-[#1F2022] font-bold mb-6">Relatório de Lançamentos</h2>
+          <TabelaLancamentos
+            currentItems={lancamentos}
+            startIndex={0}
+            currentPage={1}
+            totalPages={1}
+            onRemover={() => { }}
+            onEditar={() => { }}
+            onDuplicar={() => { }}
+            forceExpand={true}
+          />
         </div>
-      )}
+      </div>
     </>
   );
 }

@@ -17,6 +17,7 @@ export interface DetalheJuros {
 export interface BaseLancamento {
   descricao: string;
   descricaoComplementar?: string;
+  tipoCalculo?: string; // Informação da origem/tipo do cálculo (ex: 'multadiaria')
   dataInicial: string;
   dataCalculo: string;
   valorPrincipal: number;

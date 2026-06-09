@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Calculator, HelpCircle, X, BookOpen } from "lucide-react";
+import { Calculator, HelpCircle, X, BookOpen, FileText, Info } from "lucide-react";
 import DarkmodeButton from "./DarkmodeButton";
 import OnboardingModal from "./OnboardingModal";
+import SobreModal from "./SobreModal";
+import IT1062 from "../assets/IT_1062_2020.pdf";
 
 function Header() {
   const [showAjudaModal, setShowAjudaModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showSobreModal, setShowSobreModal] = useState(false);
 
   return (
     <>
@@ -80,6 +83,48 @@ function Header() {
                 </div>
               </button>
 
+              {/* Botão Diretriz Técnica */}
+              <a
+                href={IT1062}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowAjudaModal(false)}
+                className="flex items-center gap-3 w-full px-4 py-3.5 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700/50 rounded-xl text-left hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors group"
+              >
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-100 dark:bg-green-800/50 shrink-0">
+                  <FileText size={18} className="text-green-600 dark:text-green-300" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-green-800 dark:text-green-200 group-hover:text-green-900 dark:group-hover:text-green-100">
+                    Diretriz Técnica
+                  </p>
+                  <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-0.5">
+                    Acesse a documentação técnica (PDF)
+                  </p>
+                </div>
+              </a>
+
+              {/* Botão Sobre */}
+              <button
+                onClick={() => {
+                  setShowAjudaModal(false);
+                  setShowSobreModal(true);
+                }}
+                className="flex items-center gap-3 w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+              >
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-700 shrink-0">
+                  <Info size={18} className="text-slate-600 dark:text-slate-300" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-slate-100">
+                    Sobre
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Informações sobre o sistema e versão
+                  </p>
+                </div>
+              </button>
+
               {/* Fechar */}
               <button
                 onClick={() => setShowAjudaModal(false)}
@@ -95,6 +140,11 @@ function Header() {
       {/* ── Modal de Onboarding ── */}
       {showOnboarding && (
         <OnboardingModal onClose={() => setShowOnboarding(false)} />
+      )}
+
+      {/* ── Modal Sobre ── */}
+      {showSobreModal && (
+        <SobreModal onClose={() => setShowSobreModal(false)} />
       )}
     </>
   );

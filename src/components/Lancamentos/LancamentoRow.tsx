@@ -67,7 +67,7 @@ function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplica
       {/* Total devido */}
       <div className="font-semibold">{formatBRL(item.total)}</div>
       {/* Ações */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2 exclude-from-print">
         <button
           onClick={(e) => { e.stopPropagation(); onEditar(item.id); }}
           className="text-gray-500 hover:text-blue-600 transition-colors"
@@ -110,7 +110,7 @@ function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar
           </div>
           {item.descricao}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 exclude-from-print">
           <button onClick={(e) => { e.stopPropagation(); onEditar(item.id); }} className="p-1 text-gray-500 hover:text-blue-600 transition-colors">
             <EditIcon fontSize="small" />
           </button>
@@ -157,7 +157,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
 
         {/* ── Descrição ── */}
         <div className="flex flex-col gap-0.5 mb-4">
-          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Descrição</span>
+          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider">Descrição</span>
           <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">
             {item.descricao}
             {item.descricaoComplementar && (
@@ -169,32 +169,48 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
         {/* ── Mobile: campos omitidos na grade principal ── */}
         <div className="grid grid-cols-2 md:hidden gap-x-4 gap-y-4 mb-4">
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Índice</span>
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-1">Índice</span>
             <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-[#21262d] rounded-md px-2 py-0.5 w-fit">
               {item.indiceCorrecao}
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Fator de correção</span>
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-1">Fator de correção</span>
             <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{formatFatorCorrecao(item.percentualCorrecao)}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Valor corrigido</span>
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-1">Valor corrigido</span>
             <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{formatBRL(item.valorAtualizado)}</span>
           </div>
           {temJuros && (
             <div className="flex flex-col">
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Juros (R$)</span>
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-1">Juros (R$)</span>
               <span className="text-[13px] font-medium text-blue-700 dark:text-blue-300">{formatBRL(item.juros)}</span>
             </div>
           )}
         </div>
 
+        {/* ── Seção de Multa Diária ── */}
+        {item.tipoCalculo === 'multadiaria' && (
+          <div className="border border-orange-200 dark:border-orange-900/50 rounded-lg bg-orange-50/70 dark:bg-orange-900/20 p-3 md:p-4 mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Valor informado</span>
+                <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">{formatBRL(item.valorPrincipal)}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Total de dias</span>
+                <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{item.dias} dias</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Seção de Juros ── */}
         {temJuros && (
           <div className="border border-blue-200 dark:border-blue-900/50 rounded-lg bg-blue-50/70 dark:bg-blue-900/20 p-3 md:p-4">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider">
                 Total de dias de juros:
               </span>
               <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">
@@ -207,27 +223,27 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                 {item.itensJuros.map((sub, sIdx) => (
                   <div key={sIdx} className={`grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-3 ${sIdx > 0 ? "pt-3" : ""}`}>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Período de juros</span>
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Período de juros</span>
                       <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">
                         {sub.dataInicio ? `${formatDate(sub.dataInicio)} a ${formatDate(sub.dataFim)}` : "—"}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Dias de juros</span>
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Dias de juros</span>
                       <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{sub.dias}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Fator de juros</span>
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Fator de juros</span>
                       <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">
                         {sub.taxa.includes("%") ? sub.taxa : `${sub.taxa}%`}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Acumulado juros(%)</span>
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Acumulado juros(%)</span>
                       <span className="text-[13px] font-medium text-blue-700 dark:text-blue-300">{formatPercent2(sub.percentual)}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Juros</span>
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Juros</span>
                       <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">{formatBRL(sub.valor)}</span>
                     </div>
                   </div>
@@ -236,27 +252,27 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-3">
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Período de juros</span>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Período de juros</span>
                   <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">
                     {item.dataInicioJuros ? `${formatDate(item.dataInicioJuros)} a ${formatDate(item.dataFimJuros)}` : "—"}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Dias de juros</span>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Dias de juros</span>
                   <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{item.diasJuros ?? "—"}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Fator de juros</span>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Fator de juros</span>
                   <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">—</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Acumulado juros(%)</span>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Acumulado juros(%)</span>
                   <span className="text-[13px] font-medium text-blue-700 dark:text-blue-300">
                     {item.percentualJurosAcumulado != null ? formatPercent2(item.percentualJurosAcumulado) : "—"}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Juros</span>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Juros</span>
                   <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">{formatBRL(item.juros)}</span>
                 </div>
               </div>
@@ -275,7 +291,7 @@ export default React.memo(function LancamentoRow(props: LancamentoRowProps) {
   const isActuallyExpanded = props.forceExpand || isExpanded;
 
   return (
-    <div className="flex flex-col bg-white dark:bg-[#0d1117] border-b border-slate-100 dark:border-[#21262d] transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-[#1e232b]/50">
+    <div className="flex flex-col bg-white dark:bg-[#0d1117] border-b border-slate-400 dark:border-slate-600 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-[#1e232b]/50">
 
       {/* ─── LINHA PRINCIPAL ─── */}
       <div
