@@ -376,7 +376,7 @@ export default React.memo(function LancamentoRow(props: LancamentoRowProps) {
   const isActuallyExpanded = props.forceExpand || isExpanded;
 
   return (
-    <div className="flex flex-col bg-white dark:bg-[#0d1117] border-b-2 border-slate-300 dark:border-slate-500 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-[#1e232b]/50">
+    <div className="linha-lancamento flex flex-col bg-white dark:bg-[#0d1117] border-b-2 border-slate-300 dark:border-slate-500 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-[#1e232b]/50">
 
       {/* ─── LINHA PRINCIPAL ─── */}
       <div

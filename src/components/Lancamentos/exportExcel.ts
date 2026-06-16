@@ -252,7 +252,7 @@ export async function exportarParaExcel(
   // ══════════════════════════════════════════════════════════════════════════
   // ABA 2 — Memória de Cálculo de Juros (somente se houver juros detalhados)
   // ══════════════════════════════════════════════════════════════════════════
-  const lancamentosComJuros = lancamentos.filter(l => l.juros > 0 && l.itensJuros && l.itensJuros.length > 0);
+  const lancamentosComJuros = lancamentos.filter(l => l.juros > 0);
 
   if (lancamentosComJuros.length > 0) {
     const ws2 = workbook.addWorksheet('Memória de Juros', { views: [{ showGridLines: false }] });
@@ -299,15 +299,36 @@ export async function exportarParaExcel(
       rowIdx2++;
 
       let jurosAcum = 0;
-      l.itensJuros?.forEach((item) => {
-        jurosAcum += item.valor;
+      if (l.itensJuros && l.itensJuros.length > 0) {
+        l.itensJuros.forEach((item) => {
+          jurosAcum += item.valor;
+          const subRow = ws2.addRow([
+            `${formatDate(item.dataInicio)} a ${formatDate(item.dataFim)}`,
+            l.valorAtualizado,
+            item.dias,
+            item.percentual / 100,
+            jurosAcum / l.valorAtualizado,
+            item.valor,
+          ]);
+          subRow.height = 18;
+          subRow.eachCell((cell, col) => {
+            estiloCelula(cell, false, BRANCO, PRETO, 'center');
+            if ([2, 6].includes(col) && typeof cell.value === 'number') cell.numFmt = '"R$ "#,##0.00';
+            if ([4, 5].includes(col) && typeof cell.value === 'number') cell.numFmt = '0.00000000%';
+          });
+          rowIdx2++;
+        });
+      } else {
+        const periodo = l.dataInicioJuros
+          ? `${formatDate(l.dataInicioJuros)} a ${formatDate(l.dataFimJuros!)}`
+          : "—";
         const subRow = ws2.addRow([
-          `${formatDate(item.dataInicio)} a ${formatDate(item.dataFim)}`,
+          periodo,
           l.valorAtualizado,
-          item.dias,
-          item.percentual / 100,
-          jurosAcum / l.valorAtualizado,
-          item.valor,
+          l.diasJuros ?? "—",
+          l.fatorJuros != null ? l.fatorJuros : "—",
+          l.percentualJurosAcumulado != null ? l.percentualJurosAcumulado / 100 : "—",
+          l.juros,
         ]);
         subRow.height = 18;
         subRow.eachCell((cell, col) => {
@@ -316,7 +337,7 @@ export async function exportarParaExcel(
           if ([4, 5].includes(col) && typeof cell.value === 'number') cell.numFmt = '0.00000000%';
         });
         rowIdx2++;
-      });
+      }
     });
 
     // Total de juros

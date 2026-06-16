@@ -22,8 +22,9 @@ function BotoesExport({
   const inativo = "bg-[#f1f3f5] dark:bg-[#010409] border border-[#d2d6dc] dark:border-[#21262d] text-[#adb5bd] dark:text-gray-500 cursor-not-allowed";
 
   return (
-    <div className="flex items-center justify-start">
-      <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+    <div id="botoes-exportacao" className="w-full">
+      {/* Container flex com flex-wrap para ajustar ao tamanho da tela */}
+      <div className="flex flex-wrap gap-2 md:gap-3 justify-end items-stretch sm:items-center">
 
         {/* Gerar PDF */}
         <button

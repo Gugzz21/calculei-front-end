@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calculator, HelpCircle, X, BookOpen, FileText, Info } from "lucide-react";
 import DarkmodeButton from "./DarkmodeButton";
 import OnboardingModal from "./OnboardingModal";
@@ -9,6 +9,14 @@ function Header() {
   const [showAjudaModal, setShowAjudaModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSobreModal, setShowSobreModal] = useState(false);
+
+  useEffect(() => {
+    const hasSeen = localStorage.getItem('hasSeenTutorialModalV2');
+    if (!hasSeen) {
+      setShowOnboarding(true);
+      localStorage.setItem('hasSeenTutorialModalV2', 'true');
+    }
+  }, []);
 
   return (
     <>
@@ -68,9 +76,9 @@ function Header() {
                   setShowAjudaModal(false);
                   setShowOnboarding(true);
                 }}
-                className="flex items-center gap-3 w-full px-4 py-3.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700/50 rounded-xl text-left hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors group"
+                className="flex items-center gap-3 w-full px-4 py-3.5 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700/50 rounded-xl text-left hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors group"
               >
-                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-800/50 shrink-0">
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-200 dark:bg-blue-800/50 shrink-0">
                   <BookOpen size={18} className="text-blue-600 dark:text-blue-300" />
                 </div>
                 <div>
@@ -89,9 +97,9 @@ function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setShowAjudaModal(false)}
-                className="flex items-center gap-3 w-full px-4 py-3.5 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700/50 rounded-xl text-left hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors group"
+                className="flex items-center gap-3 w-full px-4 py-3.5 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700/50 rounded-xl text-left hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors group"
               >
-                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-100 dark:bg-green-800/50 shrink-0">
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-200 dark:bg-green-800/50 shrink-0">
                   <FileText size={18} className="text-green-600 dark:text-green-300" />
                 </div>
                 <div>
@@ -110,7 +118,7 @@ function Header() {
                   setShowAjudaModal(false);
                   setShowSobreModal(true);
                 }}
-                className="flex items-center gap-3 w-full px-4 py-3.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700/50 rounded-xl text-left hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors group"
+                className="flex items-center gap-3 w-full px-4 py-3.5 bg-slate-200 dark:bg-slate-800/50 border border-slate-400 dark:border-slate-700/50 rounded-xl text-left hover:bg-slate-300 dark:hover:bg-slate-800 transition-colors group"
               >
                 <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-slate-300 dark:bg-slate-700 shrink-0">
                   <Info size={18} className="text-slate-700 dark:text-slate-300" />

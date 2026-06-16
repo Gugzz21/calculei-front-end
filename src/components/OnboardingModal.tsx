@@ -92,8 +92,8 @@ const STEPS = [
   {
     icon: Sparkles,
     color: "text-violet-500 dark:text-violet-400",
-    bg: "bg-violet-50 dark:bg-violet-900/30",
-    border: "border-violet-200 dark:border-violet-700/50",
+    bg: "bg-violet-100 dark:bg-violet-900/30",
+    border: "border-violet-300 dark:border-violet-700/50",
     title: "Comece com um exemplo pronto",
     description:
       "Para facilitar o aprendizado, escolha um dos exemplos abaixo e clique em \"Preencher\". Os campos do formulário serão preenchidos automaticamente — basta clicar em Calcular para ver o resultado na tabela.",
@@ -106,8 +106,8 @@ const STEPS = [
   {
     icon: ClipboardList,
     color: "text-indigo-500 dark:text-indigo-400",
-    bg: "bg-indigo-50 dark:bg-indigo-900/30",
-    border: "border-indigo-200 dark:border-indigo-700/50",
+    bg: "bg-indigo-100 dark:bg-indigo-900/30",
+    border: "border-indigo-300 dark:border-indigo-700/50",
     title: "Bloco de entrada de dados",
     description:
       "Preencha o formulário com o Tipo de cálculo, o Índice de correção e a Descrição. Informe o Valor principal e as datas do período a corrigir.",
@@ -120,8 +120,8 @@ const STEPS = [
   {
     icon: PercentSquare,
     color: "text-blue-500 dark:text-blue-400",
-    bg: "bg-blue-50 dark:bg-blue-900/30",
-    border: "border-blue-200 dark:border-blue-700/50",
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    border: "border-blue-300 dark:border-blue-700/50",
     title: "Aplicar juros",
     description:
       "Após preencher todos os campos, marque 'Aplicar juros?' para abrir o painel de juros. Escolha o índice (ex.: Taxa Legal, Código Civil), defina o período e clique em Aplicar. O valor dos juros será calculado separadamente e exibido na coluna Juros da tabela.",
@@ -134,8 +134,8 @@ const STEPS = [
   {
     icon: Calculator,
     color: "text-green-500 dark:text-green-400",
-    bg: "bg-green-50 dark:bg-green-900/30",
-    border: "border-green-200 dark:border-green-700/50",
+    bg: "bg-green-100 dark:bg-green-900/30",
+    border: "border-green-300 dark:border-green-700/50",
     title: "Calcular e gerenciar lançamentos",
     description:
       "Clique em Calcular para gerar o resultado. O lançamento aparece na tabela com valor corrigido, juros e total devido. Clique na linha para expandir e ver os detalhes. Use os ícones de ação: ✏️ editar, 📋 duplicar e 🗑️ remover.",
@@ -148,8 +148,8 @@ const STEPS = [
   {
     icon: TableProperties,
     color: "text-amber-500 dark:text-amber-400",
-    bg: "bg-amber-50 dark:bg-amber-900/30",
-    border: "border-amber-200 dark:border-amber-700/50",
+    bg: "bg-amber-100 dark:bg-amber-900/30",
+    border: "border-amber-300 dark:border-amber-700/50",
     title: "Tabela de lançamentos",
     description:
       "Cada linha exibe: Data inicial, Data final, Valor principal, Índice, Fator de correção, Valor corrigido, Juros e Total devido. Expanda a linha para ver a seção de Juros com período, dias, fator acumulado e valor.",
@@ -162,8 +162,8 @@ const STEPS = [
   {
     icon: FileDown,
     color: "text-rose-500 dark:text-rose-400",
-    bg: "bg-rose-50 dark:bg-rose-900/30",
-    border: "border-rose-200 dark:border-rose-700/50",
+    bg: "bg-rose-100 dark:bg-rose-900/30",
+    border: "border-rose-300 dark:border-rose-700/50",
     title: "Relatórios e exportação",
     description:
       "Exporte em PDF, Excel ou Imagem. Após gerar, um modal exibirá o link de recuperação e o texto padronizado de menção ao Calculei.",
@@ -176,8 +176,8 @@ const STEPS = [
   {
     icon: Link2,
     color: "text-teal-500 dark:text-teal-400",
-    bg: "bg-teal-50 dark:bg-teal-900/30",
-    border: "border-teal-200 dark:border-teal-700/50",
+    bg: "bg-teal-100 dark:bg-teal-900/30",
+    border: "border-teal-300 dark:border-teal-700/50",
     title: "Link de recuperação",
     description:
       "Ao exportar, você receberá um link único para recuperar seu cálculo futuramente. Guarde-o para retornar à sessão exata com todos os lançamentos.",
@@ -298,14 +298,14 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
                     onClick={() => { setExemploIdx(i); setAplicado(false); }}
                     className={`flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
                       exemploIdx === i
-                        ? "border-violet-400 dark:border-violet-500 bg-violet-50 dark:bg-violet-900/30 text-violet-800 dark:text-violet-200"
-                        : "border-gray-200 dark:border-[#30363d] bg-white dark:bg-[#161b22] text-gray-700 dark:text-gray-300 hover:border-violet-300 dark:hover:border-violet-600"
+                        ? "border-violet-600 dark:border-violet-700 bg-violet-100 dark:bg-violet-900/50 text-violet-900 dark:text-violet-100"
+                        : "border-gray-200 dark:border-[#30363d] bg-white dark:bg-[#161b22] text-gray-700 dark:text-gray-300 hover:border-violet-400 dark:hover:border-violet-700"
                     }`}
                   >
                     {/* Indicador de seleção */}
                     <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
                       exemploIdx === i
-                        ? "border-violet-500 bg-violet-500"
+                        ? "border-violet-700 bg-violet-700"
                         : "border-gray-300 dark:border-gray-600"
                     }`}>
                       {exemploIdx === i && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -328,7 +328,7 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
                 className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 ${
                   aplicado
                     ? "bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300"
-                    : "bg-violet-600 hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600 text-white shadow"
+                    : "bg-violet-800 hover:bg-violet-900 dark:bg-violet-700 dark:hover:bg-violet-800 text-white shadow"
                 }`}
               >
                 {aplicado
