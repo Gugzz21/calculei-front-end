@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import Joyride, { STATUS, Step } from 'react-joyride';
+import { Joyride, STATUS } from 'react-joyride';
+import type { Step } from 'react-joyride';
 import { useCalculadoraContext } from '../contexts/CalculadoraContext';
 
 const STEPS: Step[] = [
@@ -8,7 +9,7 @@ const STEPS: Step[] = [
     placement: 'top',
     title: 'Tabela de Resultados',
     content: 'Aqui estão os lançamentos calculados. A tabela já está ordenada pela data inicial do cálculo para facilitar a leitura.',
-    disableBeacon: true,
+    skipBeacon: true,
   },
   {
     target: '.linha-lancamento',
@@ -49,7 +50,7 @@ export default function TourPosCalculo() {
     const { status, action } = data;
     const isFinishedOrSkipped = ([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status);
     const isClosed = action === 'close';
-    
+
     if (isFinishedOrSkipped || isClosed) {
       localStorage.setItem('hasSeenTourPosCalculo', 'true');
       setRun(false);
@@ -66,6 +67,10 @@ export default function TourPosCalculo() {
         primaryColor: '#6d28d9', // violet-700
         zIndex: 10000,
         showProgress: true,
+        arrowColor: '#ffffff',
+        backgroundColor: '#ffffff',
+        overlayColor: 'rgba(0, 0, 0, 0.5)',
+        textColor: '#333333',
       }}
       styles={{
         buttonPrimary: {
@@ -93,14 +98,6 @@ export default function TourPosCalculo() {
           fontSize: 14,
           color: '#475569',
           textAlign: 'left',
-        },
-        options: {
-          arrowColor: '#ffffff',
-          backgroundColor: '#ffffff',
-          overlayColor: 'rgba(0, 0, 0, 0.5)',
-          primaryColor: '#6d28d9',
-          textColor: '#333333',
-          zIndex: 1000,
         }
       }}
       locale={{
