@@ -17,15 +17,55 @@ export class CalculoService {
     this.validar(form, today);
 
     const valorBase = this.parseValor(form.valor);
+
+    /*
+     * ── Multa Diária: pré-multiplicação antes da correção ───────────────────
+     *
+     * PROBLEMA CORRIGIDO:
+     *   Para tipoCalculo === 'multadiaria', o usuário informa um valor POR DIA
+     *   (ex.: R$ 100,00/dia). O serviço anterior mandava R$ 100,00 direto para a
+     *   API de correção monetária, como se fosse um capital principal único.
+     *   Resultado errado: SELIC(R$100) = R$172,80 — incompatível com "100 × 2160 dias".
+     *
+     * CORREÇÃO:
+     *   1. Calculamos os dias LOCALMENTE (mesma fórmula do CentralCard, sem depender
+     *      da API) porque precisamos do valor já multiplicado ANTES de chamar a API.
+     *   2. `valorParaCorrecao = valorBase × diasMulta` — esse é o valor bruto da multa
+     *      ANTES de qualquer correção monetária.
+     *   3. A API recebe o valor total da multa e aplica o índice (IPCA, SELIC, etc.)
+     *      em cima disso, gerando o valor corrigido final.
+     *   4. `valorPrincipal` continua sendo `valorBase` (valor diário digitado),
+     *      que é o que aparece na tabela e no collapse como "Valor (por dia)".
+     *
+     * Por que calcular localmente em vez de esperar a API retornar os dias?
+     *   Porque precisamos de `diasMulta` ANTES de chamar a API (é o parâmetro de entrada).
+     *   A API devolve `dias` como confirmação, não como pré-requisito.
+     */
+    const isMultaDiaria = form.tipoCalculo === 'multadiaria';
+    let valorParaCorrecao = valorBase;
+    if (isMultaDiaria && form.dataInicial && form.dataCalculo) {
+      const msInicial = new Date(form.dataInicial + 'T00:00:00').getTime();
+      const msCalculo = new Date(form.dataCalculo + 'T00:00:00').getTime();
+      const diasMulta = Math.max(0, Math.floor((msCalculo - msInicial) / 86_400_000));
+      valorParaCorrecao = valorBase * diasMulta;
+    }
+
     const respCorrecao = await calcularIndice(form.indiceCorrecao, {
-      valor: valorBase,
+      valor: valorParaCorrecao,      // ← valor correto: diário × dias (ou base normal)
       dateInit: form.dataInicial,
       dateFim: form.dataCalculo,
     });
 
-    const valorAtualizado = respCorrecao ? getValorAtualizado(respCorrecao) : valorBase;
+    const valorAtualizado = respCorrecao ? getValorAtualizado(respCorrecao) : valorParaCorrecao;
     const diasCorrecao = respCorrecao?.dias ?? 0;
-    const percentualCorrecao = this.extrairPercentualCorrecao(respCorrecao, valorBase, valorAtualizado);
+
+    /*
+     * percentualCorrecao: base de comparação é `valorParaCorrecao`, não `valorBase`.
+     * Para multa diária, a "correção" é sobre o valor total da multa (diário × dias),
+     * então o percentual deve refletir quanto o índice corrigiu ESSE valor — igual
+     * ao comportamento dos outros tipos de cálculo.
+     */
+    const percentualCorrecao = this.extrairPercentualCorrecao(respCorrecao, valorParaCorrecao, valorAtualizado);
 
     const resultadoJuros = await this.processarJuros(juros, form.indiceCorrecao, valorAtualizado);
 
@@ -35,7 +75,7 @@ export class CalculoService {
       descricao: DESCRICAO_LABEL[form.descricao] ?? form.descricao,
       descricaoComplementar: form.descricaoComplementar || undefined,
       dataInicial: form.dataInicial,
-      valorPrincipal: valorBase,
+      valorPrincipal: valorBase,     // ← valor diário (o que o usuário digitou)
       dataCalculo: form.dataCalculo,
       indiceCorrecao: INDICE_LABEL[form.indiceCorrecao] ?? form.indiceCorrecao,
       valorAtualizado,

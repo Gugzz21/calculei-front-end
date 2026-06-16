@@ -58,7 +58,7 @@ function TabelaLancamentos({
     <div className="flex flex-col w-full border border-slate-300 dark:border-[#21262d] rounded-xl shadow-sm overflow-hidden bg-white dark:bg-[#0d1117] transition-colors duration-200">
 
       {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
-      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-200 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-300 dark:border-[#21262d] text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap`}>
+      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-200 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-300 dark:border-[#21262d] text-xs font-semibold text-slate-600 dark:text-slate-200 whitespace-nowrap`}>
         <div /> {/* Ícone expand */}
         <div>Data inicial</div>
         <div>Data final</div>

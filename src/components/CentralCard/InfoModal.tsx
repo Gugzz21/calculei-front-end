@@ -16,7 +16,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
       tabs: [
         {
           id: 'cdparticular',
-          label: 'Entre particulares',
+          label: 'Entre Particulares',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Créditos / Débitos Entre Particulares</p>
@@ -32,7 +32,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'cfazenda',
-          label: 'CRÉD. FAZENDA',
+          label: 'Créditos Fazenda',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Créditos da Fazenda Pública</p>
@@ -44,7 +44,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'dfazendatributario',
-          label: 'FAZ. TRIBUTÁRIO',
+          label: 'Fazenda Tributário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Débitos da Fazenda Pública - Tributários</p>
@@ -59,7 +59,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'dfazendanaotributario',
-          label: 'Faz. não tributário',
+          label: 'Fazenda Não Tributário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Débitos da Fazenda Pública - Não Tributários</p>
@@ -89,7 +89,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'precatoriostributario',
-          label: 'Prec. tributário',
+          label: 'Precatórios Tributário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Precatórios - Tributários</p>
@@ -101,7 +101,7 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
         },
         {
           id: 'precatoriosnaotributario',
-          label: 'Prec. não tributário',
+          label: 'Precatórios Não Tributário',
           content: (
             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
               <p className="font-semibold text-gray-800 dark:text-gray-100 text-base">Precatórios - Não Tributários</p>

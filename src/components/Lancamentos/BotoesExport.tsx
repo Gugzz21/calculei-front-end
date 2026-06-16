@@ -49,13 +49,12 @@ function BotoesExport({
           <span className="text-[14px]">Printar e salvar</span>
         </button>
 
-        {/* Exportar Excel */}
         <button
           type="button"
           onClick={onExportarExcel}
           disabled={!temLancamentos}
           title="Exportar dados para Excel (.xlsx)"
-          className={`flex-1 sm:flex-none sm:w-[160px] ${baseBtn} ${!temLancamentos ? inativo : ativo}`}
+          className={`flex-1 sm:flex-none ${baseBtn} ${!temLancamentos ? inativo : ativo}`}
         >
           <Table className="h-[20px] w-[20px] shrink-0" />
           <span className="text-[14px]">Gerar Excel</span>

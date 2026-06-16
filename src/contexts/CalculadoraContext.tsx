@@ -202,15 +202,37 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
     [form.valor, form.dataInicial, form.dataCalculo, form.tipoCalculo, form.indiceCorrecao, form.descricao]
   );
 
+  /*
+   * ── Ordenação por data inicial (mais antigo primeiro) ─────────────────────
+   *
+   * Por que aqui no contexto e não na tabela/exportações individualmente?
+   *   Centralizar garante consistência: tabela, PDF e Excel sempre recebem
+   *   exatamente o mesmo array ordenado, sem duplicar a lógica nos 3 lugares.
+   *
+   * Por que localeCompare e não new Date().getTime()?
+   *   As datas estão no formato ISO "YYYY-MM-DD" — a comparação lexicográfica
+   *   de strings nesse formato é equivalente à comparação cronológica.
+   *   localeCompare é mais rápido que criar objetos Date para cada comparação.
+   *
+   * Por que useMemo e não reordenar no setLancamentos?
+   *   O array bruto `lancamentos` mantém a ordem de inserção (necessária para
+   *   edição/remoção por id). A ordenação é uma visão derivada — separar
+   *   estado de apresentação é a abordagem correta em React.
+   */
+  const lancamentosOrdenados = useMemo(
+    () => [...lancamentos].sort((a, b) => a.dataInicial.localeCompare(b.dataInicial)),
+    [lancamentos]
+  );
+
   // Memoizar o value do Provider: sem isso, um novo objeto é criado a cada render
   // forçando TODOS os consumidores do contexto a re-renderizar desnecessariamente.
   const contextValue = useMemo(() => ({
-    today, form, juros, lancamentos, editandoId, loading, erro, isFormValid, ufirValue,
+    today, form, juros, lancamentos: lancamentosOrdenados, editandoId, loading, erro, isFormValid, ufirValue,
     handleFormChange, handleJurosChange, handleCalcular, handleLimpar,
     handleEditar, handleCancelarEdicao, handleRemoverLancamento,
     handleLimparTodosLancamentos, handleConfirmarDuplicacao
   }), [
-    today, form, juros, lancamentos, editandoId, loading, erro, isFormValid, ufirValue,
+    today, form, juros, lancamentosOrdenados, editandoId, loading, erro, isFormValid, ufirValue,
     handleFormChange, handleJurosChange, handleCalcular, handleLimpar,
     handleEditar, handleCancelarEdicao, handleRemoverLancamento,
     handleLimparTodosLancamentos, handleConfirmarDuplicacao

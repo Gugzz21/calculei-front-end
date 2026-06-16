@@ -193,15 +193,100 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
         {/* ── Seção de Multa Diária ── */}
         {item.tipoCalculo === 'multadiaria' && (
           <div className="border border-orange-200 dark:border-orange-900/50 rounded-lg bg-orange-50/70 dark:bg-orange-900/20 p-3 md:p-4 mb-4">
+
+            {/* Cabeçalho — padrão da seção de Juros */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider">
+                Multa diária · detalhes:
+              </span>
+              <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">
+                {item.dias} {item.dias === 1 ? 'dia' : 'dias'}
+              </span>
+            </div>
+
+            {/*
+              Grade de 4 campos que formam a equação visual:
+                Valor/dia  ×  Total de dias  =  Multa bruta  →  Multa corrigida
+
+              Por que 4 campos?
+                - "Valor/dia" e "Total de dias" são os INPUTS do usuário.
+                - "Multa bruta" é a multiplicação pura (sem índice), calculada
+                  diretamente no JSX: `item.valorPrincipal × item.dias`.
+                  Isso confirma visualmente que a conta foi feita corretamente.
+                - "Multa corrigida" é `item.valorAtualizado` (saída da API com o
+                  índice aplicado sobre a multa bruta). Usamos `valorAtualizado`
+                  e não `total` porque `total` inclui juros adicionais
+                  (que ficam separados na seção de Juros abaixo).
+            */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
+
+              {/*
+                CAMPO 1 — Valor (por dia)
+                `item.valorPrincipal` = o valor exato digitado pelo usuário.
+                O CalculoService salva `valorBase` (parseValor do form) em
+                `valorPrincipal`, independente de ser multa diária ou não.
+                É o único campo que NÃO é multiplicado nem corrigido.
+              */}
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Valor informado</span>
-                <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">{formatBRL(item.valorPrincipal)}</span>
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                  Valor (por dia)
+                </span>
+                <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">
+                  {formatBRL(item.valorPrincipal)}
+                </span>
               </div>
+
+              {/*
+                CAMPO 2 — Total de dias
+                `item.dias` vem de `respCorrecao?.dias` no CalculoService,
+                que é o número de dias retornado pela API para o período
+                dataInicial → dataCalculo. É exatamente os mesmos dias
+                usados na pré-multiplicação do CalculoService.
+              */}
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Total de dias</span>
-                <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">{item.dias} dias</span>
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                  Total de dias
+                </span>
+                <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+                  {item.dias} {item.dias === 1 ? 'dia' : 'dias'}
+                </span>
               </div>
+
+              {/*
+                CAMPO 3 — Multa bruta (sem correção)
+                Calculado NO JSX: `item.valorPrincipal × item.dias`.
+                Este é o valor que o CalculoService enviou para a API
+                antes de aplicar qualquer índice de correção.
+                Serve de confirmação visual: "Sim, fizemos 100 × 2160 = 216.000".
+                Não está salvo no item — é derivado dos dois campos acima.
+              */}
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                  Multa bruta
+                </span>
+                <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+                  {formatBRL(item.valorPrincipal * item.dias)}
+                </span>
+              </div>
+
+              {/*
+                CAMPO 4 — Multa corrigida (com índice)
+                `item.valorAtualizado` = resultado da API após aplicar
+                o índice de correção (IPCA, SELIC, etc.) sobre a multa bruta.
+                Usamos `valorAtualizado` e NÃO `item.total` porque:
+                  - `item.total` = valorAtualizado + juros adicionais
+                  - Os juros ficam separados na seção "Juros" abaixo
+                  - `valorAtualizado` é o valor puro da multa corrigida
+              */}
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                  Multa corrigida
+                </span>
+                <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">
+                  {formatBRL(item.valorAtualizado)}
+                </span>
+              </div>
+
             </div>
           </div>
         )}
@@ -291,7 +376,7 @@ export default React.memo(function LancamentoRow(props: LancamentoRowProps) {
   const isActuallyExpanded = props.forceExpand || isExpanded;
 
   return (
-    <div className="flex flex-col bg-white dark:bg-[#0d1117] border-b border-slate-500 dark:border-slate-600 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-[#1e232b]/50">
+    <div className="flex flex-col bg-white dark:bg-[#0d1117] border-b-2 border-slate-300 dark:border-slate-500 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-[#1e232b]/50">
 
       {/* ─── LINHA PRINCIPAL ─── */}
       <div
