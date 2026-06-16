@@ -1,0 +1,22 @@
+ <style>
+      /* Evita FOUC (Flash of Unstyled Content) definindo o fundo padrão instantaneamente */
+      body { margin: 0; background-color: #e2e8f0; } /* slate-200 */
+      html.dark body { background-color: #010409; }
+      
+      #root:empty {
+        display: none;
+      }
+    </style>
+    <script>
+      // Aplica o tema escuro IMEDIATAMENTE antes de qualquer renderização para evitar clarão na tela
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+
+
+
+
+    setInterval(() => { }, 2000)

@@ -8,6 +8,7 @@ import { CalculadoraProvider } from './contexts/CalculadoraContext';
 import TourPosCalculo from './components/TourPosCalculo';
 
 function App() {
+
   return (
     <CalculadoraProvider>
       <div className="flex flex-col bg-slate-200 dark:bg-[#010409] min-h-screen w-full overflow-x-hidden transition-colors duration-200">
