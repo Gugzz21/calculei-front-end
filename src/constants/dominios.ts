@@ -14,11 +14,11 @@ export const TIPO_CALCULO_OPCOES = [
 
 /** Mapeamento tipo de cálculo → índice de correção pré-selecionado */
 export const TIPO_CALCULO_INDICE_MAP: Record<string, string> = {
-  dfazendatributario:    "selic",
+  dfazendatributario: "selic",
   dfazendanaotributario: "tjrj11960",
-  abatimentos:           "semcorrecaomonetaria",
-  cdparticular:          "tjrj6899",   // Natureza Civil → TJ/RJ 6899 (UFIR-RJ)
-  cfazenda:              "tjrj11960",  // Fazenda Pública → TJ/RJ 11960
+  abatimentos: "semcorrecaomonetaria",
+  cdparticular: "tjrj6899",   // Natureza Civil → TJ/RJ 6899 (UFIR-RJ)
+  cfazenda: "tjrj11960",  // Fazenda Pública → TJ/RJ 11960
 };
 
 /**
@@ -65,7 +65,7 @@ export const MONETARY_CORRECTION_JAVA_MAP: Record<string, string> = {
 
 export const DESCRICAO_OPCOES = [
   { value: "ressarci", label: "Ressarcimento" },
-  { value: "ressarcimentoaoetario", label: "Ressarcimento ao etário" },
+  { value: "ressarcimentoaoerario", label: "Ressarcimento ao erário" },
   { value: "debitosdfp", label: "Débitos da Fazenda Pública" },
   { value: "multacivil", label: "Multa Civil" },
   { value: "honorariosadvocaticios", label: "Honorários Advocatícios" },

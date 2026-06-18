@@ -8,7 +8,7 @@ interface DescricaoProps {
   onComplementarChange: (value: string) => void;
 }
 
-function Descricao({ value, onChange, complementar, onComplementarChange }: DescricaoProps) {
+function Descricao({ value, onChange }: DescricaoProps) {
   const [forceOther, setForceOther] = useState(false);
 
   const isPredefined = (DESCRICAO_OPCOES.some(opt => opt.value === value) || value === "") && value !== "outros";

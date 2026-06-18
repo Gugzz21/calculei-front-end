@@ -91,9 +91,9 @@ const EXEMPLOS: ExemploPreenchido[] = [
 const STEPS = [
   {
     icon: Sparkles,
-    color: "text-violet-500 dark:text-violet-400",
-    bg: "bg-violet-100 dark:bg-violet-900/30",
-    border: "border-violet-300 dark:border-violet-700/50",
+    color: "text-blue-500 dark:text-blue-400",
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    border: "border-blue-300 dark:border-blue-700/50",
     title: "Comece com um exemplo pronto",
     description:
       "Para facilitar o aprendizado, escolha um dos exemplos abaixo e clique em \"Preencher\". Os campos do formulário serão preenchidos automaticamente — basta clicar em Calcular para ver o resultado na tabela.",
@@ -192,15 +192,15 @@ const STEPS = [
 // ── Componente ─────────────────────────────────────────────────────────────────
 
 export default function OnboardingModal({ onClose }: OnboardingModalProps) {
-  const [step, setStep]           = useState(0);
+  const [step, setStep] = useState(0);
   const [exemploIdx, setExemploIdx] = useState(1); // padrão: "Dano ao erário + juros" para mostrar juros
-  const [aplicado, setAplicado]   = useState(false);
+  const [aplicado, setAplicado] = useState(false);
 
   const { handleFormChange, handleJurosChange } = useCalculadoraContext();
 
   const current = STEPS[step];
-  const Icon    = current.icon;
-  const isLast  = step === STEPS.length - 1;
+  const Icon = current.icon;
+  const isLast = step === STEPS.length - 1;
 
   /*
    * Preencher o formulário com o exemplo selecionado.
@@ -222,20 +222,20 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
   function aplicarExemplo() {
     const ex = EXEMPLOS[exemploIdx];
 
-    handleFormChange("tipoCalculo",            ex.tipoCalculo);
-    handleFormChange("indiceCorrecao",         ex.indiceCorrecao);
-    handleFormChange("descricao",              ex.descricao);
-    handleFormChange("descricaoComplementar",  ex.descricaoComplementar);
-    handleFormChange("valor",                  ex.valor);
-    handleFormChange("dataInicial",            ex.dataInicial);
-    handleFormChange("dataCalculo",            ex.dataCalculo);
+    handleFormChange("tipoCalculo", ex.tipoCalculo);
+    handleFormChange("indiceCorrecao", ex.indiceCorrecao);
+    handleFormChange("descricao", ex.descricao);
+    handleFormChange("descricaoComplementar", ex.descricaoComplementar);
+    handleFormChange("valor", ex.valor);
+    handleFormChange("dataInicial", ex.dataInicial);
+    handleFormChange("dataCalculo", ex.dataCalculo);
 
     if (ex.comJuros) {
-      handleJurosChange("enabled",    true);
-      handleJurosChange("indice",     ex.jurosIndice  ?? "taxalegal");
-      handleJurosChange("taxa",       ex.jurosTaxa    ?? "12,00");
+      handleJurosChange("enabled", true);
+      handleJurosChange("indice", ex.jurosIndice ?? "taxalegal");
+      handleJurosChange("taxa", ex.jurosTaxa ?? "12,00");
       handleJurosChange("dataInicio", ex.jurosDataInicio ?? ex.dataInicial);
-      handleJurosChange("dataFim",    ex.jurosDataFim    ?? ex.dataCalculo);
+      handleJurosChange("dataFim", ex.jurosDataFim ?? ex.dataCalculo);
     } else {
       handleJurosChange("enabled", false);
     }
@@ -296,18 +296,16 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
                   <button
                     key={i}
                     onClick={() => { setExemploIdx(i); setAplicado(false); }}
-                    className={`flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
-                      exemploIdx === i
-                        ? "border-violet-600 dark:border-violet-700 bg-violet-100 dark:bg-violet-900/50 text-violet-900 dark:text-violet-100"
-                        : "border-gray-200 dark:border-[#30363d] bg-white dark:bg-[#161b22] text-gray-700 dark:text-gray-300 hover:border-violet-400 dark:hover:border-violet-700"
-                    }`}
+                    className={`flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all ${exemploIdx === i
+                      ? "border-blue-600 dark:border-blue-700 bg-blue-100 dark:bg-blue-900/50 text-blue-900 dark:text-blue-100"
+                      : "border-gray-200 dark:border-[#30363d] bg-white dark:bg-[#161b22] text-gray-700 dark:text-gray-300 hover:border-blue-400 dark:hover:border-blue-700"
+                      }`}
                   >
                     {/* Indicador de seleção */}
-                    <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
-                      exemploIdx === i
-                        ? "border-violet-700 bg-violet-700"
-                        : "border-gray-300 dark:border-gray-600"
-                    }`}>
+                    <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${exemploIdx === i
+                      ? "border-blue-700 bg-blue-700"
+                      : "border-gray-300 dark:border-gray-600"
+                      }`}>
                       {exemploIdx === i && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                     </div>
                     <div className="flex flex-col gap-0.5 min-w-0">
@@ -325,11 +323,10 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
               {/* Botão Preencher */}
               <button
                 onClick={aplicarExemplo}
-                className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 ${
-                  aplicado
-                    ? "bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300"
-                    : "bg-violet-800 hover:bg-violet-900 dark:bg-violet-700 dark:hover:bg-violet-800 text-white shadow"
-                }`}
+                className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 ${aplicado
+                  ? "bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300"
+                  : "bg-blue-800 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-800 text-white shadow"
+                  }`}
               >
                 {aplicado
                   ? <><CheckCircle2 size={16} /> Preenchido! Feche o tutorial e clique em Calcular</>
@@ -357,11 +354,10 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
               <button
                 key={i}
                 onClick={() => { setStep(i); setAplicado(false); }}
-                className={`rounded-full transition-all duration-200 ${
-                  i === step
-                    ? "w-5 h-2 bg-blue-500 dark:bg-blue-400"
-                    : "w-2 h-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
-                }`}
+                className={`rounded-full transition-all duration-200 ${i === step
+                  ? "w-5 h-2 bg-blue-500 dark:bg-blue-400"
+                  : "w-2 h-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  }`}
                 title={`Ir para passo ${i + 1}`}
               />
             ))}

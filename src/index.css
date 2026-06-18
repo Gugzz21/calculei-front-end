@@ -2,7 +2,7 @@
    Fonte Roboto via Google Fonts  ← deve vir ANTES do Tailwind!
    @import sempre precisa ser o primeiro statement do CSS
    =================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 
 @import "tailwindcss";
 
