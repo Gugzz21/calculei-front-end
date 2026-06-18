@@ -30,35 +30,6 @@ O **Calculei** é uma calculadora jurídica de atualização monetária que perm
 
 ---
 
-## Tecnologias utilizadas (Frontend)
-
-| Tecnologia | Versão | Descrição |
-|---|---|---|
-| **React** | 19.2.0 | Biblioteca principal de UI |
-| **React DOM** | 19.2.0 | Renderização no browser |
-| **TypeScript** | 5.9.3 | Tipagem estática |
-| **Vite** | 7.3.1 | Bundler e servidor de desenvolvimento |
-| **Tailwind CSS** | 4.2.1 | Utilitários CSS |
-| **@tailwindcss/vite** | 4.2.1 | Plugin Tailwind para Vite |
-| **MUI Material** | 9.0.0 | Componentes de interface (tabelas, modais) |
-| **MUI Icons Material** | 9.0.0 | Ícones Material Design |
-| **@emotion/react** | 11.14.0 | Engine de CSS-in-JS (dependência do MUI) |
-| **@emotion/styled** | 11.14.1 | Componentes estilizados (dependência do MUI) |
-| **Lucide React** | 0.577.0 | Ícones SVG |
-| **React Icons** | 5.6.0 | Coleção de ícones |
-| **React Hot Toast** | 2.6.0 | Notificações toast |
-| **@react-pdf/renderer** | 4.4.0 | Geração de PDF no browser |
-| **jsPDF** | 4.2.1 | Geração de PDF alternativo |
-| **jsPDF AutoTable** | 5.0.7 | Plugin de tabelas para jsPDF |
-| **ExcelJS** | 4.4.0 | Geração de planilhas Excel |
-| **file-saver** | 2.0.5 | Download de arquivos no browser |
-| **html2canvas** | 1.4.1 | Captura de tela (screenshot) |
-| **html-to-image** | 1.11.13 | Conversão de HTML para imagem |
-| **ESLint** | 9.39.1 | Linter de código |
-| **typescript-eslint** | 8.48.0 | Regras ESLint para TypeScript |
-
----
-
 ## Pré-requisitos
 
 - **Node.js** >= 18.x
@@ -72,8 +43,8 @@ O **Calculei** é uma calculadora jurídica de atualização monetária que perm
 ### 1. Clone o repositório e acesse a pasta do projeto
 
 ```bash
-git clone <url-do-repositório>
-cd Replica_calculei_REACT
+git clone http://gitlab.mprj.mp.br/gate/calculei-front-end.git
+cd calculei-front-end
 ```
 
 ### 2. Instale as dependências
