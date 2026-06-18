@@ -202,6 +202,13 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
   const Icon = current.icon;
   const isLast = step === STEPS.length - 1;
 
+  const handleClose = (userCancelled: boolean) => {
+    if (userCancelled || (step === 0 && !aplicado)) {
+      localStorage.setItem('hasSeenTourPosCalculo', 'true');
+    }
+    onClose();
+  };
+
   /*
    * Preencher o formulário com o exemplo selecionado.
    *
@@ -253,7 +260,7 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
             Tutorial — Passo {step + 1} de {STEPS.length}
           </span>
           <button
-            onClick={onClose}
+            onClick={() => handleClose(true)}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors rounded-full p-1"
             title="Fechar tutorial"
           >
@@ -377,7 +384,7 @@ export default function OnboardingModal({ onClose }: OnboardingModalProps) {
 
           {isLast ? (
             <button
-              onClick={onClose}
+              onClick={() => handleClose(false)}
               className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-xl text-sm font-bold shadow transition-all active:scale-95"
             >
               <CheckCircle2 size={16} />
