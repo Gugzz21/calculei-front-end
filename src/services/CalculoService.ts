@@ -1,6 +1,7 @@
 import { calcularIndice, calcularJuros, getValorAtualizado, type CalcResponse } from "./api";
 import type { FormState, JurosState, LancamentoItem, DetalheJuros } from "../types";
 import { INDICE_LABEL, DESCRICAO_LABEL, JUROS_LABEL } from "../constants/dominios";
+import { calcularDiasAbsolutosUTC } from "../utils/dateUtils";
 
 const INDICES_COM_JUROS_EMBUTIDOS = new Set(["selic"]);
 
@@ -44,9 +45,7 @@ export class CalculoService {
     const isMultaDiaria = form.tipoCalculo === 'multadiaria';
     let valorParaCorrecao = valorBase;
     if (isMultaDiaria && form.dataInicial && form.dataCalculo) {
-      const msInicial = new Date(form.dataInicial + 'T00:00:00').getTime();
-      const msCalculo = new Date(form.dataCalculo + 'T00:00:00').getTime();
-      const diasMulta = Math.max(0, Math.floor((msCalculo - msInicial) / 86_400_000));
+      const diasMulta = calcularDiasAbsolutosUTC(form.dataInicial, form.dataCalculo);
       valorParaCorrecao = valorBase * diasMulta;
     }
 
