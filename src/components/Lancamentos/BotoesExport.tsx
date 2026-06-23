@@ -24,7 +24,7 @@ function BotoesExport({
   return (
     <div id="botoes-exportacao" className="w-full">
       {/* Container flex com flex-wrap para ajustar ao tamanho da tela */}
-      <div className="flex flex-wrap gap-2 md:gap-3 justify-end items-stretch sm:items-center">
+      <div className="flex flex-wrap gap-2 md:gap-3 justify-start items-stretch sm:items-center">
 
         {/* Gerar PDF */}
         <button
