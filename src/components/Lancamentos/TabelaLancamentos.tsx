@@ -35,6 +35,7 @@ function TabelaLancamentos({
 
   // Memoizar todos os totais em um único reduce em vez de 6 independentes.
   // Sem useMemo, cada render percorre toda a lista 6 vezes (3 desktop + 3 mobile).
+<<<<<<< HEAD
   const totais = useMemo(() => lancamentos.reduce(
     (acc, l) => ({
       valorPrincipal: acc.valorPrincipal + l.valorPrincipal,
@@ -44,6 +45,22 @@ function TabelaLancamentos({
     }),
     { valorPrincipal: 0, valorAtualizado: 0, juros: 0, total: 0 }
   ), [lancamentos]);
+=======
+  // Somar usando valores arredondados a centavos para evitar diferenças
+  // entre a soma dos valores exibidos (2 casas) e o total exibido.
+  const totais = useMemo(() => {
+    const round = (v: number) => Math.round(v * 100) / 100;
+    return lancamentos.reduce(
+      (acc, l) => ({
+        valorPrincipal: acc.valorPrincipal + round(l.valorPrincipal),
+        valorAtualizado: acc.valorAtualizado + round(l.valorAtualizado),
+        juros: acc.juros + round(l.juros),
+        total: acc.total + round(l.total),
+      }),
+      { valorPrincipal: 0, valorAtualizado: 0, juros: 0, total: 0 }
+    );
+  }, [lancamentos]);
+>>>>>>> feature/inicial
 
   const itemsLengthRef = useRef(currentItems.length);
   useEffect(() => {

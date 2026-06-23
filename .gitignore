@@ -7,9 +7,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+<<<<<<< HEAD
 node_modules
 dist
 dist-ssr
+=======
+
+node_modules/
+dist/
+dist-ssr/
+>>>>>>> feature/inicial
 *.local
 
 # Editor directories and files

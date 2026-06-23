@@ -30,6 +30,7 @@ O **Calculei** é uma calculadora jurídica de atualização monetária que perm
 
 ---
 
+<<<<<<< HEAD
 ## Tecnologias utilizadas (Frontend)
 
 | Tecnologia | Versão | Descrição |
@@ -59,6 +60,8 @@ O **Calculei** é uma calculadora jurídica de atualização monetária que perm
 
 ---
 
+=======
+>>>>>>> feature/inicial
 ## Pré-requisitos
 
 - **Node.js** >= 18.x
@@ -72,8 +75,13 @@ O **Calculei** é uma calculadora jurídica de atualização monetária que perm
 ### 1. Clone o repositório e acesse a pasta do projeto
 
 ```bash
+<<<<<<< HEAD
 git clone <url-do-repositório>
 cd Replica_calculei_REACT
+=======
+git clone http://gitlab.mprj.mp.br/gate/calculei-front-end.git
+cd calculei-front-end
+>>>>>>> feature/inicial
 ```
 
 ### 2. Instale as dependências
