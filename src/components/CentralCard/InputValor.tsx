@@ -57,7 +57,7 @@ function InputValor({ value, onChange }: InputValorProps) {
           <button
             type="button"
             onClick={handleClear}
-            className="text-gray-400 hover:text-red-500 transition-colors text-xs shrink-0"
+            className="text-gray-400 hover:text-red-500 transition-colors text-sm shrink-0"
             aria-label="Limpar valor"
           >
             ✕

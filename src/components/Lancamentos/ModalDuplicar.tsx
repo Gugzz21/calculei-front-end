@@ -59,7 +59,7 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Lançamento base: <span className="font-semibold text-gray-700 dark:text-gray-200">{lancamentoBase.descricao}</span>
           </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500">Data Inicial original: {formatDate(lancamentoBase.dataInicial)}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Data Inicial original: {formatDate(lancamentoBase.dataInicial)}</p>
         </div>
 
         <div className="p-6 flex-1 overflow-y-auto">
@@ -83,13 +83,13 @@ export default function ModalDuplicar({ isOpen, onClose, lancamentoBase, onConfi
               Gerar
             </button>
           </div>
-          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2">Digite o número total de parcelas (incluindo a atual) e aperte Enter ou Gerar.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">Digite o número total de parcelas (incluindo a atual) e aperte Enter ou Gerar.</p>
 
           {/* Tabela de Pré-visualização */}
           {parcelasPreview.length > 0 && (
             <div className="mt-6 border border-gray-200 dark:border-[#21262d] rounded-lg overflow-hidden">
               <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-[#0d1117] text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
+                <thead className="bg-gray-50 dark:bg-[#0d1117] text-sm text-gray-500 dark:text-gray-400 uppercase font-semibold">
                   <tr>
                     <th className="px-4 py-3 border-b border-gray-200 dark:border-[#21262d] w-24 text-center">Parcela</th>
                     <th className="px-4 py-3 border-b border-gray-200 dark:border-[#21262d]">Data Inicial</th>

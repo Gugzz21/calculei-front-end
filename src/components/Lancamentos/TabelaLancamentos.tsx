@@ -35,17 +35,7 @@ function TabelaLancamentos({
 
   // Memoizar todos os totais em um único reduce em vez de 6 independentes.
   // Sem useMemo, cada render percorre toda a lista 6 vezes (3 desktop + 3 mobile).
-<<<<<<< HEAD
-  const totais = useMemo(() => lancamentos.reduce(
-    (acc, l) => ({
-      valorPrincipal: acc.valorPrincipal + l.valorPrincipal,
-      valorAtualizado: acc.valorAtualizado + l.valorAtualizado,
-      juros: acc.juros + l.juros,
-      total: acc.total + l.total,
-    }),
-    { valorPrincipal: 0, valorAtualizado: 0, juros: 0, total: 0 }
-  ), [lancamentos]);
-=======
+
   // Somar usando valores arredondados a centavos para evitar diferenças
   // entre a soma dos valores exibidos (2 casas) e o total exibido.
   const totais = useMemo(() => {
@@ -60,7 +50,7 @@ function TabelaLancamentos({
       { valorPrincipal: 0, valorAtualizado: 0, juros: 0, total: 0 }
     );
   }, [lancamentos]);
->>>>>>> feature/inicial
+
 
   const itemsLengthRef = useRef(currentItems.length);
   useEffect(() => {
@@ -75,7 +65,7 @@ function TabelaLancamentos({
     <div id="tabela-lancamentos" className="flex flex-col w-full border border-slate-300 dark:border-[#21262d] rounded-xl shadow-sm overflow-hidden bg-white dark:bg-[#0d1117] transition-colors duration-200">
 
       {/* ─── CABEÇALHO (Visível apenas no Desktop) ─── */}
-      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-200 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-300 dark:border-[#21262d] text-xs font-semibold text-slate-600 dark:text-slate-200 whitespace-nowrap`}>
+      <div className={`hidden md:grid ${TABLE_GRID_COLS} items-center gap-3 px-4 py-3 bg-slate-200 dark:bg-slate-600/80 backdrop-blur-sm border-b border-slate-300 dark:border-[#21262d] text-sm font-semibold text-slate-600 dark:text-slate-200 whitespace-nowrap`}>
         <div /> {/* Ícone expand */}
         <div>Data inicial</div>
         <div>Data final</div>

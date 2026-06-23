@@ -92,7 +92,7 @@ function Juros({ onOpenHelp }: JurosProps) {
         {/* Índice de juros */}
         <div className="flex flex-col gap-1 w-full md:w-auto">
           <div className="flex gap-2 items-center">
-            <strong className="text-[13px] text-gray-700 dark:text-gray-300 font-semibold">Índice de juros</strong>
+            <strong className="text-sm text-gray-700 dark:text-gray-300 font-semibold">Índice de juros</strong>
             <InfoButton onClick={onOpenHelp} />
           </div>
           <select
@@ -109,7 +109,7 @@ function Juros({ onOpenHelp }: JurosProps) {
         {/* Taxa de juros (condicional) */}
         {mostraTaxa && (
           <div className="flex flex-col gap-1 w-full md:w-auto">
-            <strong className="text-[13px] text-gray-700 dark:text-gray-300 font-semibold">Taxa de juros</strong>
+            <strong className="text-sm text-gray-700 dark:text-gray-300 font-semibold">Taxa de juros</strong>
             <div className="relative">
               <input
                 type="text"
@@ -160,7 +160,7 @@ function Juros({ onOpenHelp }: JurosProps) {
       {/* Descrição do índice selecionado */}
       {JUROS_DESCRICAO[indice] && (
         <div className="bg-[#eaecf0] dark:bg-[#010409] border border-[#979797] dark:border-[#21262d] w-[66%] mt-[6px] rounded-md p-3">
-          <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
             *{JUROS_DESCRICAO[indice]}
           </p>
         </div>
@@ -173,7 +173,7 @@ function Juros({ onOpenHelp }: JurosProps) {
       {/* Tabela de juros aplicados */}
       {aplicados.length > 0 && (
         <div className="w-full overflow-x-auto mt-2 border border-[#d2daee] dark:border-[#21262d] rounded-md">
-          <table className="w-full min-w-[500px] text-left text-[13px]">
+          <table className="w-full min-w-[500px] text-left text-sm">
             <thead>
               <tr className="bg-[#e4ebf7] dark:bg-[#0d1117] text-[#1F2022] dark:text-gray-100">
                 <th className="py-3 px-4 font-semibold w-[15%]">Data inicial</th>

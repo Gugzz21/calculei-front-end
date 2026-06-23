@@ -185,7 +185,7 @@ function Lancamentos() {
               <div className="absolute inset-0 bg-white/70 dark:bg-[#0d1117]/70 backdrop-blur-[1px] flex items-center justify-center z-10 rounded-lg">
                 <div className="flex flex-col items-center gap-2 bg-white dark:bg-[#161b22] px-6 py-4 rounded-xl shadow-lg border border-slate-300 dark:border-slate-800">
                   <div className="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-[#073365] dark:border-[#007aff]"></div>
-                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Atualizando...</span>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">Atualizando...</span>
                 </div>
               </div>
             )}

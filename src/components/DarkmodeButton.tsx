@@ -5,18 +5,12 @@ export default function DarkmodeButton() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-<<<<<<< HEAD
-    // Check initial state from localStorage or system preference
-    const savedTheme = localStorage.getItem("calculei_theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    
-    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
-=======
+
     // Check initial state from localStorage - default is light mode
     const savedTheme = localStorage.getItem("calculei_theme");
     
     if (savedTheme === "dark") {
->>>>>>> feature/inicial
+
       setIsDark(true);
       document.documentElement.classList.add("dark");
     } else {

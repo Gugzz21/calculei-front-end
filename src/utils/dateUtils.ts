@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 /**
  * 
  * @param dataInicialStr - Data inicial do período 
@@ -29,7 +28,7 @@ export function calcularDiasAbsolutosUTC(dataInicialStr: string, dataFinalStr: s
 
 
 
->>>>>>> feature/inicial
+
 /** Converte "YYYY-MM-DD" → "DD/MM/YYYY" */
 export function formatDate(dateStr: string): string {
   if (!dateStr) return "—";

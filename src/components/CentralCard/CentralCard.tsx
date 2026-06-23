@@ -65,7 +65,7 @@ function CentralCard() {
       {/* ── Banner modo edição ─────────────────────────────────────── */}
       {editandoId !== null && (
         <div className="flex items-start sm:items-center justify-between bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700/50 rounded-lg px-3 py-2.5 gap-2">
-          <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-semibold">
+          <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200 text-sm sm:text-sm font-semibold">
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
@@ -73,7 +73,7 @@ function CentralCard() {
           </div>
           <button
             onClick={handleCancelarEdicao}
-            className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 text-xs font-semibold underline shrink-0"
+            className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 text-sm font-semibold underline shrink-0"
           >
             Cancelar
           </button>
@@ -152,7 +152,7 @@ function CentralCard() {
                   )}
                 </div>
               </div>
-              <span className={`text-[13px] font-medium transition-colors duration-150 ${isFormValid ? "text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100" : "text-gray-500 dark:text-gray-600"
+              <span className={`text-sm font-medium transition-colors duration-150 ${isFormValid ? "text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100" : "text-gray-500 dark:text-gray-600"
                 }`}>
                 Aplicar juros?
               </span>
@@ -227,7 +227,7 @@ function CentralCard() {
           <Limpar onClick={handleLimpar} />
         </div>
         {juros.enabled && !jurosEmbutidos && juros.aplicados.length === 0 && (
-          <div className="text-amber-600 text-xs sm:text-sm font-medium mt-1 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/20 p-2 rounded-md">
+          <div className="text-amber-600 text-sm sm:text-sm font-medium mt-1 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/20 p-2 rounded-md">
             ⚠️ Você marcou para aplicar juros. Clique em "Aplicar" logo acima antes de calcular.
           </div>
         )}

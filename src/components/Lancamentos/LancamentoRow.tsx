@@ -38,7 +38,7 @@ function formatPercent2(value: number): string {
 function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplicar }: SubComponentProps) {
   const temJuros = item.indiceJuros !== "—";
   return (
-    <div className="hidden md:contents text-[13px] text-slate-800 dark:text-slate-300">
+    <div className="hidden md:contents text-sm text-slate-800 dark:text-slate-300">
       {/* expand icon */}
       <div
         className="flex items-center justify-center text-slate-500 transition-transform duration-300 shrink-0"
@@ -98,7 +98,7 @@ function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplica
 
 function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar }: SubComponentProps) {
   return (
-    <div className="flex flex-col md:hidden text-[13px] text-slate-800 dark:text-slate-300 w-full gap-2">
+    <div className="flex flex-col md:hidden text-sm text-slate-800 dark:text-slate-300 w-full gap-2">
       {/* Linha Superior */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 text-[14px]">
@@ -126,20 +126,20 @@ function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar
       {/* Grade de informações principais */}
       <div className="grid grid-cols-2 gap-3 mt-1 ml-7">
         <div className="flex flex-col">
-          <span className="text-[11px] font-bold text-gray-800 dark:text-gray-200">Data inicial</span>
-          <span className="text-[13px]">{formatDate(item.dataInicial)}</span>
+          <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Data inicial</span>
+          <span className="text-sm">{formatDate(item.dataInicial)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[11px] font-bold text-gray-800 dark:text-gray-200">Data final</span>
-          <span className="text-[13px]">{formatDate(item.dataCalculo)}</span>
+          <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Data final</span>
+          <span className="text-sm">{formatDate(item.dataCalculo)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[11px] font-bold text-gray-800 dark:text-gray-200">Valor original</span>
-          <span className="text-[13px]">{formatBRL(item.valorPrincipal)}</span>
+          <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Valor original</span>
+          <span className="text-sm">{formatBRL(item.valorPrincipal)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[11px] font-bold text-gray-800 dark:text-gray-200">Total devido</span>
-          <span className="font-bold text-[13px] text-gray-800 dark:text-gray-100">{formatBRL(item.total)}</span>
+          <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Total devido</span>
+          <span className="font-bold text-sm text-gray-800 dark:text-gray-100">{formatBRL(item.total)}</span>
         </div>
       </div>
     </div>
@@ -157,8 +157,8 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
 
         {/* ── Descrição ── */}
         <div className="flex flex-col gap-0.5 mb-4">
-          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider">Descrição</span>
-          <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+          <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider">Descrição</span>
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
             {item.descricao}
             {item.descricaoComplementar && (
               <span className="text-slate-600 dark:text-slate-400 italic"> ({item.descricaoComplementar})</span>
@@ -169,23 +169,23 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
         {/* ── Mobile: campos omitidos na grade principal ── */}
         <div className="grid grid-cols-2 md:hidden gap-x-4 gap-y-4 mb-4">
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Índice</span>
-            <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300 bg-white dark:bg-[#0d1117] border border-slate-300 dark:border-[#21262d] rounded-md px-2 py-0.5 w-fit">
+            <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Índice</span>
+            <span className="text-sm font-medium text-slate-800 dark:text-slate-300 bg-white dark:bg-[#0d1117] border border-slate-300 dark:border-[#21262d] rounded-md px-2 py-0.5 w-fit">
               {item.indiceCorrecao}
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Fator de correção</span>
-            <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">{formatFatorCorrecao(item.percentualCorrecao)}</span>
+            <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Fator de correção</span>
+            <span className="text-sm font-medium text-slate-800 dark:text-slate-300">{formatFatorCorrecao(item.percentualCorrecao)}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Valor corrigido</span>
-            <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">{formatBRL(item.valorAtualizado)}</span>
+            <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Valor corrigido</span>
+            <span className="text-sm font-medium text-slate-800 dark:text-slate-300">{formatBRL(item.valorAtualizado)}</span>
           </div>
           {temJuros && (
             <div className="flex flex-col">
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Juros (R$)</span>
-              <span className="text-[13px] font-medium text-blue-700 dark:text-blue-300">{formatBRL(item.juros)}</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Juros (R$)</span>
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">{formatBRL(item.juros)}</span>
             </div>
           )}
         </div>
@@ -196,10 +196,10 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
 
             {/* Cabeçalho — padrão da seção de Juros */}
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider">
+              <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider">
                 Multa diária · detalhes:
               </span>
-              <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">
+              <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">
                 {item.dias} {item.dias === 1 ? 'dia' : 'dias'}
               </span>
             </div>
@@ -228,10 +228,10 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                 É o único campo que NÃO é multiplicado nem corrigido.
               */}
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
                   Valor (por dia)
                 </span>
-                <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">
+                <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">
                   {formatBRL(item.valorPrincipal)}
                 </span>
               </div>
@@ -244,10 +244,10 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                 usados na pré-multiplicação do CalculoService.
               */}
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
                   Total de dias
                 </span>
-                <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
                   {item.dias} {item.dias === 1 ? 'dia' : 'dias'}
                 </span>
               </div>
@@ -261,10 +261,10 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                 Não está salvo no item — é derivado dos dois campos acima.
               */}
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
                   Multa bruta
                 </span>
-                <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
                   {formatBRL(item.valorPrincipal * item.dias)}
                 </span>
               </div>
@@ -279,10 +279,10 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                   - `valorAtualizado` é o valor puro da multa corrigida
               */}
               <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">
                   Multa corrigida
                 </span>
-                <span className="text-[13px] font-semibold text-orange-700 dark:text-orange-300">
+                <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">
                   {formatBRL(item.valorAtualizado)}
                 </span>
               </div>
@@ -295,10 +295,10 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
         {temJuros && (
           <div className="border border-blue-200 dark:border-blue-900/50 rounded-lg bg-blue-50/70 dark:bg-blue-900/20 p-3 md:p-4">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider">
+              <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider">
                 Total de dias de juros:
               </span>
-              <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">
+              <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
                 {item.diasJuros ?? "—"} dias
               </span>
             </div>
@@ -308,28 +308,28 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                 {item.itensJuros.map((sub, sIdx) => (
                   <div key={sIdx} className={`grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-3 ${sIdx > 0 ? "pt-3" : ""}`}>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Período de juros</span>
-                      <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Período de juros</span>
+                      <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
                         {sub.dataInicio ? `${formatDate(sub.dataInicio)} a ${formatDate(sub.dataFim)}` : "—"}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Dias de juros</span>
-                      <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">{sub.dias}</span>
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Dias de juros</span>
+                      <span className="text-sm font-medium text-slate-800 dark:text-slate-300">{sub.dias}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Fator de juros</span>
-                      <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Fator de juros</span>
+                      <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
                         {sub.taxa.includes("%") ? sub.taxa : `${sub.taxa}%`}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Acumulado juros(%)</span>
-                      <span className="text-[13px] font-medium text-blue-700 dark:text-blue-300">{formatPercent2(sub.percentual)}</span>
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Acumulado juros(%)</span>
+                      <span className="text-sm font-medium text-blue-700 dark:text-blue-300">{formatPercent2(sub.percentual)}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Juros</span>
-                      <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">{formatBRL(sub.valor)}</span>
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Juros</span>
+                      <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">{formatBRL(sub.valor)}</span>
                     </div>
                   </div>
                 ))}
@@ -337,28 +337,28 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-3">
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Período de juros</span>
-                  <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">
+                  <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Período de juros</span>
+                  <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
                     {item.dataInicioJuros ? `${formatDate(item.dataInicioJuros)} a ${formatDate(item.dataFimJuros)}` : "—"}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Dias de juros</span>
-                  <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">{item.diasJuros ?? "—"}</span>
+                  <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Dias de juros</span>
+                  <span className="text-sm font-medium text-slate-800 dark:text-slate-300">{item.diasJuros ?? "—"}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Fator de juros</span>
-                  <span className="text-[13px] font-medium text-slate-800 dark:text-slate-300">—</span>
+                  <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Fator de juros</span>
+                  <span className="text-sm font-medium text-slate-800 dark:text-slate-300">—</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Acumulado juros(%)</span>
-                  <span className="text-[13px] font-medium text-blue-700 dark:text-blue-300">
+                  <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Acumulado juros(%)</span>
+                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
                     {item.percentualJurosAcumulado != null ? formatPercent2(item.percentualJurosAcumulado) : "—"}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Juros</span>
-                  <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">{formatBRL(item.juros)}</span>
+                  <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Juros</span>
+                  <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">{formatBRL(item.juros)}</span>
                 </div>
               </div>
             )}
