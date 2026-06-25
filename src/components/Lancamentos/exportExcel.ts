@@ -7,10 +7,10 @@ import { salvarHistorico } from "../../services/api";
 // ─── Paleta de cores (igual ao PDF) ──────────────────────────────────────────
 const AZUL_HEADER = 'FF1F4E79';   // Azul escuro — cabeçalho da tabela
 const AZUL_TITULO = 'FF073365';   // Azul mais escuro — título da aba
-const AZUL_GRUPO  = 'FFBDD2EB';  // Azul clarinho — linha de grupo (igual ao PDF)
+const AZUL_GRUPO = 'FFBDD2EB';  // Azul clarinho — linha de grupo (igual ao PDF)
 const CINZA_TOTAL = 'FFF2F2F2';  // Cinza — coluna Total da linha de dados
-const BRANCO      = 'FFFFFFFF';
-const PRETO       = 'FF000000';
+const BRANCO = 'FFFFFFFF';
+const PRETO = 'FF000000';
 
 // ─── Helper: aplica estilo padrão a uma célula ────────────────────────────────
 /*
@@ -25,13 +25,13 @@ function estiloCelula(
   fontArgb = PRETO,
   align: 'left' | 'center' | 'right' = 'center'
 ) {
-  cell.font      = { name: 'Arial', size: 9, bold, color: { argb: fontArgb } };
+  cell.font = { name: 'Arial', size: 9, bold, color: { argb: fontArgb } };
   cell.alignment = { vertical: 'middle', horizontal: align };
-  cell.border    = {
-    top:    { style: 'thin', color: { argb: 'FFCBD5E1' } },
+  cell.border = {
+    top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
     bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
-    left:   { style: 'thin', color: { argb: 'FFCBD5E1' } },
-    right:  { style: 'thin', color: { argb: 'FFCBD5E1' } },
+    left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+    right: { style: 'thin', color: { argb: 'FFCBD5E1' } },
   };
   cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillArgb } };
 }
@@ -45,20 +45,21 @@ function estiloCelula(
  */
 function bordaGrupo(cell: ExcelJS.Cell) {
   cell.border = {
-    top:    { style: 'medium', color: { argb: AZUL_HEADER } },
-    bottom: { style: 'thin',   color: { argb: 'FFCBD5E1' } },
-    left:   { style: 'medium', color: { argb: AZUL_HEADER } },
-    right:  { style: 'medium', color: { argb: AZUL_HEADER } },
+    top: { style: 'medium', color: { argb: AZUL_HEADER } },
+    bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+    left: { style: 'medium', color: { argb: AZUL_HEADER } },
+    right: { style: 'medium', color: { argb: AZUL_HEADER } },
   };
 }
 
 export async function exportarParaExcel(
   lancamentos: LancamentoItem[],
-  ufirValue: number = 0
+  ufirValue: number = 0,
+  nomeInvestigado?: string
 ): Promise<{ token: string; blob: Blob; filename: string }> {
   if (!lancamentos || lancamentos.length === 0) throw new Error("Sem lançamentos para exportar.");
 
-  const token    = gerarUUID();
+  const token = gerarUUID();
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Calculei App';
   workbook.created = new Date();
@@ -70,22 +71,24 @@ export async function exportarParaExcel(
 
   // ── Larguras das colunas (definidas antes das linhas para aplicar antes do merge)
   ws1.columns = [
-    { key: 'periodo',    width: 28 },
-    { key: 'valor',      width: 18 },
-    { key: 'indice',     width: 32 },
-    { key: 'correcao',   width: 20 },
+    { key: 'periodo', width: 28 },
+    { key: 'valor', width: 18 },
+    { key: 'indice', width: 32 },
+    { key: 'correcao', width: 20 },
     { key: 'atualizado', width: 22 },
-    { key: 'juros',      width: 18 },
-    { key: 'total',      width: 22 },
+    { key: 'juros', width: 18 },
+    { key: 'total', width: 22 },
   ];
 
   // ── Título da aba
   ws1.mergeCells('A1:G3');
-  const title1      = ws1.getCell('A1');
-  title1.value      = 'Relatório de Lançamentos — Cálculo de atualização monetária';
-  title1.font       = { name: 'Arial', size: 13, bold: true, color: { argb: BRANCO } };
-  title1.alignment  = { vertical: 'middle', horizontal: 'center' };
-  title1.fill       = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_TITULO } };
+  const title1 = ws1.getCell('A1');
+  title1.value = nomeInvestigado
+    ? `Relatório de Lançamentos — Cálculo de atualização monetária (Investigado: ${nomeInvestigado})`
+    : 'Relatório de Lançamentos — Cálculo de atualização monetária';
+  title1.font = { name: 'Arial', size: 13, bold: true, color: { argb: BRANCO } };
+  title1.alignment = { vertical: 'middle', horizontal: 'center' };
+  title1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_TITULO } };
 
   ws1.addRow([]); // linha de espaço entre título e cabeçalho
 
@@ -114,7 +117,7 @@ export async function exportarParaExcel(
    *   coerentes e facilita a comparação lado a lado.
    */
   lancamentos.forEach((l, idx) => {
-    const numero         = String(idx + 1);
+    const numero = String(idx + 1);
     const nomeLancamento = `${numero} — ${l.descricao}${l.descricaoComplementar ? ` (${l.descricaoComplementar})` : ''}`;
 
     // Linha de grupo (azul-claro, texto negrito — igual ao PDF)
@@ -122,16 +125,16 @@ export async function exportarParaExcel(
     ws1.mergeCells(`A${rowIdx}:G${rowIdx}`);
     groupRow.height = 18;
     const gc = groupRow.getCell(1);
-    gc.value     = nomeLancamento;
-    gc.font      = { name: 'Arial', size: 9, bold: true, color: { argb: PRETO } };
-    gc.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_GRUPO } };
+    gc.value = nomeLancamento;
+    gc.font = { name: 'Arial', size: 9, bold: true, color: { argb: PRETO } };
+    gc.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_GRUPO } };
     gc.alignment = { vertical: 'middle', horizontal: 'left' };
     bordaGrupo(gc);
     rowIdx++;
 
     // Linha de dados
-    const periodo  = `${formatDate(l.dataInicial)} a ${formatDate(l.dataCalculo)}`;
-    const dataRow  = ws1.addRow([
+    const periodo = `${formatDate(l.dataInicial)} a ${formatDate(l.dataCalculo)}`;
+    const dataRow = ws1.addRow([
       periodo,
       l.valorPrincipal,
       l.indiceCorrecao,
@@ -160,11 +163,11 @@ export async function exportarParaExcel(
    *   separado). Agora o Total está integrado à tabela e o bloco UFIR vem
    *   logo depois, igual ao PDF.
    */
-  const totPrincipal  = lancamentos.reduce((s, l) => s + l.valorPrincipal,  0);
-  const totAtualizado = lancamentos.reduce((s, l) => s + l.valorAtualizado,  0);
-  const totJuros      = lancamentos.reduce((s, l) => s + l.juros,            0);
-  const totTotal      = lancamentos.reduce((s, l) => s + l.total,            0);
-  const temJuros      = lancamentos.some(l => l.juros > 0);
+  const totPrincipal = lancamentos.reduce((s, l) => s + l.valorPrincipal, 0);
+  const totAtualizado = lancamentos.reduce((s, l) => s + l.valorAtualizado, 0);
+  const totJuros = lancamentos.reduce((s, l) => s + l.juros, 0);
+  const totTotal = lancamentos.reduce((s, l) => s + l.total, 0);
+  const temJuros = lancamentos.some(l => l.juros > 0);
 
   const totRow = ws1.addRow(['Total', totPrincipal, '', '', totAtualizado, temJuros ? totJuros : '—', totTotal]);
   totRow.height = 22;
@@ -189,34 +192,34 @@ export async function exportarParaExcel(
   // Células A–F do bloco UFIR (azul-claro, alinhado à direita)
   for (let i = 1; i <= 6; i++) {
     const c = ufirInfoRow.getCell(i);
-    c.font      = { name: 'Arial', size: 9, bold: true, color: { argb: AZUL_TITULO } };
+    c.font = { name: 'Arial', size: 9, bold: true, color: { argb: AZUL_TITULO } };
     c.alignment = { vertical: 'middle', horizontal: 'right' };
-    c.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F0FA' } };
-    c.border    = {
+    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F0FA' } };
+    c.border = {
       top: { style: 'medium', color: { argb: AZUL_HEADER } },
       bottom: { style: 'medium', color: { argb: AZUL_HEADER } },
       left: { style: 'medium', color: { argb: AZUL_HEADER } },
-      right: { style: 'thin',   color: { argb: 'FFCBD5E1' } },
+      right: { style: 'thin', color: { argb: 'FFCBD5E1' } },
     };
   }
 
   // Célula G do bloco UFIR (azul-escuro com texto branco — igual ao PDF)
   const ufirValCell = ws1.getCell(`G${rowIdx}`);
-  ufirValCell.font      = { name: 'Arial', size: 10, bold: true, color: { argb: BRANCO } };
+  ufirValCell.font = { name: 'Arial', size: 10, bold: true, color: { argb: BRANCO } };
   ufirValCell.alignment = { vertical: 'middle', horizontal: 'center' };
-  ufirValCell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_HEADER } };
+  ufirValCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_HEADER } };
   if (typeof ufirValCell.value === 'number') ufirValCell.numFmt = '#,##0.0000';
   ufirValCell.border = {
-    top:    { style: 'medium', color: { argb: AZUL_HEADER } },
+    top: { style: 'medium', color: { argb: AZUL_HEADER } },
     bottom: { style: 'medium', color: { argb: AZUL_HEADER } },
-    left:   { style: 'thin',   color: { argb: 'FFCBD5E1' } },
-    right:  { style: 'medium', color: { argb: AZUL_HEADER } },
+    left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+    right: { style: 'medium', color: { argb: AZUL_HEADER } },
   };
   rowIdx++;
 
   // Linha "Total geral em UFIR" (azul-claro igual ao PDF)
   const totTotalGeral = lancamentos.reduce((s, l) => s + l.total, 0);
-  const totalUfirVal  = ufirValue > 0 ? totTotalGeral / ufirValue : null;
+  const totalUfirVal = ufirValue > 0 ? totTotalGeral / ufirValue : null;
 
   const totUfirRow = ws1.addRow(['Total geral em UFIR']);
   ws1.mergeCells(`A${rowIdx}:F${rowIdx}`);
@@ -224,28 +227,28 @@ export async function exportarParaExcel(
 
   for (let i = 1; i <= 6; i++) {
     const c = totUfirRow.getCell(i);
-    c.font      = { name: 'Arial', size: 9, bold: true, color: { argb: AZUL_TITULO } };
+    c.font = { name: 'Arial', size: 9, bold: true, color: { argb: AZUL_TITULO } };
     c.alignment = { vertical: 'middle', horizontal: i === 1 ? 'left' : 'right' };
-    c.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F0FA' } };
-    c.border    = {
-      top:    { style: 'medium', color: { argb: AZUL_HEADER } },
+    c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F0FA' } };
+    c.border = {
+      top: { style: 'medium', color: { argb: AZUL_HEADER } },
       bottom: { style: 'medium', color: { argb: AZUL_HEADER } },
-      left:   { style: 'medium', color: { argb: AZUL_HEADER } },
-      right:  { style: 'thin',   color: { argb: 'FFCBD5E1' } },
+      left: { style: 'medium', color: { argb: AZUL_HEADER } },
+      right: { style: 'thin', color: { argb: 'FFCBD5E1' } },
     };
   }
 
   const totUfirValCell = ws1.getCell(`G${rowIdx}`);
   totUfirValCell.value = totalUfirVal !== null ? totalUfirVal : '—';
   if (typeof totUfirValCell.value === 'number') totUfirValCell.numFmt = '#,##0.00';
-  totUfirValCell.font      = { name: 'Arial', size: 9, bold: true, color: { argb: AZUL_TITULO } };
+  totUfirValCell.font = { name: 'Arial', size: 9, bold: true, color: { argb: AZUL_TITULO } };
   totUfirValCell.alignment = { vertical: 'middle', horizontal: 'center' };
-  totUfirValCell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F0FA' } };
-  totUfirValCell.border    = {
-    top:    { style: 'medium', color: { argb: AZUL_HEADER } },
+  totUfirValCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F0FA' } };
+  totUfirValCell.border = {
+    top: { style: 'medium', color: { argb: AZUL_HEADER } },
     bottom: { style: 'medium', color: { argb: AZUL_HEADER } },
-    left:   { style: 'thin',   color: { argb: 'FFCBD5E1' } },
-    right:  { style: 'medium', color: { argb: AZUL_HEADER } },
+    left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+    right: { style: 'medium', color: { argb: AZUL_HEADER } },
   };
   rowIdx++;
 
@@ -258,20 +261,22 @@ export async function exportarParaExcel(
     const ws2 = workbook.addWorksheet('Memória de Juros', { views: [{ showGridLines: false }] });
 
     ws2.columns = [
-      { key: 'periodo',    width: 34 },
+      { key: 'periodo', width: 34 },
       { key: 'atualizado', width: 22 },
-      { key: 'dias',       width: 12 },
-      { key: 'fator',      width: 18 },
-      { key: 'acumulado',  width: 18 },
-      { key: 'juros',      width: 22 },
+      { key: 'dias', width: 12 },
+      { key: 'fator', width: 18 },
+      { key: 'acumulado', width: 18 },
+      { key: 'juros', width: 22 },
     ];
 
     ws2.mergeCells('A1:F3');
-    const title2     = ws2.getCell('A1');
-    title2.value     = 'Relatório de Lançamentos — Memória de Cálculo de Juros';
-    title2.font      = { name: 'Arial', size: 13, bold: true, color: { argb: BRANCO } };
+    const title2 = ws2.getCell('A1');
+    title2.value = nomeInvestigado
+      ? `Relatório de Lançamentos — Memória de Cálculo de Juros (Investigado: ${nomeInvestigado})`
+      : 'Relatório de Lançamentos — Memória de Cálculo de Juros';
+    title2.font = { name: 'Arial', size: 13, bold: true, color: { argb: BRANCO } };
     title2.alignment = { vertical: 'middle', horizontal: 'center' };
-    title2.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_TITULO } };
+    title2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_TITULO } };
 
     ws2.addRow([]);
 
@@ -283,7 +288,7 @@ export async function exportarParaExcel(
     let rowIdx2 = 6;
 
     lancamentosComJuros.forEach((l, idx) => {
-      const numero         = String(idx + 1);
+      const numero = String(idx + 1);
       const nomeLancamento = `${numero} — ${l.descricao}${l.descricaoComplementar ? ` (${l.descricaoComplementar})` : ''}`;
 
       // Linha de grupo
@@ -291,9 +296,9 @@ export async function exportarParaExcel(
       ws2.mergeCells(`A${rowIdx2}:F${rowIdx2}`);
       groupRow.height = 20;
       const gc2 = groupRow.getCell(1);
-      gc2.value     = nomeLancamento;
-      gc2.font      = { name: 'Arial', size: 9, bold: true, color: { argb: PRETO } };
-      gc2.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_GRUPO } };
+      gc2.value = nomeLancamento;
+      gc2.font = { name: 'Arial', size: 9, bold: true, color: { argb: PRETO } };
+      gc2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_GRUPO } };
       gc2.alignment = { vertical: 'middle', horizontal: 'left' };
       bordaGrupo(gc2);
       rowIdx2++;
@@ -351,8 +356,8 @@ export async function exportarParaExcel(
   }
 
   // ── Finalizar
-  const buffer   = await workbook.xlsx.writeBuffer();
-  const blob     = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const filename = `calculei_export_${new Date().toISOString().split('T')[0]}.xlsx`;
 
   await salvarHistorico({

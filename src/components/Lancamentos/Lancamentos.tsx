@@ -116,12 +116,29 @@ function Lancamentos() {
           type={modalExport.type}
           token={modalExport.token}
           onClose={() => setModalExport(null)}
-          onDownload={() => {
+          onDownload={async (nomeInvestigado) => {
+
             if (!modalExport.data) return;
+
             if (modalExport.type === "pdf") {
-              modalExport.data.save("relatorio-lancamentos.pdf");
+              const doc = modalExport.data;
+              if (nomeInvestigado) {
+                doc.setPage(1);
+                doc.setFont("helvetica");
+                doc.setFontSize(12);
+                doc.setTextColor(40, 40, 40);
+                doc.text(`Investigado: ${nomeInvestigado}`, 78, 21);
+              }
+              doc.save(`relatorio-lancamentos-${nomeInvestigado}.pdf`);
+
             } else if (modalExport.type === "excel") {
-              saveAs(modalExport.data.blob, modalExport.data.filename);
+              if (nomeInvestigado) {
+                const { blob } = await exportarParaExcel(lancamentos, ufirValue, nomeInvestigado);
+                saveAs(blob, modalExport.data.filename);
+              } else {
+                saveAs(modalExport.data.blob, modalExport.data.filename);
+              }
+
             } else if (modalExport.type === "imagem") {
               const link = document.createElement("a");
               link.download = "tabela-lancamentos.jpg";
@@ -142,7 +159,7 @@ function Lancamentos() {
         }}
       />
 
-      <div id="tour-tabela" className="flex flex-col bg-slate-100 dark:bg-[#0d1117]/95 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm border border-slate-500 dark:border-[#21262d]/60 overflow-hidden transition-colors duration-200">
+      <div id="tour-tabela" className="flex flex-col bg-white dark:bg-[#0d1117]/95 rounded-lg pb-6 w-full p-3 sm:p-5 md:p-8 gap-4 sm:gap-5 shadow-sm dark:border-[#21262d]/60 overflow-hidden transition-colors duration-200">
 
         {/* Cabeçalho + paginação superior */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

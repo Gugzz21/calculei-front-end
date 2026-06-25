@@ -4,8 +4,6 @@ import { DESCRICAO_OPCOES } from "../../constants/dominios";
 interface DescricaoProps {
   value: string;
   onChange: (value: string) => void;
-  complementar: string;
-  onComplementarChange: (value: string) => void;
 }
 
 
@@ -61,8 +59,6 @@ function Descricao({ value, onChange }: DescricaoProps) {
           </button>
         </div>
       )}
-
-      {/* Campo complementar: nº processo, contratada, observações */}
     </div>
   );
 }

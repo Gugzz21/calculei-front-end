@@ -7,7 +7,7 @@ interface ModalRelatorioProps {
     type: "pdf" | "imagem" | "excel";
     token: string;
     onClose: () => void;
-    onDownload: () => void;
+    onDownload: (nomeInvestigado?: string) => void;
 }
 
 export default function ModalRelatorio({ type, token, onClose, onDownload }: ModalRelatorioProps) {
@@ -24,10 +24,15 @@ export default function ModalRelatorio({ type, token, onClose, onDownload }: Mod
         });
     };
 
+    const [nomeInvestigado, setNomeInvestigado] = useState("");
+
+
+
+
     const config = {
-        pdf: { titulo: "Relatório gerado com sucesso", labelBotao: "Baixar PDF", Icone: MdPictureAsPdf },
-        imagem: { titulo: "Imagem gerada com sucesso", labelBotao: "Baixar imagem", Icone: CameraAltIcon },
-        excel: { titulo: "Excel gerado com sucesso", labelBotao: "Baixar Excel", Icone: Table },
+        pdf: { titulo: "Relatório em PDF", labelBotao: "Baixar PDF", Icone: MdPictureAsPdf },
+        imagem: { titulo: "Print de Lançamentos", labelBotao: "Baixar imagem", Icone: CameraAltIcon },
+        excel: { titulo: "Relatório em Excel", labelBotao: "Baixar Excel", Icone: Table },
     }[type];
 
     return (
@@ -36,16 +41,31 @@ export default function ModalRelatorio({ type, token, onClose, onDownload }: Mod
 
                 {/* Cabeçalho */}
                 <div className="p-6 pb-0 flex flex-col items-center text-center">
-                    <div className="mb-4 text-green-500 dark:text-green-400">
-                        <CheckCircle2 size={64} strokeWidth={1.5} />
-                    </div>
-                    <h2 className="text-2xl font-bold text-green-700 dark:text-green-500 mb-6">
+                    <h2 className="text-2xl font-bold text-black dark:text-white mb-6">
                         {config.titulo}
                     </h2>
                 </div>
 
                 {/* Conteúdo */}
-                <div className="px-8 pb-8 flex flex-col gap-6">
+                <div className="px-8 pb-6 flex flex-col gap-6">
+
+                    <div className="">
+                    <p className="text-gray-700 dark:text-gray-300 text-sm font-medium pb-3">
+                        Insira o nome do Investigado (Opcional):
+                    </p>
+                    {/* Input do nome do investigado(excel e pdf) */}
+                    {(config.labelBotao === "Baixar Excel" || config.labelBotao === "Baixar PDF") && (
+                        <div className="flex-1 bg-gray-50 dark:bg-[#010409] border border-gray-200 dark:border-[#30363d] rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 font-mono break-all line-clamp-2">
+                            <input
+                                type="text"
+                                placeholder="Nome do investigado"
+                                className="w-full bg-transparent outline-none"
+                                value={nomeInvestigado}
+                                onChange={(e) => setNomeInvestigado(e.target.value)}
+                            />
+                        </div>
+                    )}
+                    </div>
 
                     {/* Link de Recuperação */}
                     <div className="flex flex-col gap-3">
@@ -93,8 +113,9 @@ export default function ModalRelatorio({ type, token, onClose, onDownload }: Mod
                         >
                             Fechar
                         </button>
+
                         <button
-                            onClick={onDownload}
+                            onClick={() => onDownload(nomeInvestigado)}
                             className="flex items-center gap-2 px-6 py-2.5 bg-[#073365] dark:bg-[#1a4b8c] text-white rounded-lg text-sm font-bold hover:bg-[#0a4282] dark:hover:bg-[#2563eb] transition-all shadow-lg active:scale-95"
                         >
                             {type === "imagem" ? <ChevronRight size={18} /> : <config.Icone className="w-[18px] h-[18px]" />}
