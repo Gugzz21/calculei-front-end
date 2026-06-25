@@ -50,21 +50,21 @@ export default function ModalRelatorio({ type, token, onClose, onDownload }: Mod
                 <div className="px-8 pb-6 flex flex-col gap-6">
 
                     <div className="">
-                    <p className="text-gray-700 dark:text-gray-300 text-sm font-medium pb-3">
-                        Insira o nome do Investigado (Opcional):
-                    </p>
-                    {/* Input do nome do investigado(excel e pdf) */}
-                    {(config.labelBotao === "Baixar Excel" || config.labelBotao === "Baixar PDF") && (
-                        <div className="flex-1 bg-gray-50 dark:bg-[#010409] border border-gray-200 dark:border-[#30363d] rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 font-mono break-all line-clamp-2">
-                            <input
-                                type="text"
-                                placeholder="Nome do investigado"
-                                className="w-full bg-transparent outline-none"
-                                value={nomeInvestigado}
-                                onChange={(e) => setNomeInvestigado(e.target.value)}
-                            />
-                        </div>
-                    )}
+                        <p className="text-gray-700 dark:text-gray-300 text-sm font-medium pb-3">
+                            Insira o nome do Investigado (Opcional):
+                        </p>
+                        {/* Input do nome do investigado(excel e pdf) */}
+                        {(config.labelBotao === "Baixar Excel" || config.labelBotao === "Baixar PDF") && (
+                            <div className="flex-1 bg-gray-50 dark:bg-[#010409] border border-gray-200 dark:border-[#30363d] rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 font-mono break-all line-clamp-2">
+                                <input
+                                    type="text"
+                                    placeholder="Nome do investigado"
+                                    className="w-full bg-transparent outline-none"
+                                    value={nomeInvestigado}
+                                    onChange={(e) => setNomeInvestigado(e.target.value)}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {/* Link de Recuperação */}
