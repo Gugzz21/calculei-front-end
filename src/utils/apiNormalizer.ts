@@ -1,11 +1,11 @@
 import type { CalcRequest, CalcResponse } from "../types/api";
+import { calcularDiasAbsolutosUTC } from "./dateUtils";
 
 // ─── Utilitário ───────────────────────────────────────────────────────────────
 
+/** @deprecated Use calcularDiasAbsolutosUTC de dateUtils. Mantido para compatibilidade de importações externas. */
 export function calcularDias(dateInit: string, dateFim: string): number {
-  const d1 = new Date(dateInit).getTime();
-  const d2 = new Date(dateFim).getTime();
-  return Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+  return calcularDiasAbsolutosUTC(dateInit, dateFim);
 }
 
 /**

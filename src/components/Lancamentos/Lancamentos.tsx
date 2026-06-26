@@ -9,7 +9,7 @@ import BotoesExport from "./BotoesExport";
 import ModalRelatorio from "./ModalRelatorio";
 import ModalDuplicar from "./ModalDuplicar";
 import { exportarParaPDF } from "./exportPDF";
-import { baixarImagem } from "./exportImagem";
+import { baixarImagem, gerarImagemDataUrl } from "./exportImagem";
 import { exportarParaExcel } from "./exportExcel";
 import toast from "react-hot-toast";
 
@@ -94,7 +94,6 @@ function Lancamentos() {
     if (window.confirm("Tem certeza que deseja remover este lançamento?")) {
       handleRemoverLancamento(id);
       handleItemRemoved(isLastInPage);
-      toast.success("Lançamento removido com sucesso!");
     }
   }, [handleRemoverLancamento, handleItemRemoved]);
 
@@ -140,6 +139,24 @@ function Lancamentos() {
               }
 
             } else if (modalExport.type === "imagem") {
+              if (nomeInvestigado && exportRef.current) {
+                const h2 = exportRef.current.querySelector("h2");
+                if (h2) {
+                  const originalText = h2.innerText;
+                  h2.innerText = `Relatório de Lançamentos (Investigado: ${nomeInvestigado})`;
+                  const dataUrl = await gerarImagemDataUrl(exportRef.current);
+                  h2.innerText = originalText;
+                  
+                  if (dataUrl) {
+                    const link = document.createElement("a");
+                    link.download = `tabela-lancamentos-${nomeInvestigado}.jpg`;
+                    link.href = dataUrl;
+                    link.click();
+                  }
+                  setModalExport(null);
+                  return;
+                }
+              }
               const link = document.createElement("a");
               link.download = "tabela-lancamentos.jpg";
               link.href = modalExport.data;

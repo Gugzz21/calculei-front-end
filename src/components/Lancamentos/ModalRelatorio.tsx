@@ -1,7 +1,5 @@
 import { useState } from "react";
-import MdPictureAsPdf from "@mui/icons-material/PictureAsPdf";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import { Table, Copy, Check, ChevronRight } from "lucide-react";
+import { FileText, Camera, Table, Copy, Check, ChevronRight } from "lucide-react";
 
 interface ModalRelatorioProps {
     type: "pdf" | "imagem" | "excel";
@@ -30,8 +28,8 @@ export default function ModalRelatorio({ type, token, onClose, onDownload }: Mod
 
 
     const config = {
-        pdf: { titulo: "Relatório em PDF", labelBotao: "Baixar PDF", Icone: MdPictureAsPdf },
-        imagem: { titulo: "Print de Lançamentos", labelBotao: "Baixar imagem", Icone: CameraAltIcon },
+        pdf: { titulo: "Relatório em PDF", labelBotao: "Baixar PDF", Icone: FileText },
+        imagem: { titulo: "Print de Lançamentos", labelBotao: "Baixar imagem", Icone: Camera },
         excel: { titulo: "Relatório em Excel", labelBotao: "Baixar Excel", Icone: Table },
     }[type];
 
@@ -53,18 +51,15 @@ export default function ModalRelatorio({ type, token, onClose, onDownload }: Mod
                         <p className="text-gray-700 dark:text-gray-300 text-sm font-medium pb-3">
                             Insira o nome do Investigado (Opcional):
                         </p>
-                        {/* Input do nome do investigado(excel e pdf) */}
-                        {(config.labelBotao === "Baixar Excel" || config.labelBotao === "Baixar PDF") && (
-                            <div className="flex-1 bg-gray-50 dark:bg-[#010409] border border-gray-200 dark:border-[#30363d] rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 font-mono break-all line-clamp-2">
-                                <input
-                                    type="text"
-                                    placeholder="Nome do investigado"
-                                    className="w-full bg-transparent outline-none"
-                                    value={nomeInvestigado}
-                                    onChange={(e) => setNomeInvestigado(e.target.value)}
-                                />
-                            </div>
-                        )}
+                        <div className="flex-1 bg-gray-50 dark:bg-[#010409] border border-gray-200 dark:border-[#30363d] rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 font-mono break-all line-clamp-2">
+                            <input
+                                type="text"
+                                placeholder="Nome do investigado"
+                                className="w-full bg-transparent outline-none"
+                                value={nomeInvestigado}
+                                onChange={(e) => setNomeInvestigado(e.target.value)}
+                            />
+                        </div>
                     </div>
 
                     {/* Link de Recuperação */}

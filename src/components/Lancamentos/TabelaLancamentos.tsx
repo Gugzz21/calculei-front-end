@@ -3,7 +3,7 @@ import { formatBRL } from "../../utils/formatters";
 import LancamentoRow from "./LancamentoRow";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 import type { LancamentoItem } from "../../types";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Trash2 } from "lucide-react";
 
 // ─── Constante de grid compartilhada com LancamentoRow ───────────────────────
 // expand | Data inicial | Data final | Valor principal | Índice | Fator de correção | Valor corrigido | Juros | Total devido | ações
@@ -85,7 +85,7 @@ function TabelaLancamentos({
             className="p-1 text-slate-600 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded"
             title="Limpar todos os lançamentos"
           >
-            <DeleteIcon fontSize="small" />
+            <Trash2 size={16} />
           </button>
         </div>
       </div>

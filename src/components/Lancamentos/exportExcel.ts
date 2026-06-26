@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import type { LancamentoItem } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
-import { gerarUUID } from "../../utils/helpers";
+import { gerarUUID, buildHistoricoPayload } from "../../utils/helpers";
 import { salvarHistorico } from "../../services/api";
 
 // ─── Paleta de cores (igual ao PDF) ──────────────────────────────────────────
@@ -94,7 +94,7 @@ export async function exportarParaExcel(
 
   // ── Cabeçalho da tabela (igual ao PDF — com "Fator de correção")
   const HEADERS1 = [
-    'Período de cálculo',
+    'Período do cálculo',
     'Valor (R$)',
     'Índice',
     'Fator de correção',         // ← renomeado de "Correção" para alinhar com PDF
@@ -138,7 +138,7 @@ export async function exportarParaExcel(
       periodo,
       l.valorPrincipal,
       l.indiceCorrecao,
-      l.percentualCorrecao / 100,   // fator como decimal para formatar como %
+      (l.percentualCorrecao / 100) + 1,   // fator como decimal
       l.valorAtualizado,
       l.juros > 0 ? l.juros : '—',
       l.total,
@@ -150,7 +150,7 @@ export async function exportarParaExcel(
         cell.numFmt = '"R$ "#,##0.00';
       }
       // Fator de correção com 8 casas decimais (igual ao PDF)
-      if (col === 4) cell.numFmt = '0.00000000%';
+      if (col === 4) cell.numFmt = '0.00000000';
     });
     rowIdx++;
   });
@@ -280,7 +280,7 @@ export async function exportarParaExcel(
 
     ws2.addRow([]);
 
-    const HEADERS2 = ['Período de cálculo', 'Valor atualizado (R$)', 'Dias', 'Fator (%)', 'Acumulado (%)', 'Juros (R$)'];
+    const HEADERS2 = ['Período do cálculo', 'Valor atualizado (R$)', 'Dias', 'Fator (%)', 'Acumulado (%)', 'Juros (R$)'];
     const headerRow2 = ws2.addRow(HEADERS2);
     headerRow2.height = 22;
     headerRow2.eachCell(cell => estiloCelula(cell, true, AZUL_HEADER, BRANCO, 'center'));
@@ -360,15 +360,7 @@ export async function exportarParaExcel(
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const filename = `calculei_export_${new Date().toISOString().split('T')[0]}.xlsx`;
 
-  await salvarHistorico({
-    data: new Date().toISOString().split('T')[0],
-    token,
-    json: {
-      geradoEm: new Date().toISOString(),
-      totalLancamentos: lancamentos.length,
-      lancamentos,
-    },
-  });
+  await salvarHistorico(buildHistoricoPayload(token, lancamentos));
 
   return { token, blob, filename };
 }

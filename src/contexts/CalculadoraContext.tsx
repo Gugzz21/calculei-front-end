@@ -64,7 +64,7 @@ export const CalculadoraProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const calculandoRef = useRef(false);
 
   // ── Recuperação automática por token na URL (?token=...)
-  useAutoRecovery(setLancamentos, setLoading, setErro);
+  useAutoRecovery(setLancamentos, setLoading, setErro, setLancamentosOrigem);
 
   // Buscar UFIR ao carregar
   React.useEffect(() => {

@@ -3,6 +3,7 @@ import Data from "./Data";
 import { calcularJuros } from "../../services/api";
 import { JUROS_DESCRICAO, JUROS_LABEL } from "../../constants/dominios";
 import { PercentIcon } from "lucide-react";
+import toast from "react-hot-toast";
 import { useIndices } from "../../hooks/useIndices";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
 import InfoButton from "./InfoButton";
@@ -70,6 +71,7 @@ function Juros({ onOpenHelp }: JurosProps) {
 
       await addAplicado(indice, dataInicio, dataFim, taxa);
       handleJurosChange("aplicados", [...aplicados, ...novosAplicados]);
+      toast.success("Taxa de juros aplicada com sucesso!");
     } catch (e: any) {
       setErroLocal(e.message || "Erro ao calcular juros");
     } finally {
@@ -177,10 +179,9 @@ function Juros({ onOpenHelp }: JurosProps) {
             <thead>
               <tr className="bg-[#e4ebf7] dark:bg-[#0d1117] text-[#1F2022] dark:text-gray-100">
                 <th className="py-3 px-4 font-semibold w-[20%]">Índice</th>
-                <th className="py-3 px-4 font-semibold w-[15%]">Data inicial</th>
-                <th className="py-3 px-4 font-semibold w-[15%]">Data final</th>
+                <th className="py-3 px-4 font-semibold w-[30%]">Período</th>
                 <th className="py-3 px-4 font-semibold w-[10%]">Dias</th>
-                <th className="py-3 px-4 font-semibold w-[20%]">% Acumulado</th>
+                <th className="py-3 px-4 font-semibold w-[20%]">Percentual</th>
                 <th className="py-3 px-4 font-semibold w-[10%] text-center"></th>
               </tr>
             </thead>
@@ -192,8 +193,9 @@ function Juros({ onOpenHelp }: JurosProps) {
                       {JUROS_LABEL[item.indice] ?? item.indice}
                     </span>
                   </td>
-                  <td className="py-3 px-4">{new Date(item.dataInicio + "T12:00:00").toLocaleDateString("pt-BR")}</td>
-                  <td className="py-3 px-4">{new Date(item.dataFim + "T12:00:00").toLocaleDateString("pt-BR")}</td>
+                  <td className="py-3 px-4 text-xs md:text-sm">
+                    {new Date(item.dataInicio + "T12:00:00").toLocaleDateString("pt-BR")} a {new Date(item.dataFim + "T12:00:00").toLocaleDateString("pt-BR")}
+                  </td>
                   <td className="py-3 px-4">{item.dias}</td>
                   <td className="py-3 px-4">{item.percentual.toFixed(2).replace(".", ",")}%</td>
                   <td className="py-3 px-4 text-center">

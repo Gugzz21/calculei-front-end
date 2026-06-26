@@ -49,7 +49,6 @@ function CentralCard() {
   const handleTipoCalculo = useCallback((v: string) => handleFormChange("tipoCalculo", v), [handleFormChange]);
   const handleIndiceCorrecao = useCallback((v: string) => handleFormChange("indiceCorrecao", v), [handleFormChange]);
   const handleDescricao = useCallback((v: string) => handleFormChange("descricao", v), [handleFormChange]);
-  const handleComplementar = useCallback((v: string) => handleFormChange("descricaoComplementar", v), [handleFormChange]);
   const handleValor = useCallback((v: string) => handleFormChange("valor", v), [handleFormChange]);
   const handleDataInicial = useCallback((v: string) => handleFormChange("dataInicial", v), [handleFormChange]);
   const handleDataCalculo = useCallback((v: string) => handleFormChange("dataCalculo", v), [handleFormChange]);
@@ -57,8 +56,6 @@ function CentralCard() {
   const handleOpenIndiceCorrecao = useCallback(() => setHelpContext('indiceCorrecao'), []);
   const handleOpenJurosIndice = useCallback(() => setHelpContext('jurosIndice'), []);
   const handleCloseHelp = useCallback(() => setHelpContext(null), []);
-  const handleJurosEnabled = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
-    handleJurosChange("enabled", e.target.checked), [handleJurosChange]);
 
   return (
     <div id="tour-inclusao" className="flex flex-col bg-white/95 dark:bg-[#0d1117]/95 backdrop-blur-sm rounded-2xl pb-6 p-4 sm:p-6 md:p-8 gap-5 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-300/60 dark:border-[#21262d]/60 transition-colors duration-200">
@@ -88,16 +85,20 @@ function CentralCard() {
         </h1>
       </div>
 
-      {/* ── Linha 1: Tipo de cálculo | Índice de correção | Descrição ─ */}
-      <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-5 w-full">
-        <div id="tour-tipo-calculo" className="w-full sm:flex-[10] md:flex-[13] min-w-0">
+      {/* ── Formulário (Grid) ────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-4 gap-x-4 lg:gap-x-5 items-start">
+        
+        {/* Coluna 1: Tipo de Cálculo */}
+        <div className="lg:col-span-4 min-w-0">
           <TipoCalculo
             value={form.tipoCalculo}
             onChange={handleTipoCalculo}
             onOpenHelp={handleOpenTipoCalculo}
           />
         </div>
-        <div id="tour-indice-juros" className="w-full sm:flex-[7] md:flex-[8] min-w-0">
+
+        {/* Coluna 2: Índice */}
+        <div className="lg:col-span-4 min-w-0">
           <IndiceCorrecao
             value={form.indiceCorrecao}
             onChange={handleIndiceCorrecao}
@@ -105,81 +106,87 @@ function CentralCard() {
             tipoCalculo={form.tipoCalculo}
           />
         </div>
-        <div className="w-full sm:flex-[8] md:flex-[10] min-w-0">
+
+        {/* Coluna 3: Descrição e Complemento (ocupa 2 linhas no grid desktop) */}
+        <div className="lg:col-span-4 lg:row-span-2 min-w-0 flex flex-col gap-2">
           <Descricao
             value={form.descricao}
             onChange={handleDescricao}
           />
-        </div>
-      </div>
-
-      {/* ── Linha 2: Valor + checkbox | Datas | (Multa info) ────────── */}
-      <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-5 items-start w-full">
-
-        {/* Valor + checkbox "Aplicar juros?" */}
-        <div id="tour-valor-principal" className="flex flex-col gap-2 w-full sm:w-auto">
-          <InputValor
-            value={form.valor}
-            onChange={handleValor}
+          <input
+            type="text"
+            value={form.descricaoComplementar || ""}
+            onChange={(e) => handleFormChange("descricaoComplementar", e.target.value)}
+            placeholder="Complemento (ex: Nº Processo, Contratada...)"
+            className="bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[35px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-500 dark:hover:border-slate-500"
           />
-          {!jurosEmbutidos && (
-            <label
-              htmlFor="aplicar-juros"
-              className={`flex items-center gap-2 select-none group w-fit mt-1 ${isFormValid ? "cursor-pointer" : "cursor-not-allowed opacity-50"
-                }`}
-              title={!isFormValid ? "Preencha o Valor e as Datas primeiro" : ""}
-            >
-              <div className="relative flex items-center justify-center">
-                <input
-                  type="checkbox"
-                  id="aplicar-juros"
-                  checked={juros.enabled}
-                  onChange={handleJurosEnabled}
-                  disabled={!isFormValid}
-                  className="peer sr-only"
-                />
-                <div
-                  className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${juros.enabled
-                    ? "bg-[#007aff] border-[#007aff]"
-                    : "bg-white border-gray-400 group-hover:border-blue-400"
-                    }`}
-                >
-                  {juros.enabled && (
-                    <svg className="w-[11px] h-[11px] text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
-                    </svg>
-                  )}
-                </div>
-              </div>
-              <span className={`text-sm font-medium transition-colors duration-150 ${isFormValid ? "text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100" : "text-gray-500 dark:text-gray-600"
-                }`}>
-                Aplicar juros?
-              </span>
-            </label>
-          )}
         </div>
 
-        {/* Data inicial */}
-        <div id="tour-datas" className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <div className="w-full sm:w-auto">
-            <Data
-              title="Data inicial"
-              value={form.dataInicial}
-              onChange={handleDataInicial}
-              max={today}
+        {/* Linha 2 (Ocupa colunas 1 e 2 sob Tipo e Índice) */}
+        <div className="lg:col-span-8 flex flex-col sm:flex-row flex-wrap gap-4 md:gap-5 items-start w-full">
+          {/* Valor e Juros */}
+          <div id="tour-valor-principal" className="flex flex-col gap-2 min-w-0 w-full sm:w-auto">
+            <InputValor
+              value={form.valor}
+              onChange={handleValor}
             />
+            {!jurosEmbutidos && (
+              <label
+                htmlFor="aplicar-juros"
+                className={`flex items-center gap-2 select-none group w-fit mt-1 ${isFormValid ? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                  }`}
+                title={!isFormValid ? "Preencha o Valor e as Datas primeiro" : ""}
+              >
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    id="aplicar-juros"
+                    checked={juros.enabled}
+                    onChange={(e) => handleJurosChange("enabled", e.target.checked)}
+                    disabled={!isFormValid}
+                    className="peer sr-only"
+                  />
+                  <div
+                    className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${juros.enabled
+                      ? "bg-[#007aff] border-[#007aff]"
+                      : "bg-white border-gray-400 group-hover:border-blue-400"
+                      }`}
+                  >
+                    {juros.enabled && (
+                      <svg className="w-[11px] h-[11px] text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <span className={`text-sm font-medium transition-colors duration-150 ${isFormValid ? "text-gray-600 dark:text-gray-300 group-hover:text-gray-800 dark:group-hover:text-gray-100" : "text-gray-500 dark:text-gray-600"
+                  }`}>
+                  Aplicar juros?
+                </span>
+              </label>
+            )}
           </div>
 
-          {/* Data do cálculo */}
-          <div className="w-full sm:w-auto">
-            <Data
-              title="Data do cálculo"
+          {/* Datas */}
+          <div id="tour-datas" className="flex flex-col sm:flex-row gap-3 min-w-0 w-full sm:w-auto">
+            <div className="w-full sm:w-auto">
+              <Data
+                title="Data inicial"
+                value={form.dataInicial}
+                onChange={handleDataInicial}
+                max={today}
+              />
+            </div>
+            <div className="w-full sm:w-auto">
+              <Data
+                title="Data do cálculo"
               value={form.dataCalculo}
               onChange={handleDataCalculo}
               max={today}
               min={form.dataInicial || undefined}
             />
           </div>
+        </div>
         </div>
 
         {/* Cards informativos de multa diária */}

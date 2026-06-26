@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import type { LancamentoItem } from "../../types";
 import { formatBRL } from "../../utils/formatters";
 import { formatDate } from "../../utils/dateUtils";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { ChevronDown, Trash2, Pencil, Copy } from "lucide-react";
 import { TABLE_GRID_COLS } from "./TabelaLancamentos";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
@@ -46,7 +43,7 @@ function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplica
         className="flex items-center justify-center text-slate-500 transition-transform duration-300 shrink-0"
         style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
       >
-        <KeyboardArrowDownIcon fontSize="small" />
+        <ChevronDown size={18} />
       </div>
       {/* Data inicial */}
       <div>{formatDate(item.dataInicial)}</div>
@@ -75,21 +72,21 @@ function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplica
           className="text-gray-500 hover:text-blue-600 transition-colors"
           title="Editar"
         >
-          <EditIcon fontSize="small" />
+          <Pencil size={16} />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onDuplicar(item); }}
           className="text-gray-500 hover:text-blue-600 transition-colors"
           title="Duplicar"
         >
-          <ContentCopyIcon fontSize="small" />
+          <Copy size={16} />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onRemover(item.id); }}
           className="text-gray-500 hover:text-red-500 transition-colors"
           title="Remover"
         >
-          <DeleteIcon fontSize="small" />
+          <Trash2 size={16} />
         </button>
       </div>
     </div>
@@ -108,19 +105,24 @@ function LancamentoRowMobile({ item, isExpanded, onRemover, onEditar, onDuplicar
             className="flex items-center justify-center text-slate-500 transition-transform duration-300"
             style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
           >
-            <KeyboardArrowDownIcon fontSize="small" />
+            <ChevronDown size={18} />
           </div>
           {item.descricao}
+          {item.descricaoComplementar && (
+            <span className="text-slate-500 dark:text-slate-400 italic font-normal ml-1">
+              ({item.descricaoComplementar})
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1 exclude-from-print">
           <button onClick={(e) => { e.stopPropagation(); onEditar(item.id); }} className="p-1 text-gray-500 hover:text-blue-600 transition-colors">
-            <EditIcon fontSize="small" />
+            <Pencil size={16} />
           </button>
           <button onClick={(e) => { e.stopPropagation(); onDuplicar(item); }} className="p-1 text-gray-500 hover:text-blue-600 transition-colors">
-            <ContentCopyIcon fontSize="small" />
+            <Copy size={16} />
           </button>
           <button onClick={(e) => { e.stopPropagation(); onRemover(item.id); }} className="p-1 text-gray-500 hover:text-red-500 transition-colors">
-            <DeleteIcon fontSize="small" />
+            <Trash2 size={16} />
           </button>
         </div>
       </div>

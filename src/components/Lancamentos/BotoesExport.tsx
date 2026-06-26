@@ -1,6 +1,4 @@
-import MdPictureAsPdf from "@mui/icons-material/PictureAsPdf";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import { Table } from "lucide-react";
+import { FileText, Camera, Table } from "lucide-react";
 
 interface BotoesExportProps {
   temLancamentos: boolean;
@@ -23,10 +21,7 @@ function BotoesExport({
 
   return (
     <div id="botoes-exportacao" className="w-full">
-      {/* Container flex com flex-wrap para ajustar ao tamanho da tela */}
-
       <div className="flex flex-wrap gap-2 md:gap-3 justify-start items-stretch sm:items-center">
-
 
         {/* Gerar PDF */}
         <button
@@ -36,7 +31,7 @@ function BotoesExport({
           title="Gerar PDF e salvar token"
           className={`flex-1 sm:flex-none sm:w-[160px] ${baseBtn} ${!temLancamentos || salvandoPDF ? inativo : ativo}`}
         >
-          <MdPictureAsPdf className="h-[20px] w-[20px] shrink-0" />
+          <FileText className="h-[20px] w-[20px] shrink-0" />
           <span className="text-[14px]">{salvandoPDF ? "Salvando…" : "Gerar PDF"}</span>
         </button>
 
@@ -48,7 +43,7 @@ function BotoesExport({
           title="Salvar tabela como imagem"
           className={`flex-1 sm:flex-none sm:w-[200px] ${baseBtn} ${!temLancamentos ? inativo : ativo}`}
         >
-          <CameraAltIcon className="h-[20px] w-[20px] shrink-0" />
+          <Camera className="h-[20px] w-[20px] shrink-0" />
           <span className="text-[14px]">Printar e salvar</span>
         </button>
 

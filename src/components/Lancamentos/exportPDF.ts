@@ -1,9 +1,8 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { LancamentoItem } from "../../types";
-import type { LancamentoRecuperado } from "./types";
 import { formatDate } from "../../utils/dateUtils";
-import { gerarUUID } from "../../utils/helpers";
+import { gerarUUID, buildHistoricoPayload } from "../../utils/helpers";
 import { buscarUfirValue, salvarHistorico } from "../../services/api";
 import { logoGrandeMPRJUrl, logoGateUrl, carregarImagemBase64 } from "../../assets/images";
 
@@ -110,7 +109,7 @@ function gerarTabelaCorrecao(
   const tableStartY = startY + 5;
 
   // Cabeçalho da tabela
-  const head = [["Período de cálculo", "Valor (R$)", "Índice", "Fator de correção", "Valor atualizado (R$)", "Juros (R$)", "Total devido (R$)"]];
+  const head = [["Período do cálculo", "Valor (R$)", "Índice", "Fator de correção", "Valor atualizado (R$)", "Juros (R$)", "Total devido (R$)"]];
 
   // Corpo: para cada lançamento, linha de dados + linha de subtotal + linha Total em UFIR
   const body: any[] = [];
@@ -123,7 +122,8 @@ function gerarTabelaCorrecao(
     const periodo = `${formatDate(l.dataInicial)} a ${formatDate(l.dataCalculo)}`;
 
     // A correção deve mostrar muitas casas decimais conforme o modelo
-    const correcaoPct = Number(l.percentualCorrecao).toLocaleString("pt-BR", { minimumFractionDigits: 8, maximumFractionDigits: 8 });
+    const fatorCorrecao = (Number(l.percentualCorrecao) / 100) + 1;
+    const correcaoPct = fatorCorrecao.toLocaleString("pt-BR", { minimumFractionDigits: 8, maximumFractionDigits: 8 });
     const descricaoGrupo = `${numero} - ${l.descricao}${l.descricaoComplementar ? ` (${l.descricaoComplementar})` : ""}`;
 
     // ── Linha de grupo (Ressarcimento)
@@ -245,7 +245,7 @@ function gerarTabelaJuros(
 
   const tableStartY = startY + 5;
 
-  const head = [["Período de cálculo", "Valor atualizado (R$)", "Dias", "Fator (%)", "Acumulado (%)", "Juros (R$)"]];
+  const head = [["Período do cálculo", "Valor atualizado (R$)", "Dias", "Fator (%)", "Acumulado (%)", "Juros (R$)"]];
   const body: any[] = [];
 
   lancamentos.forEach((l, idx) => {
@@ -410,78 +410,8 @@ export async function exportarParaPDF(
   adicionarRodape(doc, link);
 
   // ── Salvar histórico no backend
-  await salvarHistorico({
-    data: new Date().toISOString().split("T")[0],
-    token,
-    json: {
-      geradoEm: new Date().toISOString(),
-      totalLancamentos: lancamentos.length,
-      lancamentos: lancamentos.map((l) => ({
-        id: l.id,
-        descricao: l.descricao,
-        dataInicial: l.dataInicial,
-        dataCalculo: l.dataCalculo,
-        valorPrincipal: l.valorPrincipal,
-        indiceCorrecao: l.indiceCorrecao,
-        valorAtualizado: l.valorAtualizado,
-        dias: l.dias,
-        percentualCorrecao: l.percentualCorrecao,
-        indiceJuros: l.indiceJuros,
-        dataInicioJuros: l.dataInicioJuros,
-        dataFimJuros: l.dataFimJuros,
-        diasJuros: l.diasJuros,
-        fatorJuros: l.fatorJuros,
-        percentualJurosAcumulado: l.percentualJurosAcumulado,
-        juros: l.juros,
-        total: l.total,
-        itensJuros: l.itensJuros,
-      })),
-    },
-  });
+  await salvarHistorico(buildHistoricoPayload(token, lancamentos));
 
   return { token, doc };
 }
 
-// ─── PDF de recuperação ───────────────────────────────────────────────────────
-
-export async function gerarPDFRecuperado(items: LancamentoRecuperado[], tokenUsado: string): Promise<void> {
-  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-
-  // ── Carregar logos
-  let logoGrandeB64 = "";
-  let logoGateB64 = "";
-  try {
-    [logoGrandeB64, logoGateB64] = await Promise.all([
-      carregarImagemBase64(logoGrandeMPRJUrl),
-      carregarImagemBase64(logoGateUrl),
-    ]);
-  } catch (err) {
-    console.error("Erro ao carregar logos:", err);
-  }
-
-  const link = `${window.location.origin}/?token=${tokenUsado}`;
-
-  desenharCabecalho(doc, 1, logoGrandeB64, logoGateB64, link);
-
-  const lancamentos = items as LancamentoItem[];
-  let currentY = 32;
-
-  currentY = gerarTabelaCorrecao(doc, lancamentos, currentY, 0, logoGrandeB64, logoGateB64);
-
-  const temJuros = lancamentos.some(l => l.juros > 0);
-  if (temJuros) {
-    const lancamentosComJuros = lancamentos.filter(l => l.juros > 0);
-    currentY += 10;
-    const ph = doc.internal.pageSize.getHeight();
-    if (currentY + 40 > ph - 20) {
-      doc.addPage();
-      desenharCabecalho(doc, (doc.internal as any).getNumberOfPages(), logoGrandeB64, logoGateB64, link);
-      currentY = 32;
-    }
-    gerarTabelaJuros(doc, lancamentosComJuros, currentY, logoGrandeB64, logoGateB64);
-  }
-
-  adicionarRodape(doc, link);
-
-  doc.save(`relatorio-token-${tokenUsado.slice(0, 8)}.pdf`);
-}
