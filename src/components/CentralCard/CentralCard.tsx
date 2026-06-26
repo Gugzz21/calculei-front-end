@@ -120,6 +120,18 @@ function CentralCard() {
             placeholder="Complemento (ex: Nº Processo, Contratada...)"
             className="bg-white dark:bg-[#010409] border border-slate-300 dark:border-[#21262d] h-[35px] w-full px-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-500 dark:hover:border-slate-500"
           />
+
+          {/* Cards informativos de multa diária */}
+          {form.tipoCalculo === "multadiaria" && (
+            <div className="w-full flex flex-row flex-wrap gap-3 items-center mt-2">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-200 border border-[#E3D21A] dark:border-[#E3D21A]/50 bg-[#FFFADF] dark:bg-[#FFFADF]/10 p-2 h-[60px] flex-1 min-w-[120px] rounded-md flex flex-col justify-center">
+                Total de dias: <br />{totalDias}
+              </div>
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-200 border border-[#E3D21A] dark:border-[#E3D21A]/50 bg-[#FFFADF] dark:bg-[#FFFADF]/10 p-2 h-[60px] flex-1 min-w-[120px] rounded-md flex flex-col justify-center">
+                Multa total: <br /> R$ {multaTotal.toFixed(2).replace(".", ",")}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Linha 2 (Ocupa colunas 1 e 2 sob Tipo e Índice) */}
@@ -186,20 +198,8 @@ function CentralCard() {
               min={form.dataInicial || undefined}
             />
           </div>
-        </div>
-        </div>
-
-        {/* Cards informativos de multa diária */}
-        {form.tipoCalculo === "multadiaria" && (
-          <div className="w-full sm:w-auto flex flex-row flex-wrap gap-3 items-center sm:pt-6">
-            <div className="text-sm font-medium text-gray-700 dark:text-gray-200 border border-[#E3D21A] dark:border-[#E3D21A]/50 bg-[#FFFADF] dark:bg-[#FFFADF]/10 p-2 h-[60px] w-[148px] rounded-md">
-              Total de dias: <br />{totalDias}
-            </div>
-            <div className="text-sm font-medium text-gray-700 dark:text-gray-200 border border-[#E3D21A] dark:border-[#E3D21A]/50 bg-[#FFFADF] dark:bg-[#FFFADF]/10 p-2 h-[60px] w-[148px] rounded-md">
-              Multa total: <br /> R$ {multaTotal.toFixed(2).replace(".", ",")}
-            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* ── Painel de juros ─────────────────────────────────────────── */}
