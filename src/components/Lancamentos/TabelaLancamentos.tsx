@@ -70,7 +70,7 @@ function TabelaLancamentos({
         <div>Data inicial</div>
         <div>Data final</div>
         <div>Valor principal</div>
-        <div>Índice</div>
+        <div>Índice de correção</div>
         <div>Fator de correção</div>
         <div>Valor corrigido</div>
         <div>Juros</div>

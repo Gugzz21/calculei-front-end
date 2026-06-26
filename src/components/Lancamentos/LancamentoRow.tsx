@@ -26,8 +26,10 @@ interface SubComponentProps extends LancamentoRowProps {
 // Nova ordem: expand | Data inicial | Data final | Valor principal | Índice | Fator de correção | Valor corrigido | Juros | Total devido | ações
 
 function formatFatorCorrecao(value: number): string {
-  const formatted = Number(value).toFixed(8).replace(".", ",");
-  return `${formatted} %`;
+  // Exibe o índice de correção no formato (percentual/100)+1
+  // Ex: 15,3% → 1,15300000
+  const indice = (value / 100) + 1;
+  return Number(indice).toFixed(8).replace(".", ",");
 }
 
 function formatPercent2(value: number): string {
@@ -52,11 +54,11 @@ function LancamentoRowDesktop({ item, isExpanded, onRemover, onEditar, onDuplica
       <div>{formatDate(item.dataCalculo)}</div>
       {/* Valor principal */}
       <div>{formatBRL(item.valorPrincipal)}</div>
-      {/* Índice */}
+      {/* Índice de correção */}
       <div className="truncate pr-2 text-gray-600 dark:text-gray-400" title={item.indiceCorrecao}>
         {item.indiceCorrecao}
       </div>
-      {/* Fator de correção */}
+      {/* Índice de correção (fator) */}
       <div>{formatFatorCorrecao(item.percentualCorrecao)}</div>
       {/* Valor corrigido */}
       <div>{formatBRL(item.valorAtualizado)}</div>
@@ -169,13 +171,13 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
         {/* ── Mobile: campos omitidos na grade principal ── */}
         <div className="grid grid-cols-2 md:hidden gap-x-4 gap-y-4 mb-4">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Índice</span>
+            <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Índice de correção</span>
             <span className="text-sm font-medium text-slate-800 dark:text-slate-300 bg-white dark:bg-[#0d1117] border border-slate-300 dark:border-[#21262d] rounded-md px-2 py-0.5 w-fit">
               {item.indiceCorrecao}
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Fator de correção</span>
+            <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-1">Índice de correção (fator)</span>
             <span className="text-sm font-medium text-slate-800 dark:text-slate-300">{formatFatorCorrecao(item.percentualCorrecao)}</span>
           </div>
           <div className="flex flex-col">
@@ -306,7 +308,13 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
             {item.itensJuros && item.itensJuros.length > 0 ? (
               <div className="flex flex-col gap-4 divide-y divide-blue-200/50 dark:divide-blue-900/30">
                 {item.itensJuros.map((sub, sIdx) => (
-                  <div key={sIdx} className={`grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-3 ${sIdx > 0 ? "pt-3" : ""}`}>
+                  <div key={sIdx} className={`grid grid-cols-2 md:grid-cols-6 gap-x-6 gap-y-3 ${sIdx > 0 ? "pt-3" : ""}`}>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Índice de juros</span>
+                      <span className="text-sm font-medium text-slate-800 dark:text-slate-300 bg-white dark:bg-[#0d1117] border border-blue-200 dark:border-blue-900/50 rounded-md px-2 py-0.5 w-fit">
+                        {sub.indice}
+                      </span>
+                    </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Período de juros</span>
                       <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
@@ -318,7 +326,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                       <span className="text-sm font-medium text-slate-800 dark:text-slate-300">{sub.dias}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Fator de juros</span>
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Taxa aplicada</span>
                       <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
                         {sub.taxa.includes("%") ? sub.taxa : `${sub.taxa}%`}
                       </span>
@@ -328,7 +336,7 @@ function LancamentoRowExpanded({ item }: { item: LancamentoItem }) {
                       <span className="text-sm font-medium text-blue-700 dark:text-blue-300">{formatPercent2(sub.percentual)}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Juros</span>
+                      <span className="text-sm font-bold text-slate-500 dark:text-slate-500 tracking-wider mb-0.5">Juros (R$)</span>
                       <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">{formatBRL(sub.valor)}</span>
                     </div>
                   </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import MdPictureAsPdf from "@mui/icons-material/PictureAsPdf";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import { Table, CheckCircle2, Copy, Check, ChevronRight } from "lucide-react";
+import { Table, Copy, Check, ChevronRight } from "lucide-react";
 
 interface ModalRelatorioProps {
     type: "pdf" | "imagem" | "excel";

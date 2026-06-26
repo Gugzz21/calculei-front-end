@@ -158,7 +158,7 @@ function gerarTabelaCorrecao(
   const totalAtualizado = lancamentos.reduce((acc, l) => acc + l.valorAtualizado, 0);
   const totalJuros = lancamentos.reduce((acc, l) => acc + l.juros, 0);
   const totalGeral = lancamentos.reduce((acc, l) => acc + l.total, 0);
-  
+
   const totalEmUfir = ufirValue > 0 ? (totalGeral / ufirValue).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—";
   const ufirUnitStr = ufirValue > 0 ? ufirValue.toLocaleString("pt-BR", { minimumFractionDigits: 4, maximumFractionDigits: 4 }) : "Não disponível";
 

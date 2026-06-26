@@ -66,14 +66,12 @@ export const MONETARY_CORRECTION_JAVA_MAP: Record<string, string> = {
 // ─── Descrição ────────────────────────────────────────────────────────────────
 
 export const DESCRICAO_OPCOES = [
+  { value: "outros", label: "Digite sua descrição..." },
   { value: "ressarci", label: "Ressarcimento" },
-
   { value: "ressarcimentoaoerario", label: "Ressarcimento ao erário" },
-
   { value: "debitosdfp", label: "Débitos da Fazenda Pública" },
   { value: "multacivil", label: "Multa Civil" },
   { value: "honorariosadvocaticios", label: "Honorários Advocatícios" },
-  { value: "outros", label: "Digite sua descrição..." },
 ] as const;
 
 export const DESCRICAO_LABEL: Record<string, string> = Object.fromEntries(
@@ -124,6 +122,6 @@ export const JUROS_DESCRICAO: Record<string, string> = {
   poupancanova: "Poupança Nova: Taxa Selic quando abaixo de 8,5% a.a., ou 0,5% a.m. + TR.",
   poupancaantiga: "Poupança Antiga: 0,5% a.m. até 03/05/2012; 0,5% a.m. + TR a partir de 04/05/2012.",
   poupanca: "Poupança (Antiga + Nova): 0,5% a.m. até 03/05/2012; Taxa Selic quando abaixo de 8,5% a.a., ou 0,5% a.m. + TR a partir de 04/05/2012.",
-  taxalegal: "Taxa Legal: 1% a.m. até 10/01/2003; 0,5% a.m. de 11/01/2003 a 09/01/2006; 1% a.m. a partir de 10/01/2006.",
+  taxalegal: "Taxa Legal (Res. CMN nº 5.171/2024): diferença entre a Selic mensal e a variação do IPCA-15 do mês anterior. Aplica juros simples com fração pro rata. Valores negativos são definidos como zero.",
   especificartaxa: "Taxa a ser especificada pelo usuário.",
 };

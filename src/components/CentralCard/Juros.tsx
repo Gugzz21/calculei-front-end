@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Data from "./Data";
 import { calcularJuros } from "../../services/api";
-import { JUROS_DESCRICAO } from "../../constants/dominios";
+import { JUROS_DESCRICAO, JUROS_LABEL } from "../../constants/dominios";
 import { PercentIcon } from "lucide-react";
 import { useIndices } from "../../hooks/useIndices";
 import { useCalculadoraContext } from "../../contexts/CalculadoraContext";
@@ -173,13 +173,13 @@ function Juros({ onOpenHelp }: JurosProps) {
       {/* Tabela de juros aplicados */}
       {aplicados.length > 0 && (
         <div className="w-full overflow-x-auto mt-2 border border-[#d2daee] dark:border-[#21262d] rounded-md">
-          <table className="w-full min-w-[500px] text-left text-sm">
+          <table className="w-full min-w-[600px] text-left text-sm">
             <thead>
               <tr className="bg-[#e4ebf7] dark:bg-[#0d1117] text-[#1F2022] dark:text-gray-100">
+                <th className="py-3 px-4 font-semibold w-[20%]">Índice</th>
                 <th className="py-3 px-4 font-semibold w-[15%]">Data inicial</th>
                 <th className="py-3 px-4 font-semibold w-[15%]">Data final</th>
-                <th className="py-3 px-4 font-semibold w-[15%]">Dias</th>
-                <th className="py-3 px-4 font-semibold w-[15%]">Fator</th>
+                <th className="py-3 px-4 font-semibold w-[10%]">Dias</th>
                 <th className="py-3 px-4 font-semibold w-[20%]">% Acumulado</th>
                 <th className="py-3 px-4 font-semibold w-[10%] text-center"></th>
               </tr>
@@ -187,10 +187,14 @@ function Juros({ onOpenHelp }: JurosProps) {
             <tbody className="bg-white dark:bg-[#010409]">
               {aplicados.map((item) => (
                 <tr key={item.id} className="border-t border-[#d2daee] dark:border-[#21262d] text-gray-800 dark:text-gray-200">
+                  <td className="py-3 px-4">
+                    <span className="inline-block bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded px-2 py-0.5 text-blue-800 dark:text-blue-300 text-xs font-semibold">
+                      {JUROS_LABEL[item.indice] ?? item.indice}
+                    </span>
+                  </td>
                   <td className="py-3 px-4">{new Date(item.dataInicio + "T12:00:00").toLocaleDateString("pt-BR")}</td>
                   <td className="py-3 px-4">{new Date(item.dataFim + "T12:00:00").toLocaleDateString("pt-BR")}</td>
                   <td className="py-3 px-4">{item.dias}</td>
-                  <td className="py-3 px-4">{item.taxa ? item.taxa.replace(/,00$/, "") : "—"}</td>
                   <td className="py-3 px-4">{item.percentual.toFixed(2).replace(".", ",")}%</td>
                   <td className="py-3 px-4 text-center">
                     <button

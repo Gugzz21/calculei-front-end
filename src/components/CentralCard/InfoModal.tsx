@@ -138,8 +138,15 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
                 Penalidade de caráter coercitivo imposta pelo juiz para compelir a parte ao cumprimento de obrigações de fazer ou não fazer dentro do prazo estabelecido.
               </p>
               <p className="leading-relaxed">
-                O cálculo é realizado de forma linear, multiplicando-se o valor unitário diário da multa pelo número de dias decorridos em mora (dias úteis ou corridos, conforme a decisão judicial).
+                O cálculo é realizado em duas etapas:
               </p>
+              <ol className="list-decimal list-inside space-y-1.5 pl-2">
+                <li><strong>Apuração da multa bruta:</strong> multiplica-se o valor unitário diário pelo número de dias em mora (corridos ou úteis, conforme a decisão judicial).</li>
+                <li><strong>Correção monetária:</strong> o valor bruto resultante é então atualizado pelo índice de correção escolhido (ex.: IPCA-E, SELIC) desde a data inicial até a data do cálculo.</li>
+              </ol>
+              <div className="p-3 bg-orange-50 dark:bg-orange-900/10 border-l-4 border-orange-500 rounded-r text-sm">
+                <strong>Exemplo:</strong> Multa de R$ 100,00/dia por 30 dias = Multa bruta de R$ 3.000,00 → corrigida pelo índice selecionado.
+              </div>
             </div>
           )
         },
@@ -376,16 +383,28 @@ export default function InfoModal({ isOpen, onClose, context, selectedValue }: I
           content: (
 
             <div className="space-y-4 text-sm text-gray-800 dark:text-gray-300">
-              <p className="font-semibold text-gray-950 dark:text-gray-100 text-base">Taxa Legal Judiciária</p>
+              <p className="font-semibold text-gray-950 dark:text-gray-100 text-base">Taxa Legal (Resolução CMN nº 5.171/2024)</p>
 
               <p className="leading-relaxed">
-                Segue a evolução histórica determinada nos tribunais estaduais brasileiros:
+                A Taxa Legal mensal é determinada pela diferença entre a <strong>taxa Selic mensal</strong> e a <strong>taxa de variação do IPCA-15</strong>, ambos do mês anterior ao de referência. Valores negativos são definidos como zero.
               </p>
-              <ul className="list-disc list-inside space-y-1.5 pl-2">
-                <li><strong>Até 10/01/2003:</strong> Incidência de 1% ao mês.</li>
-                <li><strong>De 11/01/2003 a 09/01/2006:</strong> Incidência de 0,5% ao mês (interpretação inicial da taxa do CC/02).</li>
-                <li><strong>A partir de 10/01/2006:</strong> Incidência restaurada para 1% ao mês.</li>
-              </ul>
+
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/10 border-l-4 border-blue-500 rounded-r text-sm space-y-1">
+                <p><strong>Metodologia de cálculo:</strong></p>
+                <ul className="list-disc list-inside space-y-1 pl-2">
+                  <li>Utiliza <strong>juros simples</strong> com acumulação das taxas mensais.</li>
+                  <li>Para frações de mês, apura-se <strong>juros proporcionais pro rata</strong>, com 6 casas decimais, calculados pela razão entre a Taxa Legal do mês e o número de dias corridos do mês, multiplicada pelos dias a apropriar.</li>
+                </ul>
+              </div>
+
+              <div className="p-3 bg-amber-50 dark:bg-amber-900/10 border-l-4 border-amber-500 rounded-r text-sm">
+                <p><strong>Exemplo (30/08/2024 a 31/08/2024):</strong></p>
+                <p className="mt-1">Índice de correção no período: 0,00019526 → Valor de R$ 1.000,00 corrigido para R$ 1.000,20.</p>
+              </div>
+
+              <p className="text-xs text-gray-500 dark:text-gray-500">
+                Referência: Resolução CMN nº 5.171, de 29 de agosto de 2024.
+              </p>
             </div>
           )
         },

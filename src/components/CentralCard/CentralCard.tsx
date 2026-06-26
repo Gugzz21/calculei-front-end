@@ -40,23 +40,24 @@ function CentralCard() {
       dias = (dCalculo - dInicial) > 0 ? Math.floor((dCalculo - dInicial) / 86400000) : 0;
     }
     const valorNumerico = form.valor ? parseInt(form.valor, 10) / 100 : 0;
-    return { totalDias: dias, multaTotal: valorNumerico * 0.01 * dias };
+    // Multa bruta = valor diário × total de dias
+    return { totalDias: dias, multaTotal: valorNumerico * dias };
   }, [form.dataInicial, form.dataCalculo, form.valor]);
 
   // Callbacks memoizados para evitar recriação de funções a cada render.
   // Sem useCallback, cada render cria novas referências, forçando re-render dos filhos.
-  const handleTipoCalculo    = useCallback((v: string) => handleFormChange("tipoCalculo", v), [handleFormChange]);
+  const handleTipoCalculo = useCallback((v: string) => handleFormChange("tipoCalculo", v), [handleFormChange]);
   const handleIndiceCorrecao = useCallback((v: string) => handleFormChange("indiceCorrecao", v), [handleFormChange]);
-  const handleDescricao      = useCallback((v: string) => handleFormChange("descricao", v), [handleFormChange]);
-  const handleComplementar   = useCallback((v: string) => handleFormChange("descricaoComplementar", v), [handleFormChange]);
-  const handleValor          = useCallback((v: string) => handleFormChange("valor", v), [handleFormChange]);
-  const handleDataInicial    = useCallback((v: string) => handleFormChange("dataInicial", v), [handleFormChange]);
-  const handleDataCalculo    = useCallback((v: string) => handleFormChange("dataCalculo", v), [handleFormChange]);
-  const handleOpenTipoCalculo    = useCallback(() => setHelpContext('tipoCalculo'), []);
+  const handleDescricao = useCallback((v: string) => handleFormChange("descricao", v), [handleFormChange]);
+  const handleComplementar = useCallback((v: string) => handleFormChange("descricaoComplementar", v), [handleFormChange]);
+  const handleValor = useCallback((v: string) => handleFormChange("valor", v), [handleFormChange]);
+  const handleDataInicial = useCallback((v: string) => handleFormChange("dataInicial", v), [handleFormChange]);
+  const handleDataCalculo = useCallback((v: string) => handleFormChange("dataCalculo", v), [handleFormChange]);
+  const handleOpenTipoCalculo = useCallback(() => setHelpContext('tipoCalculo'), []);
   const handleOpenIndiceCorrecao = useCallback(() => setHelpContext('indiceCorrecao'), []);
-  const handleOpenJurosIndice    = useCallback(() => setHelpContext('jurosIndice'), []);
-  const handleCloseHelp          = useCallback(() => setHelpContext(null), []);
-  const handleJurosEnabled   = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
+  const handleOpenJurosIndice = useCallback(() => setHelpContext('jurosIndice'), []);
+  const handleCloseHelp = useCallback(() => setHelpContext(null), []);
+  const handleJurosEnabled = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
     handleJurosChange("enabled", e.target.checked), [handleJurosChange]);
 
   return (
@@ -108,8 +109,6 @@ function CentralCard() {
           <Descricao
             value={form.descricao}
             onChange={handleDescricao}
-            complementar={form.descricaoComplementar}
-            onComplementarChange={handleComplementar}
           />
         </div>
       </div>
@@ -141,8 +140,8 @@ function CentralCard() {
                 />
                 <div
                   className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center transition-all duration-200 ${juros.enabled
-                      ? "bg-[#007aff] border-[#007aff]"
-                      : "bg-white border-gray-400 group-hover:border-blue-400"
+                    ? "bg-[#007aff] border-[#007aff]"
+                    : "bg-white border-gray-400 group-hover:border-blue-400"
                     }`}
                 >
                   {juros.enabled && (
@@ -163,24 +162,24 @@ function CentralCard() {
         {/* Data inicial */}
         <div id="tour-datas" className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <div className="w-full sm:w-auto">
-          <Data
-            title="Data inicial"
-            value={form.dataInicial}
-            onChange={handleDataInicial}
-            max={today}
-          />
-        </div>
+            <Data
+              title="Data inicial"
+              value={form.dataInicial}
+              onChange={handleDataInicial}
+              max={today}
+            />
+          </div>
 
-        {/* Data do cálculo */}
-        <div className="w-full sm:w-auto">
-          <Data
-            title="Data do cálculo"
-            value={form.dataCalculo}
-            onChange={handleDataCalculo}
-            max={today}
-            min={form.dataInicial || undefined}
-          />
-        </div>
+          {/* Data do cálculo */}
+          <div className="w-full sm:w-auto">
+            <Data
+              title="Data do cálculo"
+              value={form.dataCalculo}
+              onChange={handleDataCalculo}
+              max={today}
+              min={form.dataInicial || undefined}
+            />
+          </div>
         </div>
 
         {/* Cards informativos de multa diária */}
@@ -197,7 +196,7 @@ function CentralCard() {
       </div>
 
       {/* ── Painel de juros ─────────────────────────────────────────── */}
-        {juros.enabled && !jurosEmbutidos && (
+      {juros.enabled && !jurosEmbutidos && (
         <div className="border border-gray-300 dark:border-[#21262d] rounded-lg p-3 sm:p-4 bg-slate-100/30 dark:bg-[#010409]/30">
           <Juros onOpenHelp={handleOpenJurosIndice} />
         </div>
@@ -241,8 +240,8 @@ function CentralCard() {
           context={helpContext}
           selectedValue={
             helpContext === 'tipoCalculo' ? form.tipoCalculo :
-            helpContext === 'indiceCorrecao' ? form.indiceCorrecao :
-            juros.indice
+              helpContext === 'indiceCorrecao' ? form.indiceCorrecao :
+                juros.indice
           }
         />
       )}
