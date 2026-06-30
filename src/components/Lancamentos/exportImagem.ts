@@ -7,6 +7,8 @@ import { toJpeg } from "html-to-image";
  * Gera apenas o DataUrl de um elemento
  */
 export async function gerarImagemDataUrl(element: HTMLElement | null): Promise<string | null> {
+
+  
   if (!element) return null;
   try {
     const filter = (node: HTMLElement) => !node.classList?.contains('exclude-from-print');
@@ -25,8 +27,10 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
     alert("Nenhum lançamento para exportar.");
     return null;
   }
-
+  console.time("Imagem");
   const dataUrl = await gerarImagemDataUrl(element);
+
+  
   if (!dataUrl) {
     alert("Erro ao gerar imagem.");
     return null;
@@ -45,4 +49,6 @@ export async function baixarImagem(lancamentos: LancamentoItem[], element: HTMLE
     alert("Erro ao salvar o histórico da imagem.");
     return null;
   }
+
+  
 }

@@ -3,6 +3,7 @@ import { FileText, Camera, Table } from "lucide-react";
 interface BotoesExportProps {
   temLancamentos: boolean;
   salvandoPDF: boolean;
+  salvandoImagem?: boolean;
   onGerarPDF: () => void;
   onBaixarImagem: () => void;
   onExportarExcel: () => void;
@@ -11,6 +12,7 @@ interface BotoesExportProps {
 function BotoesExport({
   temLancamentos,
   salvandoPDF,
+  salvandoImagem = false,
   onGerarPDF,
   onBaixarImagem,
   onExportarExcel,
@@ -39,12 +41,16 @@ function BotoesExport({
         <button
           type="button"
           onClick={onBaixarImagem}
-          disabled={!temLancamentos}
+          disabled={!temLancamentos || salvandoImagem}
           title="Salvar tabela como imagem"
-          className={`flex-1 sm:flex-none sm:w-[200px] ${baseBtn} ${!temLancamentos ? inativo : ativo}`}
+          className={`flex-1 sm:flex-none sm:w-[200px] ${baseBtn} ${!temLancamentos || salvandoImagem ? inativo : ativo}`}
         >
-          <Camera className="h-[20px] w-[20px] shrink-0" />
-          <span className="text-[14px]">Printar e salvar</span>
+          {salvandoImagem ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-t-transparent border-[#1F2022] dark:border-gray-100" />
+          ) : (
+            <Camera className="h-[20px] w-[20px] shrink-0" />
+          )}
+          <span className="text-[14px]">{salvandoImagem ? "Processando..." : "Printar e salvar"}</span>
         </button>
 
         <button

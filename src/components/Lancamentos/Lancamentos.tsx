@@ -53,6 +53,7 @@ function Lancamentos() {
   } | null>(null);
   const [duplicandoItem, setDuplicandoItem] = useState<LancamentoItem | null>(null);
   const [salvandoPDF, setSalvandoPDF] = useState(false);
+  const [salvandoImagem, setSalvandoImagem] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
@@ -75,6 +76,11 @@ function Lancamentos() {
 
   const handleBaixarImagem = useCallback(async () => {
     if (!exportRef.current) return;
+    setSalvandoImagem(true);
+    
+    // Aguarda um pequeno ciclo de renderização para que a UI mostre o "Processando..."
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
     try {
       const result = await baixarImagem(lancamentos, exportRef.current);
       if (result) {
@@ -87,6 +93,8 @@ function Lancamentos() {
       } else {
         alert(`Erro ao gerar imagem: ${msg}`);
       }
+    } finally {
+      setSalvandoImagem(false);
     }
   }, [lancamentos]);
 
@@ -198,6 +206,7 @@ function Lancamentos() {
         <BotoesExport
           temLancamentos={lancamentos.length > 0}
           salvandoPDF={salvandoPDF}
+          salvandoImagem={salvandoImagem}
           onGerarPDF={handleGerarPDF}
           onBaixarImagem={handleBaixarImagem}
           onExportarExcel={handleExportarExcel}
