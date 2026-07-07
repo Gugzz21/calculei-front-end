@@ -121,7 +121,3 @@ Utilize os botões no topo da tabela:
 <br>*(Disponível em: [calculeiBackend](https://github.com/Helio-fagundes/calculeiBackend.git))* | Fonte primária — dados históricos dos índices populados no banco de dados local. |
 | **API BCB (Banco Central do Brasil)** | Fallback automático quando o backend não possui dados ou está offline. |
 
-
-```
-
-```
